@@ -48,17 +48,15 @@ export function ChatTab({ game }: { game: Game }) {
     });
 
     let acc = "";
+    let assistantStarted = false;
     const upsert = (chunk: string) => {
       acc += chunk;
       setMessages((prev) => {
-        const last = prev[prev.length - 1];
-        if (last?.role === "assistant" && last.content !== messages[messages.length - 1]?.content) {
-          // last is streaming
+        if (!assistantStarted) {
+          assistantStarted = true;
+          return [...prev, { role: "assistant" as const, content: acc }];
         }
-        if (last?.role === "assistant" && prev.length > next.length) {
-          return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: acc } : m);
-        }
-        return [...prev, { role: "assistant" as const, content: acc }];
+        return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: acc } : m);
       });
     };
 
