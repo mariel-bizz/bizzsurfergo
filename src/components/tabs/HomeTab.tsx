@@ -1,0 +1,159 @@
+import type { TabKey, GameState } from "../AppShell";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket } from "lucide-react";
+import { useState } from "react";
+import banner from "@/assets/bizzsurfer-banner.png";
+import { WaitlistDialog } from "../WaitlistDialog";
+
+type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
+
+const painPoints = [
+  { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
+  { icon: Network, title: "Disconnected enterprise systems", desc: "ERP, HRIS, CRM, BI — each a fortress. Decisions wait on data that never arrives." },
+  { icon: Users, title: "Change fatigue at every level", desc: "Leaders push. Middle management resists. Frontline disengages. Adoption stalls below 40%." },
+  { icon: AlertTriangle, title: "AI agents that just don't decide", desc: "Most copilots wait for prompts. You need autonomous agents that orchestrate outcomes." },
+];
+
+const faqs = [
+  { q: "What's the difference between Agentic AI and AI agents?", a: "AI agents are task-specific, rule-based, human-directed. Agentic AI is autonomous, adaptive, and outcome-driven — it perceives, decides and acts across systems with minimal human steering." },
+  { q: "How fast can we deploy BizzSurfer in our enterprise?", a: "First Agentic AI workflows go live in 2–4 weeks once core systems are connected. Full transformation orchestration typically scales over a 90-day execution sprint." },
+  { q: "Is it secure for regulated industries?", a: "Yes. BizzSurfer runs with role-based access, full audit trails, and supports private deployments. Designed with CISO-grade governance from day one." },
+  { q: "Will it replace our transformation team?", a: "No. It amplifies them. BizzSurfer is human-centred technology — leaders stay in the driver's seat, agents handle the orchestration load." },
+  { q: "What ROI should leaders expect?", a: "Customers report 30–60% reduction in execution time, 2–3x faster decision cycles, and measurable adoption lift across change initiatives within the first quarter." },
+];
+
+export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void; game: Game }) {
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const [waitOpen, setWaitOpen] = useState(false);
+
+  return (
+    <div className="space-y-8 pt-2">
+      {/* Hero */}
+      <section className="relative px-5 pt-6 pb-8 wave-bg overflow-hidden">
+        <div className="relative">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-accent-foreground">
+            <Sparkles className="w-3 h-3" /> For Transformation Leaders
+          </span>
+          <h1 className="mt-4 text-[28px] leading-[1.1] font-bold text-foreground text-balance">
+            Agentic AI Intelligence for <span className="text-primary italic">Business Transformation</span>
+          </h1>
+          <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
+            Connect your enterprise systems. Let Agentic AI orchestrate decisions, adoption and execution — at the speed of the boardroom.
+          </p>
+          <div className="mt-5 flex flex-col gap-2.5">
+            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-sm font-bold" onClick={() => onNavigate("chat")}>
+              Talk to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4" />
+            </Button>
+            <Button size="lg" variant="outline" className="h-12 text-sm font-semibold" onClick={() => setWaitOpen(true)}>
+              Join the Agentic AI launch waitlist
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Banner */}
+      <section className="px-5">
+        <div className="rounded-2xl overflow-hidden shadow-card border border-border">
+          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" />
+        </div>
+      </section>
+
+      {/* Pain points */}
+      <section className="px-5">
+        <div className="flex items-baseline justify-between mb-4">
+          <h2 className="text-xl font-bold text-foreground">The pain you feel</h2>
+          <span className="text-xs text-muted-foreground">4 of 4</span>
+        </div>
+        <div className="space-y-3">
+          {painPoints.map((p) => (
+            <div key={p.title} className="rounded-2xl bg-card border border-border p-4 shadow-card flex gap-3">
+              <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
+                <p.icon className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-foreground">{p.title}</h3>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Gamification card */}
+      <section className="px-5">
+        <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
+          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+          <div className="relative flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Executive Surfer</p>
+              <p className="text-lg font-bold">Level {Math.floor(game.state.xp / 100) + 1}</p>
+            </div>
+            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => onNavigate("profile")}>
+              View
+            </Button>
+          </div>
+          <div className="relative mt-4 grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
+              <p className="text-lg font-bold">{game.state.xp}</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-wider">XP</p>
+            </div>
+            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
+              <p className="text-lg font-bold">{game.state.streak}🔥</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-wider">Streak</p>
+            </div>
+            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
+              <p className="text-lg font-bold">{game.state.badges.length}</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-wider">Badges</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQs */}
+      <section className="px-5">
+        <h2 className="text-xl font-bold text-foreground mb-4">Frequently asked at the C-suite</h2>
+        <div className="space-y-2">
+          {faqs.map((f, i) => {
+            const open = openFaq === i;
+            return (
+              <button
+                key={i}
+                onClick={() => setOpenFaq(open ? null : i)}
+                className="w-full text-left rounded-2xl bg-card border border-border p-4 shadow-card transition-all"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <h3 className="text-sm font-bold text-foreground">{f.q}</h3>
+                  <ChevronDown className={`shrink-0 w-4 h-4 text-primary transition-transform ${open ? "rotate-180" : ""}`} />
+                </div>
+                {open && <p className="mt-2 text-xs text-muted-foreground leading-relaxed">{f.a}</p>}
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* CTA waitlist */}
+      <section className="px-5">
+        <div className="relative rounded-3xl p-6 bg-gradient-primary text-primary-foreground shadow-elegant overflow-hidden">
+          <div className="absolute -bottom-10 -left-10 w-40 h-40 rounded-full bg-white/10 blur-3xl" />
+          <Rocket className="w-7 h-7 mb-3" />
+          <h2 className="text-2xl font-bold leading-tight">BizzSurfer Agentic AI is launching soon</h2>
+          <p className="mt-2 text-sm opacity-95">Be among the first executives to orchestrate transformation with autonomous agents.</p>
+          <Button size="lg" variant="secondary" className="mt-5 w-full bg-white text-primary hover:bg-white/90 h-12 font-bold" onClick={() => setWaitOpen(true)}>
+            Join the waitlist
+          </Button>
+        </div>
+      </section>
+
+      <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {
+        game.update((s) => {
+          const badges = s.badges.includes("Early Adopter") ? s.badges : [...s.badges, "Early Adopter"];
+          return { ...s, xp: s.xp + 50, badges };
+        });
+      }} />
+    </div>
+  );
+}
