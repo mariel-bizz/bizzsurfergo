@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "BizzSurfer Go! — Agentic AI for Business Transformation" },
-      { name: "description", content: "BizzSurfer Go! — Agentic AI Intelligence for Business Transformation leaders. Connect your enterprise systems and let Agentic AI orchestrate your transformation." },
+      { title: "BizzSurfer Go!  Agentic AI & Business Transformation" },
+      { name: "description", content: "BizzSurfer Go! Agentic AI Intelligence for Business Transformation leaders. Connect your enterprise systems and let Agentic AI orchestrate your transformation." },
       { name: "author", content: "BizzSurfer" },
-      { property: "og:title", content: "BizzSurfer Go! — Agentic AI for Business Transformation" },
-      { property: "og:description", content: "Agentic AI Intelligence for Business Transformation leaders." },
+      { property: "og:title", content: "BizzSurfer Go!  Agentic AI & Business Transformation" },
+      { property: "og:description", content: "BizzSurfer Go! Agentic AI Intelligence for Business Transformation leaders. Connect your enterprise systems and let Agentic AI orchestrate your transformation." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "BizzSurfer Go!  Agentic AI & Business Transformation" },
+      { name: "twitter:description", content: "BizzSurfer Go! Agentic AI Intelligence for Business Transformation leaders. Connect your enterprise systems and let Agentic AI orchestrate your transformation." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/372cdf7b-4a78-4f93-8fb4-bfb2c675ee46/id-preview-dce76e76--93cf30e3-bdcc-47f4-a14e-e80c68d0be7a.lovable.app-1778180566801.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/372cdf7b-4a78-4f93-8fb4-bfb2c675ee46/id-preview-dce76e76--93cf30e3-bdcc-47f4-a14e-e80c68d0be7a.lovable.app-1778180566801.png" },
     ],
     links: [
       {
