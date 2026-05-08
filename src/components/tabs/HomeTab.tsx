@@ -4,6 +4,8 @@ import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDow
 import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.png";
 import { WaitlistDialog } from "../WaitlistDialog";
+import { ROICalculator } from "../ROICalculator";
+import { ResourcesSection } from "../ResourcesSection";
 
 type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 
