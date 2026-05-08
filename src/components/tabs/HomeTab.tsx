@@ -4,6 +4,8 @@ import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDow
 import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.png";
 import { WaitlistDialog } from "../WaitlistDialog";
+import { ROICalculator } from "../ROICalculator";
+import { ResourcesSection } from "../ResourcesSection";
 
 type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 
@@ -111,6 +113,14 @@ export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void;
           </div>
         </div>
       </section>
+
+      {/* ROI Calculator */}
+      <section className="px-5">
+        <ROICalculator />
+      </section>
+
+      {/* Resources, partners, socials, integrations */}
+      <ResourcesSection />
 
       {/* FAQs */}
       <section className="px-5">
