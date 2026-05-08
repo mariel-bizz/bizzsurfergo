@@ -2,7 +2,7 @@ import type { TabKey, GameState } from "../AppShell";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket } from "lucide-react";
 import { useState } from "react";
-import banner from "@/assets/bizzsurfer-banner.png";
+import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection } from "../ResourcesSection";
@@ -56,7 +56,7 @@ export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void;
       {/* Banner */}
       <section className="px-5">
         <div className="rounded-2xl overflow-hidden shadow-card border border-border">
-          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1584} height={396} fetchPriority="high" decoding="async" />
+          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
         </div>
       </section>
 
