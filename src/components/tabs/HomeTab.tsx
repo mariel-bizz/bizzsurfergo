@@ -114,6 +114,14 @@ export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void;
         </div>
       </section>
 
+      {/* ROI Calculator */}
+      <section className="px-5">
+        <ROICalculator />
+      </section>
+
+      {/* Resources, partners, socials, integrations */}
+      <ResourcesSection />
+
       {/* FAQs */}
       <section className="px-5">
         <h2 className="text-xl font-bold text-foreground mb-4">Frequently asked at the C-suite</h2>
