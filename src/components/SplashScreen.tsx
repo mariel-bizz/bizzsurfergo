@@ -11,10 +11,10 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-wave transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"}`}>
-      <div className="relative animate-float">
+      <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="relative animate-float">
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-3xl" />
         <img src={logo} alt="BizzSurfer" className="relative w-44 h-44 object-contain" />
-      </div>
+      </a>
       <div className="mt-8 px-8 text-center max-w-sm">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary mb-3">BizzSurfer Go!</p>
         <h1 className="text-2xl font-bold text-foreground text-balance leading-tight">
