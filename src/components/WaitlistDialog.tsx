@@ -7,7 +7,12 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { upsertHubspotWaitlistContact } from "@/lib/hubspot.functions";
 import { toast } from "sonner";
-import { Rocket, CheckCircle2, Pencil, Mail, Briefcase, Building2, User } from "lucide-react";
+import { Rocket, CheckCircle2, Pencil, Mail, Briefcase, Building2, User, Trophy, Sparkles } from "lucide-react";
+
+// XP gamification — earned for joining the waitlist; next milestone is the Executive badge.
+const XP_EARNED = 50;
+const XP_NEXT_BADGE = 200;
+const NEXT_BADGE_NAME = "Executive";
 
 type WaitlistForm = { name: string; email: string; role: string; company: string };
 
