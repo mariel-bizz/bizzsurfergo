@@ -1,7 +1,5 @@
-import type { GameState } from "../AppShell";
+import { useGame } from "../AppShell";
 import { Trophy, Flame, Zap, Award, Target, MessageCircle, Calendar, Rocket, Sparkles } from "lucide-react";
-
-type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 
 const ALL_BADGES = [
   { id: "First Question", label: "First Question", icon: MessageCircle, desc: "Asked your first question to BizzSurfer Go!" },
@@ -12,7 +10,8 @@ const ALL_BADGES = [
   { id: "Early Adopter", label: "Early Adopter", icon: Rocket, desc: "Joined the Agentic AI launch waitlist" },
 ];
 
-export function ProfileTab({ game }: { game: Game }) {
+export function ProfileTab() {
+  const game = useGame();
   const level = Math.floor(game.state.xp / 100) + 1;
   const xpInLevel = game.state.xp % 100;
 
