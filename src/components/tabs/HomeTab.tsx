@@ -62,20 +62,46 @@ export function HomeTab() {
       </section>
 
       {/* Pain points */}
-      <section className="px-5">
-        <div className="flex items-baseline justify-between mb-4">
-          <h2 className="text-xl font-bold text-foreground">The pain you feel</h2>
-          <span className="text-xs text-muted-foreground">4 of 4</span>
+      <section className="relative px-5 py-8 overflow-hidden">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-primary/15 blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 -right-10 w-56 h-56 rounded-full bg-accent/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
         </div>
-        <div className="space-y-3">
-          {painPoints.map((p) => (
-            <div key={p.title} className="rounded-2xl bg-card border border-border p-4 shadow-card flex gap-3">
-              <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
-                <p.icon className="w-5 h-5 text-primary-foreground" />
+
+        <div className="mb-5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-destructive">
+            <AlertTriangle className="w-3 h-3" /> Reality check
+          </span>
+          <h2 className="mt-3 text-2xl font-bold text-foreground leading-tight">
+            The pain you <span className="italic text-primary relative">
+              feel
+              <svg className="absolute left-0 -bottom-1 w-full" height="6" viewBox="0 0 120 6" preserveAspectRatio="none" aria-hidden="true">
+                <path d="M2 4 Q 30 0, 60 3 T 118 2" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
+              </svg>
+            </span> every quarter
+          </h2>
+          <p className="mt-2 text-xs text-muted-foreground">Four friction points stalling enterprise transformation right now.</p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {painPoints.map((p, i) => (
+            <div
+              key={p.title}
+              className="group relative rounded-2xl bg-card/80 backdrop-blur border border-border p-4 shadow-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant hover:border-primary/40 animate-fade-in"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-primary scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
+              <div className="absolute -right-6 -bottom-6 text-[88px] font-black leading-none text-primary/5 group-hover:text-primary/10 transition-colors select-none">
+                0{i + 1}
               </div>
-              <div>
-                <h3 className="text-sm font-bold text-foreground">{p.title}</h3>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{p.desc}</p>
+              <div className="relative flex items-start gap-3">
+                <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
+                  <p.icon className="w-5 h-5 text-primary-foreground" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-sm font-bold text-foreground leading-snug">{p.title}</h3>
+                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{p.desc}</p>
+                </div>
               </div>
             </div>
           ))}
