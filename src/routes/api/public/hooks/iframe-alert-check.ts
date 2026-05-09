@@ -1,6 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { createClient } from "@supabase/supabase-js";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { dispatchAlertNotifications } from "@/lib/alert-notify.server";
+import type { Database } from "@/integrations/supabase/types";
 
 // Configurable thresholds
 const WINDOW_MINUTES = 15;
@@ -13,11 +15,56 @@ const ALERT_KIND = "iframe_failure_rate";
 export const Route = createFileRoute("/api/public/hooks/iframe-alert-check")({
   server: {
     handlers: {
-      POST: async () => runCheck(),
-      GET: async () => runCheck(),
+      POST: async ({ request }) => authorize(request) ?? runCheck(),
+      GET: async ({ request }) => authorize(request) ?? runCheck(),
     },
   },
 });
+
+async function authorize(request: Request): Promise<Response | undefined> {
+  // Option 1: shared cron secret (preferred for scheduled callers)
+  const cronSecret = process.env.IFRAME_ALERT_CRON_SECRET;
+  const provided = request.headers.get("x-cron-secret");
+  if (cronSecret && provided && timingSafeEqualStr(provided, cronSecret)) {
+    return undefined;
+  }
+
+  // Option 2: authenticated admin user (Bearer JWT + has_role admin)
+  const auth = request.headers.get("authorization");
+  if (!auth?.startsWith("Bearer ")) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  const token = auth.slice("Bearer ".length).trim();
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    return new Response("Server misconfigured", { status: 500 });
+  }
+  const sb = createClient<Database>(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+    global: { headers: { Authorization: `Bearer ${token}` } },
+    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+  });
+  const { data: claimsData, error: claimsErr } = await sb.auth.getClaims(token);
+  const userId = claimsData?.claims?.sub;
+  if (claimsErr || !userId) {
+    return new Response("Unauthorized", { status: 401 });
+  }
+  const { data: isAdmin, error: roleErr } = await sb.rpc("has_role", {
+    _user_id: userId,
+    _role: "admin",
+  });
+  if (roleErr || !isAdmin) {
+    return new Response("Forbidden", { status: 403 });
+  }
+  return undefined;
+}
+
+function timingSafeEqualStr(a: string, b: string): boolean {
+  if (a.length !== b.length) return false;
+  let mismatch = 0;
+  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  return mismatch === 0;
+}
 
 async function runCheck(): Promise<Response> {
   const since = new Date(Date.now() - WINDOW_MINUTES * 60_000).toISOString();
