@@ -124,11 +124,50 @@ jobs:
           exit $fail
 
   # ---------------------------------------------------------------------------
-  # 5. Summary gate — fails PR if any critical job failed
+  # 5. SBOM (CycloneDX) — dependency traceability
+  # ---------------------------------------------------------------------------
+  sbom:
+    name: Generate SBOM (CycloneDX)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+      - name: Generate CycloneDX SBOM (JSON + XML)
+        run: |
+          mkdir -p sbom
+          bunx --bun @cyclonedx/cyclonedx-npm \
+            --output-format JSON \
+            --output-file sbom/sbom.cdx.json \
+            --spec-version 1.5
+          bunx --bun @cyclonedx/cyclonedx-npm \
+            --output-format XML \
+            --output-file sbom/sbom.cdx.xml \
+            --spec-version 1.5
+      - name: Summarize SBOM
+        run: |
+          components=$(jq '.components | length' sbom/sbom.cdx.json)
+          echo "## SBOM" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Format: CycloneDX 1.5" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Components: $components" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: \`${GITHUB_SHA}\`" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload SBOM artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx-${{ github.sha }}
+          path: sbom/
+          retention-days: 90
+          if-no-files-found: error
+
+  # ---------------------------------------------------------------------------
+  # 6. Summary gate — fails PR if any critical job failed
   # ---------------------------------------------------------------------------
   gate:
     name: Security gate
-    needs: [dependencies, codeql, secrets, migrations]
+    needs: [dependencies, codeql, secrets, migrations, sbom]
     if: always()
     runs-on: ubuntu-latest
     steps:
