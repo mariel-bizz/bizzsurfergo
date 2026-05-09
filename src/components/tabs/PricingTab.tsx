@@ -48,7 +48,7 @@ const tiers = [
       "Custom Agentic AI workflows pilot",
       "Quarterly board-ready insight reports",
     ],
-    cta: "Talk to sales",
+    cta: "Upgrade to Boardroom",
     highlighted: false,
   },
 ];
@@ -59,9 +59,9 @@ export function PricingTab() {
   return (
     <div className="px-5 py-5 space-y-5">
       <div className="text-center">
-        <span className="inline-block rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground">BizzSurfer Go!</span>
-        <h1 className="mt-3 text-2xl font-bold text-foreground">Pricing built for transformation leaders</h1>
-        <p className="mt-2 text-sm text-muted-foreground">Choose the plan that matches the scale of your ambition.</p>
+        <span className="inline-block rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground">Upgrade</span>
+        <h1 className="mt-3 text-2xl font-bold text-foreground">Upgrade BizzSurfer Go! for transformation leaders</h1>
+        <p className="mt-2 text-sm text-muted-foreground">Choose the upgrade that matches the scale of your ambition.</p>
       </div>
 
       <div className="flex items-center justify-center gap-2">
