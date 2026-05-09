@@ -1,16 +1,23 @@
 import { useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-
 import { MessageCircle } from "lucide-react";
 import { ChatTab } from "./tabs/ChatTab";
+
+const SEEDS_BY_PATH: Record<string, string> = {
+  "/events": "Which upcoming BizzSurfer event is most relevant for a transformation leader like me, and what should I expect to take away?",
+  "/profile": "Based on my XP and streak, what's the next high-impact Agentic AI topic I should explore to level up as a transformation leader?",
+  "/pricing": "Which BizzSurfer Go! upgrade tier fits a leader driving enterprise transformation, and how do I justify it to my board?",
+  "/": "Where should an executive start with Agentic AI for business transformation?",
+};
 
 export function FloatingChat() {
   const [open, setOpen] = useState(false);
   const location = useLocation();
 
-  // Don't show on the dedicated chat page (it's already there)
   if (location.pathname === "/chat") return null;
+
+  const seedPrompt = SEEDS_BY_PATH[location.pathname];
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -31,7 +38,7 @@ export function FloatingChat() {
       >
         <SheetTitle className="sr-only">BizzSurfer Go! Chat</SheetTitle>
         <div className="h-full overflow-hidden">
-          <ChatTab />
+          {open && <ChatTab key={location.pathname} seedPrompt={seedPrompt} />}
         </div>
       </SheetContent>
     </Sheet>

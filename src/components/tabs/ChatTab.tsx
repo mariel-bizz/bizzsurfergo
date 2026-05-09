@@ -17,14 +17,18 @@ const PRESETS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-chat`;
 
-export function ChatTab() {
+export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const game = useGame();
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started." },
   ]);
-  const [input, setInput] = useState("");
+  const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (seedPrompt) setInput(seedPrompt);
+  }, [seedPrompt]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });

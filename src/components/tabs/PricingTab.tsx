@@ -15,7 +15,7 @@ const tiers = [
       "Public events & masterclasses",
       "Daily XP & streak gamification",
     ],
-    cta: "Start free",
+    cta: "Upgrade to Explorer",
     highlighted: false,
   },
   {
