@@ -176,6 +176,7 @@ jobs:
           if [[ "${{ needs.dependencies.result }}" != "success" || \
                 "${{ needs.codeql.result }}"       != "success" || \
                 "${{ needs.secrets.result }}"      != "success" || \
+                "${{ needs.sbom.result }}"         != "success" || \
                 ( "${{ needs.migrations.result }}" != "success" && \
                   "${{ needs.migrations.result }}" != "skipped" ) ]]; then
             echo "One or more security checks failed."
