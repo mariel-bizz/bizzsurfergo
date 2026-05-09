@@ -1,7 +1,26 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/bizzsurfer-logo.png";
+
+const OUTBOUND_URL = "https://www.bizzsurfer.com";
+
+async function trackOutboundClick(source: string) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("outbound_clicks").insert({
+      source,
+      destination: OUTBOUND_URL,
+      user_id: user?.id ?? null,
+      referrer: typeof document !== "undefined" ? document.referrer || null : null,
+      user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+      path: typeof window !== "undefined" ? window.location.pathname : null,
+    });
+  } catch (err) {
+    console.warn("outbound click tracking failed", err);
+  }
+}
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const [fade, setFade] = useState(false);
