@@ -31,6 +31,13 @@ export function HomeTab() {
 
   return (
     <div className="space-y-8 pt-2">
+      {/* Banner */}
+      <section className="px-5 pt-2">
+        <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden shadow-card border border-border">
+          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
+        </a>
+      </section>
+
       {/* Hero */}
       <section className="relative px-5 pt-6 pb-8 wave-bg overflow-hidden">
         <div className="relative">
@@ -54,12 +61,7 @@ export function HomeTab() {
         </div>
       </section>
 
-      {/* Banner */}
-      <section className="px-5">
-        <div className="rounded-2xl overflow-hidden shadow-card border border-border">
-          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
-        </div>
-      </section>
+
 
       {/* Pain points */}
       <section className="px-5">
