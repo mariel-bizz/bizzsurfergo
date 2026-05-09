@@ -14,6 +14,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSeoRoute = AdminSeoRouteImport.update({
+  id: '/admin/seo',
+  path: '/admin/seo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -47,6 +53,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/admin/seo': typeof AdminSeoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,6 +61,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/admin/seo': typeof AdminSeoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -62,13 +70,21 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/admin/seo': typeof AdminSeoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/events' | '/pricing' | '/profile'
+  fullPaths: '/' | '/chat' | '/events' | '/pricing' | '/profile' | '/admin/seo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/events' | '/pricing' | '/profile'
-  id: '__root__' | '/' | '/chat' | '/events' | '/pricing' | '/profile'
+  to: '/' | '/chat' | '/events' | '/pricing' | '/profile' | '/admin/seo'
+  id:
+    | '__root__'
+    | '/'
+    | '/chat'
+    | '/events'
+    | '/pricing'
+    | '/profile'
+    | '/admin/seo'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -77,6 +93,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
+  AdminSeoRoute: typeof AdminSeoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -116,6 +133,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/seo': {
+      id: '/admin/seo'
+      path: '/admin/seo'
+      fullPath: '/admin/seo'
+      preLoaderRoute: typeof AdminSeoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -125,7 +149,18 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
+  AdminSeoRoute: AdminSeoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
