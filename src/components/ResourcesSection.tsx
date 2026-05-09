@@ -5,7 +5,42 @@ import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Plug, Youtube,
 } from "lucide-react";
 
-const partners = ["NVIDIA Inception", "Atlassian", "GitLab", "AWS"];
+const partners = [
+  "Notion",
+  "Apollo.io",
+  "Google for Startups",
+  "Google Maps Cloud Program",
+  "NVIDIA",
+  "GitLab",
+  "Scaleway",
+  "HubSpot for Startups",
+  "MongoDB",
+  "NVIDIA Inception",
+  "Miro",
+  "Microsoft Azure",
+  "Databricks",
+  "DevRev",
+  "Datadog",
+  "Nebius",
+  "Bubble",
+  "Loom",
+  "Atlassian",
+  "Zendesk",
+  "Salesforce",
+  "CircleCI",
+  "Amplitude",
+  "Lambda",
+  "Auth0",
+  "AWS",
+  "QuantPI",
+  "Perplexity",
+  "Deel",
+  "Grafana",
+  "Porter",
+  "Cloudflare",
+  "Confluent",
+  "Intercom",
+];
 
 const resources = [
   { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/resources", internal: true },
@@ -23,18 +58,6 @@ const socials = [
 export function ResourcesSection() {
   return (
     <section className="px-5 space-y-5">
-      {/* Partners */}
-      <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
-        <div className="mt-3 flex flex-wrap gap-2">
-          {partners.map((p) => (
-            <span key={p} className="rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">
-              {p}
-            </span>
-          ))}
-        </div>
-      </div>
-
       {/* Resources grid */}
       <div>
         <h2 className="text-xl font-bold text-foreground mb-3">Explore & download</h2>
@@ -111,6 +134,18 @@ export function ResourcesSection() {
               <s.icon className="w-4 h-4 text-primary" />
               <span className="text-[11px] font-semibold text-foreground">{s.label}</span>
             </a>
+          ))}
+        </div>
+      </div>
+
+      {/* Partners */}
+      <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {partners.map((p) => (
+            <span key={p} className="rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">
+              {p}
+            </span>
           ))}
         </div>
       </div>
