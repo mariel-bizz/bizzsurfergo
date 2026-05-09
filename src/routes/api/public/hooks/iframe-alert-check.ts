@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { dispatchAlertNotifications } from "@/lib/alert-notify.server";
 
 // Configurable thresholds
 const WINDOW_MINUTES = 15;
@@ -74,18 +75,26 @@ async function runCheck(): Promise<Response> {
   }
 
   const pct = Math.round(rate * 100);
-  const { error: insertError } = await supabaseAdmin.from("admin_alerts").insert({
+  const severity: "warning" | "critical" = rate >= 0.8 ? "critical" : "warning";
+  const alert = {
     kind: ALERT_KIND,
-    severity: rate >= 0.8 ? "critical" : "warning",
+    severity,
     title: `Insights iframe failing (${pct}% of last ${WINDOW_MINUTES}m)`,
     message: `${failures}/${attempts} loads failed in the past ${WINDOW_MINUTES} minutes (${errors} errors, ${timeouts} timeouts). Threshold ${Math.round(FAILURE_RATE_THRESHOLD * 100)}%.`,
-    metadata: summary,
-  });
+    metadata: summary as Record<string, unknown>,
+  };
 
+  const { error: insertError } = await supabaseAdmin
+    .from("admin_alerts")
+    .insert({ ...alert, metadata: alert.metadata as never });
   if (insertError) {
     console.error("[iframe-alert-check] insert failed", insertError);
     return Response.json({ ok: false, error: insertError.message }, { status: 500 });
   }
 
-  return Response.json({ ok: true, alerted: true, ...summary });
+  // Fan out to email / Slack / webhook. Failures are logged but never block the alert.
+  const notifications = await dispatchAlertNotifications(alert);
+  console.log("[iframe-alert-check] notifications", notifications);
+
+  return Response.json({ ok: true, alerted: true, notifications, ...summary });
 }
