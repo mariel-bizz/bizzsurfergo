@@ -42,13 +42,6 @@ export const Route = createFileRoute("/")({
               offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
             },
             {
-              "@type": "BreadcrumbList",
-              "@id": `${SITE}/#breadcrumbs`,
-              itemListElement: [
-                { "@type": "ListItem", position: 1, name: "Home", item: `${SITE}/` },
-              ],
-            },
-            {
               "@type": "FAQPage",
               "@id": `${SITE}/#faq`,
               mainEntity: [
