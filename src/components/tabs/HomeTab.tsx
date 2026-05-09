@@ -115,6 +115,23 @@ export function HomeTab() {
         </div>
       </section>
 
+      {/* Marketplace */}
+      <section className="px-5">
+        <Link to="/marketplace" className="block rounded-3xl bg-card border border-border shadow-card p-5 hover:border-primary/40 hover:shadow-soft transition">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0">
+              <Store className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Marketplace</p>
+              <h3 className="text-base font-bold text-foreground">Agents, services & playbooks</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Curated tools to accelerate your transformation.</p>
+            </div>
+            <ArrowRight className="w-5 h-5 text-primary shrink-0" />
+          </div>
+        </Link>
+      </section>
+
       {/* ROI Calculator */}
       <section className="px-5">
         <ROICalculator />
