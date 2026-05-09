@@ -6,8 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Folder, FileIcon, Upload, Trash2, Download, RefreshCw, ArrowLeft } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronRight, Folder, FileIcon, Upload, Trash2, Download, RefreshCw, ArrowLeft, Search, X } from "lucide-react";
 import { toast } from "sonner";
+
+function mimeCategory(m?: string): string {
+  if (!m) return "other";
+  if (m.startsWith("image/")) return "image";
+  if (m.startsWith("video/")) return "video";
+  if (m.startsWith("audio/")) return "audio";
+  if (m === "application/pdf") return "pdf";
+  if (m.startsWith("text/") || m.includes("json") || m.includes("xml") || m.includes("javascript")) return "text";
+  return "other";
+}
 
 const BUCKET = "storage";
 
