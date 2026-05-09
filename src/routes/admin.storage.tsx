@@ -326,7 +326,7 @@ function AdminStoragePage() {
             <p className="text-sm text-muted-foreground">No items match your filters.</p>
           ) : (
             <ul className="divide-y">
-              {filteredFolders.map((e) => (
+              {sortedFolders.map((e) => (
                 <li key={`f-${e.name}`} className="flex items-center justify-between gap-2 py-2">
                   <button
                     onClick={() => enterFolder(e.name)}
