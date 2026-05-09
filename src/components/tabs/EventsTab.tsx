@@ -121,19 +121,23 @@ export function EventsTab() {
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
               <div className="flex gap-2 pt-1">
-                <Button
-                  onClick={() => handleRsvp(e.id, e.href)}
-                  className="flex-1 bg-gradient-primary shadow-soft h-11 font-bold"
-                  disabled={isRsvped}
-                >
-                  {isRsvped ? (
-                    <>
-                      <Check className="w-4 h-4 mr-1" /> RSVP'd
-                    </>
-                  ) : (
-                    e.cta
-                  )}
-                </Button>
+                {isRsvped ? (
+                  <Button
+                    onClick={() => handleCancel(e.id)}
+                    variant="outline"
+                    className="flex-1 h-11 font-bold border-primary/40 text-foreground"
+                  >
+                    <Check className="w-4 h-4 mr-1 text-primary" /> RSVP'd · Cancel
+                    <X className="w-3.5 h-3.5 ml-1 opacity-70" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleRsvp(e.id, e.href)}
+                    className="flex-1 bg-gradient-primary shadow-soft h-11 font-bold"
+                  >
+                    {e.cta}
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon" className="h-11 w-11 shrink-0" aria-label="Add to calendar">
