@@ -52,6 +52,9 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
               <DialogDescription>Get early access when BizzSurfer Agentic AI launches.</DialogDescription>
             </DialogHeader>
             <form onSubmit={submit} className="space-y-3 mt-2">
+              <p className="text-sm text-foreground bg-muted/50 rounded-lg px-3 py-2">
+                Please share your Name, Email and Language to get started! 🙂
+              </p>
               <div>
                 <Label htmlFor="name" className="text-xs font-semibold">Full name</Label>
                 <Input id="name" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1" />
