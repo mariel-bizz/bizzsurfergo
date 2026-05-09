@@ -14,8 +14,13 @@ import {
   BookmarkPlus,
   RotateCcw,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import { listings, categoryMeta, type Category } from "@/lib/marketplace-data";
+import {
+  MarketplaceOnboarding,
+  hasCompletedMarketplaceOnboarding,
+} from "@/components/marketplace/MarketplaceOnboarding";
 import {
   builtInPresets,
   defaultState,
@@ -78,6 +83,7 @@ export function MarketplaceTab() {
   const [saveOpen, setSaveOpen] = useState(false);
   const [presetName, setPresetName] = useState("");
   const [manageOpen, setManageOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const allTags = useMemo(() => {
     const set = new Set<string>();
@@ -104,7 +110,11 @@ export function MarketplaceTab() {
       if (found) {
         applyState(found.state);
         setActivePresetId(found.id);
+        return;
       }
+    }
+    if (!hasCompletedMarketplaceOnboarding()) {
+      setOnboardingOpen(true);
     }
   }, []);
 
@@ -130,6 +140,17 @@ export function MarketplaceTab() {
     applyState(defaultState);
     setActivePresetId(null);
     saveLastPresetId(null);
+  }
+
+  function handleOnboardingApply(
+    state: PresetState,
+    bestPresetId: string | null,
+    label: string,
+  ) {
+    applyState(state);
+    setActivePresetId(bestPresetId);
+    saveLastPresetId(bestPresetId);
+    toast.success(`Tailored marketplace for ${label}`);
   }
 
   function handleSavePreset() {
@@ -254,6 +275,14 @@ export function MarketplaceTab() {
             )}
           </div>
           <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={() => setOnboardingOpen(true)}
+              className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold bg-accent text-accent-foreground"
+              title="Personalize via a quick 3-step wizard"
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              Personalize
+            </button>
             <button
               onClick={() => setSaveOpen(true)}
               className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold bg-gradient-primary text-primary-foreground shadow-soft"
@@ -588,6 +617,12 @@ export function MarketplaceTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <MarketplaceOnboarding
+        open={onboardingOpen}
+        onOpenChange={setOnboardingOpen}
+        onApply={handleOnboardingApply}
+      />
     </div>
   );
 }
