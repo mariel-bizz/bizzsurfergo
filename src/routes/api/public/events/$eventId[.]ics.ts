@@ -6,7 +6,8 @@ export const Route = createFileRoute("/api/public/events/$eventId.ics")({
   server: {
     handlers: {
       GET: async ({ params }) => {
-        const id = Number((params as { eventId: string }).eventId);
+        const raw = (params as Record<string, string>)["eventId.ics"] ?? (params as Record<string, string>).eventId ?? "";
+        const id = Number(raw);
         const e = events.find((x) => x.id === id);
         if (!e) return new Response("Not found", { status: 404 });
         const ics = buildICS(e);
