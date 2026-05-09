@@ -34,7 +34,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { toast } from "sonner";
 
@@ -45,50 +44,6 @@ const categories: { key: Category | "all"; label: string; icon: typeof Bot }[] =
   { key: "templates", label: "Templates", icon: FileText },
 ];
 
-type SortKey = "recommended" | "rating" | "price-asc" | "price-desc" | "title";
-
-const sortOptions: { value: SortKey; label: string }[] = [
-  { value: "recommended", label: "Recommended" },
-  { value: "rating", label: "Top rated" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
-  { value: "title", label: "Name (A–Z)" },
-];
-
-// Extract a numeric price from strings like "€39 / mo", "Free", "Included with Hero".
-function priceValue(price: string): number {
-  const lower = price.toLowerCase();
-  if (lower.includes("free") || lower.includes("included")) return 0;
-  const match = price.match(/(\d[\d,.]*)/);
-  if (!match) return Number.POSITIVE_INFINITY;
-  return parseFloat(match[1].replace(/,/g, ""));
-}
-
-export function MarketplaceTab() {
-  const [active, setActive] = useState<Category | "all">("all");
-  const [query, setQuery] = useState("");
-  const [sort, setSort] = useState<SortKey>("recommended");
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [freeOnly, setFreeOnly] = useState(false);
-  const [minRating, setMinRating] = useState(0);
-
-  const allTags = useMemo(() => {
-    const set = new Set<string>();
-    listings.forEach((l) => l.tags.forEach((t) => set.add(t)));
-    return Array.from(set).sort();
-  }, []);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    const result = listings.filter((l) => {
-      if (active !== "all" && l.category !== active) return false;
-      if (
-        q &&
-        !l.title.toLowerCase().includes(q) &&
-        !l.provider.toLowerCase().includes(q) &&
-        !l.tags.some((t) => t.toLowerCase().includes(q))
-      )
-        return false;
 type SortKey = PresetState["sort"];
 
 const sortOptions: { value: SortKey; label: string }[] = [
@@ -98,6 +53,8 @@ const sortOptions: { value: SortKey; label: string }[] = [
   { value: "price-desc", label: "Price: high to low" },
   { value: "title", label: "Name (A–Z)" },
 ];
+
+const presetGroups: Preset["group"][] = ["Role", "Department", "Transformation", "Custom"];
 
 // Extract a numeric price from strings like "€39 / mo", "Free", "Included with Hero".
 function priceValue(price: string): number {
@@ -122,14 +79,28 @@ export function MarketplaceTab() {
   const [presetName, setPresetName] = useState("");
   const [manageOpen, setManageOpen] = useState(false);
 
-  // Load saved presets on mount and apply last-used preset.
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    listings.forEach((l) => l.tags.forEach((t) => set.add(t)));
+    return Array.from(set).sort();
+  }, []);
+
+  function applyState(s: PresetState) {
+    setActive(s.category);
+    setQuery(s.query);
+    setSort(s.sort);
+    setSelectedTags(s.selectedTags);
+    setFreeOnly(s.freeOnly);
+    setMinRating(s.minRating);
+  }
+
+  // Load saved presets and apply last-used preset on mount.
   useEffect(() => {
     const saved = loadCustomPresets();
     setCustomPresets(saved);
     const lastId = loadLastPresetId();
     if (lastId) {
-      const all = [...builtInPresets, ...saved];
-      const found = all.find((p) => p.id === lastId);
+      const found = [...builtInPresets, ...saved].find((p) => p.id === lastId);
       if (found) {
         applyState(found.state);
         setActivePresetId(found.id);
@@ -146,19 +117,9 @@ export function MarketplaceTab() {
     minRating,
   };
 
-  function applyState(s: PresetState) {
-    setActive(s.category);
-    setQuery(s.query);
-    setSort(s.sort);
-    setSelectedTags(s.selectedTags);
-    setFreeOnly(s.freeOnly);
-    setMinRating(s.minRating);
-  }
-
   function applyPreset(p: Preset) {
-    // Intersect tag selection with tags actually present in the catalog.
-    const validTags = new Set<string>();
-    listings.forEach((l) => l.tags.forEach((t) => validTags.add(t)));
+    // Drop tags not present in the catalog so a preset still partially applies.
+    const validTags = new Set(allTags);
     const filteredTags = p.state.selectedTags.filter((t) => validTags.has(t));
     applyState({ ...p.state, selectedTags: filteredTags });
     setActivePresetId(p.id);
@@ -183,7 +144,7 @@ export function MarketplaceTab() {
     saveLastPresetId(id);
     setPresetName("");
     setSaveOpen(false);
-    toast.success(`Saved preset "${name}"`);
+    toast.success(`Saved preset “${name}”`);
   }
 
   function deletePreset(id: string) {
@@ -196,14 +157,35 @@ export function MarketplaceTab() {
     }
   }
 
-  // Track if current state still matches the active preset; if not, mark as modified.
-  const activePreset = useMemo(() => {
-    const all = [...builtInPresets, ...customPresets];
-    return all.find((p) => p.id === activePresetId) ?? null;
-  }, [activePresetId, customPresets]);
+  const allPresets = useMemo(
+    () => [...builtInPresets, ...customPresets],
+    [customPresets],
+  );
+  const activePreset = useMemo(
+    () => allPresets.find((p) => p.id === activePresetId) ?? null,
+    [allPresets, activePresetId],
+  );
   const presetModified = activePreset
     ? !statesEqual(activePreset.state, currentState)
     : false;
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const result = listings.filter((l) => {
+      if (active !== "all" && l.category !== active) return false;
+      if (
+        q &&
+        !l.title.toLowerCase().includes(q) &&
+        !l.provider.toLowerCase().includes(q) &&
+        !l.tags.some((t) => t.toLowerCase().includes(q))
+      )
+        return false;
+      if (selectedTags.length && !selectedTags.every((t) => l.tags.includes(t)))
+        return false;
+      if (freeOnly && priceValue(l.price) > 0) return false;
+      if (l.rating < minRating) return false;
+      return true;
+    });
 
     const sorted = [...result];
     switch (sort) {
@@ -252,6 +234,87 @@ export function MarketplaceTab() {
           Hand-picked tools to accelerate your Agentic AI transformation.
         </p>
       </header>
+
+      {/* Preset switcher */}
+      <section
+        aria-label="Filter presets"
+        className="rounded-3xl bg-card border border-border p-4 space-y-3"
+      >
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <Bookmark className="w-4 h-4 text-primary shrink-0" />
+            <h2 className="text-sm font-bold text-foreground truncate">
+              Filter presets
+            </h2>
+            {activePreset && (
+              <span className="text-[11px] font-semibold text-muted-foreground truncate">
+                · {activePreset.name}
+                {presetModified ? " (modified)" : ""}
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={() => setSaveOpen(true)}
+              className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold bg-gradient-primary text-primary-foreground shadow-soft"
+              title="Save current filters as a preset"
+            >
+              <BookmarkPlus className="w-3.5 h-3.5" />
+              Save
+            </button>
+            <button
+              onClick={resetFilters}
+              className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold bg-muted text-foreground"
+              title="Reset all filters"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              Reset
+            </button>
+            {customPresets.length > 0 && (
+              <button
+                onClick={() => setManageOpen(true)}
+                className="inline-flex items-center gap-1 rounded-full h-8 px-2 text-[11px] font-bold text-muted-foreground hover:text-foreground"
+                title="Manage saved presets"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          {presetGroups.map((group) => {
+            const items = allPresets.filter((p) => p.group === group);
+            if (items.length === 0) return null;
+            return (
+              <div key={group} className="flex items-start gap-2">
+                <span className="shrink-0 mt-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground w-20">
+                  {group}
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {items.map((p) => {
+                    const isActive = activePresetId === p.id;
+                    return (
+                      <button
+                        key={p.id}
+                        onClick={() => applyPreset(p)}
+                        className={`rounded-full px-3 h-8 text-[11px] font-bold border transition ${
+                          isActive
+                            ? "bg-primary text-primary-foreground border-transparent shadow-soft"
+                            : "bg-muted text-foreground border-transparent hover:border-border"
+                        }`}
+                        aria-pressed={isActive}
+                      >
+                        {p.name}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
 
       <div className="relative">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
@@ -442,6 +505,89 @@ export function MarketplaceTab() {
           Apply to be listed
         </Button>
       </div>
+
+      {/* Save preset dialog */}
+      <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Save filter preset</DialogTitle>
+            <DialogDescription>
+              Capture your current category, tags, sort and rating filters so you can
+              switch back with one tap.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2">
+            <label htmlFor="preset-name" className="text-xs font-bold text-foreground">
+              Preset name
+            </label>
+            <input
+              id="preset-name"
+              value={presetName}
+              onChange={(e) => setPresetName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSavePreset();
+              }}
+              placeholder="e.g. My CMO shortlist"
+              className="w-full h-10 rounded-xl bg-background border border-border px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
+              autoFocus
+            />
+            <p className="text-[11px] text-muted-foreground">
+              Includes: {active === "all" ? "all categories" : active},{" "}
+              {selectedTags.length} tag{selectedTags.length === 1 ? "" : "s"},{" "}
+              {freeOnly ? "free only, " : ""}
+              {minRating > 0 ? `${minRating}+ rating, ` : ""}
+              sort “{sortOptions.find((o) => o.value === sort)?.label}”.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setSaveOpen(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSavePreset} disabled={!presetName.trim()}>
+              Save preset
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manage presets dialog */}
+      <Dialog open={manageOpen} onOpenChange={setManageOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Your saved presets</DialogTitle>
+            <DialogDescription>
+              Remove presets you no longer need. Built-in presets cannot be deleted.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="space-y-2">
+            {customPresets.length === 0 && (
+              <li className="text-sm text-muted-foreground">
+                No custom presets yet.
+              </li>
+            )}
+            {customPresets.map((p) => (
+              <li
+                key={p.id}
+                className="flex items-center justify-between gap-3 rounded-xl bg-muted px-3 py-2"
+              >
+                <span className="text-sm font-bold text-foreground truncate">
+                  {p.name}
+                </span>
+                <button
+                  onClick={() => deletePreset(p.id)}
+                  className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold text-destructive hover:bg-destructive/10"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  Delete
+                </button>
+              </li>
+            ))}
+          </ul>
+          <DialogFooter>
+            <Button onClick={() => setManageOpen(false)}>Done</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
