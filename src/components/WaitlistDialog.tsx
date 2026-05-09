@@ -82,7 +82,35 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
               </p>
             </div>
 
-            <div className="mt-5 rounded-2xl border bg-muted/30 p-4 space-y-2.5">
+            <div className="mt-5 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/5 to-primary/10 p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-primary flex items-center justify-center shadow-soft">
+                    <Trophy className="w-4 h-4 text-primary-foreground" />
+                  </div>
+                  <div>
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground font-semibold">Next badge</div>
+                    <div className="text-sm font-bold">{NEXT_BADGE_NAME}</div>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 text-primary font-bold text-sm">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  +{XP_EARNED} XP
+                </div>
+              </div>
+              <div className="mt-3 h-2 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-gradient-primary transition-all"
+                  style={{ width: `${Math.min(100, (XP_EARNED / XP_NEXT_BADGE) * 100)}%` }}
+                />
+              </div>
+              <div className="mt-1.5 flex justify-between text-[11px] text-muted-foreground font-medium">
+                <span>{XP_EARNED} / {XP_NEXT_BADGE} XP</span>
+                <span>{XP_NEXT_BADGE - XP_EARNED} XP to go</span>
+              </div>
+            </div>
+
+            <div className="mt-4 rounded-2xl border bg-muted/30 p-4 space-y-2.5">
               <ProfileRow icon={<User className="w-4 h-4" />} label="Name" value={savedProfile.name} />
               <ProfileRow icon={<Mail className="w-4 h-4" />} label="Email" value={savedProfile.email} />
               <ProfileRow icon={<Briefcase className="w-4 h-4" />} label="Role" value={savedProfile.role || "—"} />
