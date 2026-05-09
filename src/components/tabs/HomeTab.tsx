@@ -7,12 +7,13 @@ import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection } from "../ResourcesSection";
+import { PainTracker, type PainItem } from "../PainTracker";
 
-const painPoints = [
-  { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
-  { icon: Network, title: "Disconnected enterprise systems", desc: "ERP, HRIS, CRM, BI — each a fortress. Decisions wait on data that never arrives." },
-  { icon: Users, title: "Change fatigue at every level", desc: "Leaders push. Middle management resists. Frontline disengages. Adoption stalls below 40%." },
-  { icon: AlertTriangle, title: "AI agents that just don't decide", desc: "Most copilots wait for prompts. You need autonomous agents that orchestrate outcomes." },
+const painPoints: PainItem[] = [
+  { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
+  { key: "systems", icon: Network, title: "Disconnected enterprise systems", desc: "ERP, HRIS, CRM, BI — each a fortress. Decisions wait on data that never arrives." },
+  { key: "fatigue", icon: Users, title: "Change fatigue at every level", desc: "Leaders push. Middle management resists. Frontline disengages. Adoption stalls below 40%." },
+  { key: "agents", icon: AlertTriangle, title: "AI agents that just don't decide", desc: "Most copilots wait for prompts. You need autonomous agents that orchestrate outcomes." },
 ];
 
 const faqs = [
