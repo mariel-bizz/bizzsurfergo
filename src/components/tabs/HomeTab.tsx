@@ -73,6 +73,16 @@ export function HomeTab() {
         </div>
       </section>
 
+      {/* Inline waitlist form with language selector */}
+      <section className="px-5">
+        <InlineWaitlistForm onJoined={() => {
+          game.update((s) => {
+            const badges = s.badges.includes("Early Adopter") ? s.badges : [...s.badges, "Early Adopter"];
+            return { ...s, xp: s.xp + 50, badges };
+          });
+        }} />
+      </section>
+
 
 
       {/* Pain points */}
