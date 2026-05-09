@@ -14,6 +14,7 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
@@ -50,6 +51,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
+  '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
@@ -141,6 +148,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
+  '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
@@ -161,6 +169,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
+  '/marketplace': typeof MarketplaceRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
@@ -182,6 +191,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed.xml'
     | '/login'
+    | '/marketplace'
     | '/pricing'
     | '/profile'
     | '/resources'
@@ -201,6 +211,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed.xml'
     | '/login'
+    | '/marketplace'
     | '/pricing'
     | '/profile'
     | '/resources'
@@ -220,6 +231,7 @@ export interface FileRouteTypes {
     | '/events'
     | '/feed.xml'
     | '/login'
+    | '/marketplace'
     | '/pricing'
     | '/profile'
     | '/resources'
@@ -240,6 +252,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   LoginRoute: typeof LoginRoute
+  MarketplaceRoute: typeof MarketplaceRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -288,6 +301,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -384,6 +404,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   LoginRoute: LoginRoute,
+  MarketplaceRoute: MarketplaceRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
@@ -399,13 +420,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
