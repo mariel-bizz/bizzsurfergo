@@ -1,28 +1,25 @@
 import { useGame } from "../AppShell";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Languages, Send, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Languages } from "lucide-react";
 import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection } from "../ResourcesSection";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { toast } from "sonner";
 
 const LANGUAGES = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Español" },
-  { code: "fr", label: "Français" },
-  { code: "de", label: "Deutsch" },
-  { code: "pt", label: "Português" },
-  { code: "it", label: "Italiano" },
-  { code: "nl", label: "Nederlands" },
-  { code: "zh", label: "中文" },
-  { code: "ja", label: "日本語" },
+  { code: "en", label: "English", flag: "🇬🇧", greeting: "Hi" },
+  { code: "es", label: "Español", flag: "🇪🇸", greeting: "Hola" },
+  { code: "fr", label: "Français", flag: "🇫🇷", greeting: "Salut" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪", greeting: "Hallo" },
+  { code: "pt", label: "Português", flag: "🇵🇹", greeting: "Olá" },
+  { code: "it", label: "Italiano", flag: "🇮🇹", greeting: "Ciao" },
+  { code: "nl", label: "Nederlands", flag: "🇳🇱", greeting: "Hoi" },
+  { code: "zh", label: "中文", flag: "🇨🇳", greeting: "你好" },
+  { code: "ja", label: "日本語", flag: "🇯🇵", greeting: "こんにちは" },
 ];
 
 const painPoints = [
@@ -45,20 +42,8 @@ export function HomeTab() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [waitOpen, setWaitOpen] = useState(false);
-  const [contact, setContact] = useState({ name: "", email: "", message: "", language: "en" });
-  const [contactSent, setContactSent] = useState(false);
-
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!contact.name.trim() || !contact.email.trim() || !contact.message.trim()) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-    setContactSent(true);
-    toast.success("Thanks! We'll be in touch.", {
-      description: `Replying in ${LANGUAGES.find((l) => l.code === contact.language)?.label}.`,
-    });
-  };
+  const [visitor, setVisitor] = useState({ name: "", language: "en" });
+  const selectedLang = LANGUAGES.find((l) => l.code === visitor.language) ?? LANGUAGES[0];
 
   return (
     <div className="space-y-8 pt-2">
@@ -105,95 +90,61 @@ export function HomeTab() {
 
 
 
-      {/* Contact form with language selection */}
+      {/* Say hi — name + language */}
       <section className="px-5">
         <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-          <div className="flex items-start gap-3 mb-4">
-            <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft shrink-0">
-              <Send className="w-5 h-5 text-primary-foreground" />
-            </div>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="text-3xl" aria-hidden>{selectedLang.flag}</div>
             <div>
-              <h2 className="text-lg font-bold text-foreground">Get in touch</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Tell us about your transformation goals — choose your preferred language.</p>
+              <h2 className="text-lg font-bold text-foreground">
+                {selectedLang.greeting}{visitor.name.trim() ? `, ${visitor.name.trim()}` : " there"} 👋
+              </h2>
+              <p className="text-xs text-muted-foreground mt-0.5">Tell us your name and pick your language.</p>
             </div>
           </div>
 
-          {contactSent ? (
-            <div className="flex flex-col items-center text-center py-6 gap-3">
-              <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-sm font-bold text-foreground">Message received</p>
-                <p className="text-xs text-muted-foreground mt-1">We'll get back to you in {LANGUAGES.find((l) => l.code === contact.language)?.label}.</p>
-              </div>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={() => {
-                  setContactSent(false);
-                  setContact({ name: "", email: "", message: "", language: contact.language });
-                }}
-              >
-                Send another
-              </Button>
+          <div className="space-y-1.5 mb-4">
+            <Label htmlFor="visitor-name" className="text-xs font-semibold">Your name</Label>
+            <Input
+              id="visitor-name"
+              value={visitor.name}
+              maxLength={60}
+              onChange={(e) => setVisitor({ ...visitor, name: e.target.value })}
+              placeholder="e.g. Alex"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold flex items-center gap-1.5">
+              <Languages className="w-3.5 h-3.5" /> Language
+            </Label>
+            <div className="grid grid-cols-3 gap-2">
+              {LANGUAGES.map((l) => {
+                const active = visitor.language === l.code;
+                return (
+                  <button
+                    key={l.code}
+                    type="button"
+                    onClick={() => setVisitor({ ...visitor, language: l.code })}
+                    aria-pressed={active}
+                    className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-2.5 transition-all ${
+                      active
+                        ? "border-primary bg-primary/10 shadow-soft"
+                        : "border-border bg-background hover:bg-accent"
+                    }`}
+                  >
+                    <span className="text-2xl leading-none" aria-hidden>{l.flag}</span>
+                    <span className={`text-[11px] font-semibold ${active ? "text-primary" : "text-foreground"}`}>
+                      {l.label}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-          ) : (
-            <form onSubmit={handleContactSubmit} className="space-y-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="contact-name" className="text-xs font-semibold">Name</Label>
-                <Input
-                  id="contact-name"
-                  value={contact.name}
-                  onChange={(e) => setContact({ ...contact, name: e.target.value })}
-                  placeholder="Jane Doe"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="contact-email" className="text-xs font-semibold">Email</Label>
-                <Input
-                  id="contact-email"
-                  type="email"
-                  value={contact.email}
-                  onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                  placeholder="jane@company.com"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="contact-language" className="text-xs font-semibold flex items-center gap-1.5">
-                  <Languages className="w-3.5 h-3.5" /> Preferred language
-                </Label>
-                <Select
-                  value={contact.language}
-                  onValueChange={(v) => setContact({ ...contact, language: v })}
-                >
-                  <SelectTrigger id="contact-language">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {LANGUAGES.map((l) => (
-                      <SelectItem key={l.code} value={l.code}>{l.label}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="contact-message" className="text-xs font-semibold">Message</Label>
-                <Textarea
-                  id="contact-message"
-                  rows={4}
-                  value={contact.message}
-                  onChange={(e) => setContact({ ...contact, message: e.target.value })}
-                  placeholder="What would you like to discuss?"
-                />
-              </div>
-              <Button type="submit" className="w-full bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-11 font-bold">
-                Send message <ArrowRight className="ml-1 w-4 h-4" />
-              </Button>
-            </form>
-          )}
+          </div>
         </div>
       </section>
+
 
       {/* Pain points */}
       <section className="px-5">
