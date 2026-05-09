@@ -84,7 +84,9 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
       </a>
 
       <div className="mt-6 text-center max-w-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary mb-2">BizzSurfer Go!</p>
+        <p className="mb-3 text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-primary bg-clip-text text-transparent drop-shadow-sm animate-float">
+          BizzSurfer <span className="italic">Go!</span>
+        </p>
         <h1 className="text-xl font-bold text-foreground text-balance leading-tight">
           {selectedLang.greeting}{name.trim() ? `, ${name.trim()}` : ""} 👋
         </h1>
