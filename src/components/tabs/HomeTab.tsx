@@ -61,6 +61,8 @@ export function HomeTab() {
         </div>
       </section>
 
+      <TrustedPartnersSection />
+
 
 
       {/* Pain points */}
