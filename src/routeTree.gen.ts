@@ -22,6 +22,7 @@ import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 
@@ -90,6 +91,11 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
   path: '/admin/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAlertsRoute = AdminAlertsRouteImport.update({
   id: '/admin/alerts',
   path: '/admin/alerts',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -132,6 +139,7 @@ export interface FileRoutesByTo {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -150,6 +158,7 @@ export interface FileRoutesById {
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/alerts': typeof AdminAlertsRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -169,6 +178,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/alerts'
+    | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
     | '/api/public/hooks/iframe-alert-check'
@@ -186,6 +196,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/alerts'
+    | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
     | '/api/public/hooks/iframe-alert-check'
@@ -203,6 +214,7 @@ export interface FileRouteTypes {
     | '/robots.txt'
     | '/sitemap.xml'
     | '/admin/alerts'
+    | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
     | '/api/public/hooks/iframe-alert-check'
@@ -221,6 +233,7 @@ export interface RootRouteChildren {
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
@@ -319,6 +332,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/alerts': {
       id: '/admin/alerts'
       path: '/admin/alerts'
@@ -349,6 +369,7 @@ const rootRouteChildren: RootRouteChildren = {
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminAlertsRoute: AdminAlertsRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
