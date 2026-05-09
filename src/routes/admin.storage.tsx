@@ -198,6 +198,13 @@ function AdminStoragePage() {
 
   const totalShown = sortedFolders.length + sortedFiles.length;
   const isFiltering = q !== "" || mimeFilter !== "all";
+  const isCustomized = isFiltering || sortBy !== "name" || sortDir !== "asc";
+  const resetFilters = () => {
+    setSearch("");
+    setMimeFilter("all");
+    setSortBy("name");
+    setSortDir("asc");
+  };
 
   return (
     <main className="container mx-auto max-w-5xl space-y-4 p-4 pb-24">
