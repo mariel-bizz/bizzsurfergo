@@ -617,6 +617,12 @@ export function MarketplaceTab() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <MarketplaceOnboarding
+        open={onboardingOpen}
+        onOpenChange={setOnboardingOpen}
+        onApply={handleOnboardingApply}
+      />
     </div>
   );
 }
