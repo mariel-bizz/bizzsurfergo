@@ -17,11 +17,11 @@ const painPoints = [
 ];
 
 const faqs = [
-  { q: "What's the difference between Agentic AI and AI agents?", a: "AI agents are task-specific, rule-based, human-directed. Agentic AI is autonomous, adaptive, and outcome-driven — it perceives, decides and acts across systems with minimal human steering." },
-  { q: "How fast can we deploy BizzSurfer in our enterprise?", a: "First Agentic AI workflows go live in 2–4 weeks once core systems are connected. Full transformation orchestration typically scales over a 90-day execution sprint." },
-  { q: "Is it secure for regulated industries?", a: "Yes. BizzSurfer runs with role-based access, full audit trails, and supports private deployments. Designed with CISO-grade governance from day one." },
-  { q: "Will it replace our transformation team?", a: "No. It amplifies them. BizzSurfer is human-centred technology — leaders stay in the driver's seat, agents handle the orchestration load." },
-  { q: "What ROI should leaders expect?", a: "Customers report 30–60% reduction in execution time, 2–3x faster decision cycles, and measurable adoption lift across change initiatives within the first quarter." },
+  { q: "What's the difference between Agentic AI and AI agents?", a: "AI agents handle specific tasks under human direction. Agentic AI is designed to act more autonomously, coordinating decisions and actions across connected systems." },
+  { q: "How fast can we deploy BizzSurfer in our enterprise?", a: "Timelines depend on which systems are connected and the scope of the rollout. Workflows can be introduced incrementally rather than as a single large programme." },
+  { q: "Is it secure for regulated industries?", a: "BizzSurfer is built with role-based access, audit logging, and support for private deployments, so it can fit within governed enterprise environments." },
+  { q: "Will it replace our transformation team?", a: "No. BizzSurfer is built to support transformation teams — people stay in control of decisions while agents help with coordination and execution work." },
+  { q: "What ROI should leaders expect?", a: "Outcomes vary by organisation and use case. The platform is designed to shorten execution cycles, speed up decisions, and improve adoption of change initiatives." },
 ];
 
 export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void; game: Game }) {
