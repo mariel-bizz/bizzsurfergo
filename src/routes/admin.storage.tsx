@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ChevronRight, Folder, FileIcon, Upload, Trash2, Download, RefreshCw, ArrowLeft, Search, X } from "lucide-react";
+import { ChevronRight, Folder, FileIcon, Upload, Trash2, Download, RefreshCw, ArrowLeft, Search, X, ArrowUp, ArrowDown } from "lucide-react";
 import { toast } from "sonner";
 
 function mimeCategory(m?: string): string {
@@ -163,6 +163,8 @@ function AdminStoragePage() {
 
   const [search, setSearch] = useState("");
   const [mimeFilter, setMimeFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"name" | "size" | "updated">("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const availableCategories = Array.from(
     new Set(allFiles.map((f) => mimeCategory(f.metadata?.mimetype)))
@@ -177,7 +179,24 @@ function AdminStoragePage() {
     if (mimeFilter !== "all" && mimeCategory(f.metadata?.mimetype) !== mimeFilter) return false;
     return true;
   });
-  const totalShown = filteredFolders.length + filteredFiles.length;
+
+  const dir = sortDir === "asc" ? 1 : -1;
+  const sortedFolders = [...filteredFolders].sort(
+    (a, b) => a.name.localeCompare(b.name) * (sortBy === "name" ? dir : 1)
+  );
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    if (sortBy === "size") {
+      return ((a.metadata?.size ?? 0) - (b.metadata?.size ?? 0)) * dir;
+    }
+    if (sortBy === "updated") {
+      const at = a.updated_at ?? a.created_at ?? "";
+      const bt = b.updated_at ?? b.created_at ?? "";
+      return at.localeCompare(bt) * dir;
+    }
+    return a.name.localeCompare(b.name) * dir;
+  });
+
+  const totalShown = sortedFolders.length + sortedFiles.length;
   const isFiltering = q !== "" || mimeFilter !== "all";
 
   return (
@@ -277,6 +296,25 @@ function AdminStoragePage() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+              <SelectTrigger className="sm:w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Sort: Name</SelectItem>
+                <SelectItem value="size">Sort: Size</SelectItem>
+                <SelectItem value="updated">Sort: Modified</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+              aria-label={`Sort ${sortDir === "asc" ? "ascending" : "descending"}`}
+              title={sortDir === "asc" ? "Ascending" : "Descending"}
+            >
+              {sortDir === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
@@ -288,7 +326,7 @@ function AdminStoragePage() {
             <p className="text-sm text-muted-foreground">No items match your filters.</p>
           ) : (
             <ul className="divide-y">
-              {filteredFolders.map((e) => (
+              {sortedFolders.map((e) => (
                 <li key={`f-${e.name}`} className="flex items-center justify-between gap-2 py-2">
                   <button
                     onClick={() => enterFolder(e.name)}
@@ -299,7 +337,7 @@ function AdminStoragePage() {
                   </button>
                 </li>
               ))}
-              {filteredFiles.map((e) => (
+              {sortedFiles.map((e) => (
                 <li key={`x-${e.name}`} className="flex flex-wrap items-center justify-between gap-2 py-2">
                   <button
                     onClick={() => handlePreview(e)}
