@@ -50,6 +50,71 @@ export type Database = {
         }
         Relationships: []
       }
+      event_reminder_log: {
+        Row: {
+          id: string
+          reminder_kind: string
+          rsvp_id: string
+          sent_at: string
+        }
+        Insert: {
+          id?: string
+          reminder_kind: string
+          rsvp_id: string
+          sent_at?: string
+        }
+        Update: {
+          id?: string
+          reminder_kind?: string
+          rsvp_id?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_reminder_log_rsvp_id_fkey"
+            columns: ["rsvp_id"]
+            isOneToOne: false
+            referencedRelation: "event_rsvps"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      event_rsvps: {
+        Row: {
+          created_at: string
+          email: string
+          event_href: string | null
+          event_id: number
+          event_location: string | null
+          event_starts_at: string
+          event_title: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          event_href?: string | null
+          event_id: number
+          event_location?: string | null
+          event_starts_at: string
+          event_title: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          event_href?: string | null
+          event_id?: number
+          event_location?: string | null
+          event_starts_at?: string
+          event_title?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       outbound_clicks: {
         Row: {
           created_at: string
