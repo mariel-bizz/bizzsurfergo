@@ -165,6 +165,6 @@ export const validateStructuredData = createServerFn({ method: "POST" })
       jsonLdBlocks: blocks.length,
       detected,
       issues,
-      rawSchemas: flat,
+      rawSchemas: JSON.stringify(flat, null, 2),
     };
   });
