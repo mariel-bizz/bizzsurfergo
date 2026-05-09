@@ -84,7 +84,22 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
                   <Input id="company" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="mt-1" />
                 </div>
               </div>
-              <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-primary font-bold mt-2">
+              <div className="flex items-start gap-2 pt-1">
+                <Checkbox
+                  id="consent"
+                  checked={consent}
+                  onCheckedChange={(v) => setConsent(v === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="consent" className="text-xs leading-snug font-normal text-muted-foreground cursor-pointer">
+                  I agree to BizzSurfer's{" "}
+                  <a href="https://www.bizzsurfer.com/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">Terms</a>{" "}
+                  and{" "}
+                  <a href="https://www.bizzsurfer.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a>{" "}
+                  and consent to be contacted about the launch (GDPR).
+                </Label>
+              </div>
+              <Button type="submit" disabled={loading || !consent} className="w-full h-11 bg-gradient-primary font-bold mt-2">
                 {loading ? "Adding you..." : "Join waitlist"}
               </Button>
             </form>
