@@ -52,7 +52,7 @@ export const Route = createFileRoute("/")({
                   name: "What's the difference between Agentic AI and AI agents?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "AI agents are task-specific, rule-based, human-directed. Agentic AI is autonomous, adaptive, and outcome-driven — it perceives, decides and acts across systems with minimal human steering.",
+                    text: "AI agents handle specific tasks under human direction. Agentic AI is designed to act more autonomously, coordinating decisions and actions across connected systems.",
                   },
                 },
                 {
@@ -60,7 +60,7 @@ export const Route = createFileRoute("/")({
                   name: "How fast can we deploy BizzSurfer in our enterprise?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "First Agentic AI workflows go live in 2–4 weeks once core systems are connected. Full transformation orchestration typically scales over a 90-day execution sprint.",
+                    text: "Timelines depend on which systems are connected and the scope of the rollout. Workflows can be introduced incrementally rather than as a single large programme.",
                   },
                 },
                 {
@@ -68,7 +68,7 @@ export const Route = createFileRoute("/")({
                   name: "Is it secure for regulated industries?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Yes. BizzSurfer runs with role-based access, full audit trails, and supports private deployments. Designed with CISO-grade governance from day one.",
+                    text: "BizzSurfer is built with role-based access, audit logging, and support for private deployments, so it can fit within governed enterprise environments.",
                   },
                 },
                 {
@@ -76,7 +76,7 @@ export const Route = createFileRoute("/")({
                   name: "Will it replace our transformation team?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "No. It amplifies them. BizzSurfer is human-centred technology — leaders stay in the driver's seat, agents handle the orchestration load.",
+                    text: "No. BizzSurfer is built to support transformation teams — people stay in control of decisions while agents help with coordination and execution work.",
                   },
                 },
                 {
@@ -84,7 +84,7 @@ export const Route = createFileRoute("/")({
                   name: "What ROI should leaders expect?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Customers report 30–60% reduction in execution time, 2–3x faster decision cycles, and measurable adoption lift across change initiatives within the first quarter.",
+                    text: "Outcomes vary by organisation and use case. The platform is designed to shorten execution cycles, speed up decisions, and improve adoption of change initiatives.",
                   },
                 },
               ],
