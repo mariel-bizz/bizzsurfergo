@@ -14,15 +14,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 
 const LANGUAGES = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Español" },
-  { code: "fr", label: "Français" },
-  { code: "de", label: "Deutsch" },
-  { code: "pt", label: "Português" },
-  { code: "it", label: "Italiano" },
-  { code: "nl", label: "Nederlands" },
-  { code: "zh", label: "中文" },
-  { code: "ja", label: "日本語" },
+  { code: "en", label: "English", flag: "🇬🇧", greeting: "Hi" },
+  { code: "es", label: "Español", flag: "🇪🇸", greeting: "Hola" },
+  { code: "fr", label: "Français", flag: "🇫🇷", greeting: "Salut" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪", greeting: "Hallo" },
+  { code: "pt", label: "Português", flag: "🇵🇹", greeting: "Olá" },
+  { code: "it", label: "Italiano", flag: "🇮🇹", greeting: "Ciao" },
+  { code: "nl", label: "Nederlands", flag: "🇳🇱", greeting: "Hoi" },
+  { code: "zh", label: "中文", flag: "🇨🇳", greeting: "你好" },
+  { code: "ja", label: "日本語", flag: "🇯🇵", greeting: "こんにちは" },
 ];
 
 const painPoints = [
