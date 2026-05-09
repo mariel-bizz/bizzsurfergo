@@ -7,12 +7,13 @@ import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection } from "../ResourcesSection";
+import { PainTracker, type PainItem } from "../PainTracker";
 
-const painPoints = [
-  { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
-  { icon: Network, title: "Disconnected enterprise systems", desc: "ERP, HRIS, CRM, BI — each a fortress. Decisions wait on data that never arrives." },
-  { icon: Users, title: "Change fatigue at every level", desc: "Leaders push. Middle management resists. Frontline disengages. Adoption stalls below 40%." },
-  { icon: AlertTriangle, title: "AI agents that just don't decide", desc: "Most copilots wait for prompts. You need autonomous agents that orchestrate outcomes." },
+const painPoints: PainItem[] = [
+  { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
+  { key: "systems", icon: Network, title: "Disconnected enterprise systems", desc: "ERP, HRIS, CRM, BI — each a fortress. Decisions wait on data that never arrives." },
+  { key: "fatigue", icon: Users, title: "Change fatigue at every level", desc: "Leaders push. Middle management resists. Frontline disengages. Adoption stalls below 40%." },
+  { key: "agents", icon: AlertTriangle, title: "AI agents that just don't decide", desc: "Most copilots wait for prompts. You need autonomous agents that orchestrate outcomes." },
 ];
 
 const faqs = [
@@ -80,32 +81,10 @@ export function HomeTab() {
               </svg>
             </span> every quarter
           </h2>
-          <p className="mt-2 text-xs text-muted-foreground">Four friction points stalling enterprise transformation right now.</p>
+          <p className="mt-2 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {painPoints.map((p, i) => (
-            <div
-              key={p.title}
-              className="group relative rounded-2xl bg-card/80 backdrop-blur border border-border p-4 shadow-card overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-elegant hover:border-primary/40 animate-fade-in"
-              style={{ animationDelay: `${i * 80}ms` }}
-            >
-              <div className="absolute inset-x-0 top-0 h-1 bg-gradient-primary scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
-              <div className="absolute -right-6 -bottom-6 text-[88px] font-black leading-none text-primary/5 group-hover:text-primary/10 transition-colors select-none">
-                0{i + 1}
-              </div>
-              <div className="relative flex items-start gap-3">
-                <div className="shrink-0 w-11 h-11 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft transition-transform duration-300 group-hover:rotate-6 group-hover:scale-110">
-                  <p.icon className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="text-sm font-bold text-foreground leading-snug">{p.title}</h3>
-                  <p className="text-xs text-muted-foreground mt-1.5 leading-relaxed">{p.desc}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <PainTracker items={painPoints} />
       </section>
 
       {/* Gamification card */}
