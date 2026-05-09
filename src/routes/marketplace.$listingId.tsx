@@ -3,7 +3,7 @@ import { ArrowLeft, ArrowRight, Check, Download, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
-import { categoryMeta, getListing } from "@/lib/marketplace-data";
+import { categoryMeta, getListing, type Listing } from "@/lib/marketplace-data";
 
 export const Route = createFileRoute("/marketplace/$listingId")({
   loader: ({ params }) => {
