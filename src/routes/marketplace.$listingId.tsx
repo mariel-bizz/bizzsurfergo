@@ -1,9 +1,10 @@
+import { useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, ArrowRight, Check, Download, Star } from "lucide-react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { categoryMeta, getListing, type Listing } from "@/lib/marketplace-data";
+import { ListingActionDialog } from "@/components/marketplace/ListingActionDialog";
 
 export const Route = createFileRoute("/marketplace/$listingId")({
   loader: ({ params }) => {
@@ -48,22 +49,7 @@ function ListingDetail() {
   const Icon = meta.icon;
   const isDownload = listing.category === "templates";
   const ActionIcon = isDownload ? Download : ArrowRight;
-
-  const handleAction = () => {
-    if (isDownload) {
-      toast.success(`${listing.title} download starting…`, {
-        description: "Check your email for the file link.",
-      });
-    } else if (listing.category === "agents") {
-      toast.success(`${listing.title} installed`, {
-        description: "Open your workspace to configure it.",
-      });
-    } else {
-      toast.success("Intro requested", {
-        description: `${listing.provider} will reach out within 1 business day.`,
-      });
-    }
-  };
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <div className="px-5 py-5 space-y-5">
@@ -141,13 +127,19 @@ function ListingDetail() {
           <p className="text-base font-bold text-white">{listing.price}</p>
         </div>
         <Button
-          onClick={handleAction}
+          onClick={() => setDialogOpen(true)}
           className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
         >
           <ActionIcon className="w-4 h-4 mr-1.5" />
           {listing.cta}
         </Button>
       </div>
+
+      <ListingActionDialog
+        listing={listing}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 }
