@@ -147,12 +147,24 @@ function validateFAQ(o: Record<string, unknown>, issues: ValidationIssue[]) {
 }
 
 export const validateStructuredData = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: { url: string }) => {
-    if (!data?.url || !/^https?:\/\//i.test(data.url)) throw new Error("Provide an absolute http(s) URL");
+    if (!data?.url) throw new Response("URL required", { status: 400 });
+    assertAllowedUrl(data.url);
     return data;
   })
-  .handler(async ({ data }): Promise<ValidationResult> => {
-    const res = await fetch(data.url, {
+  .handler(async ({ data, context }): Promise<ValidationResult> => {
+    // Admin-only: verify role server-side via has_role RPC.
+    const { data: isAdmin, error: roleErr } = await context.supabase.rpc(
+      "has_role",
+      { _user_id: context.userId, _role: "admin" },
+    );
+    if (roleErr || !isAdmin) {
+      throw new Response("Forbidden: admin role required", { status: 403 });
+    }
+
+    const target = assertAllowedUrl(data.url);
+    const res = await fetch(target.toString(), {
       headers: { "user-agent": "Mozilla/5.0 (compatible; LovableSEOBot/1.0)" },
       redirect: "follow",
     });
