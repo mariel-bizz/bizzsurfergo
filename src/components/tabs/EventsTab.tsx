@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
-import { rsvpToEvent, listMyRsvps } from "@/lib/rsvp.functions";
+import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
 
@@ -27,6 +27,7 @@ export function EventsTab() {
   const game = useGame();
   const navigate = useNavigate();
   const rsvp = useServerFn(rsvpToEvent);
+  const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [authed, setAuthed] = useState(false);
@@ -62,6 +63,16 @@ export function EventsTab() {
       if (href !== "#") window.open(href, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
+    }
+  };
+
+  const handleCancel = async (id: number) => {
+    try {
+      await cancel({ data: { eventId: id } });
+      setRsvpedIds((prev) => prev.filter((x) => x !== id));
+      toast.success("RSVP cancelled. No more reminders for this event.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cancel failed");
     }
   };
 
@@ -110,19 +121,23 @@ export function EventsTab() {
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
               <div className="flex gap-2 pt-1">
-                <Button
-                  onClick={() => handleRsvp(e.id, e.href)}
-                  className="flex-1 bg-gradient-primary shadow-soft h-11 font-bold"
-                  disabled={isRsvped}
-                >
-                  {isRsvped ? (
-                    <>
-                      <Check className="w-4 h-4 mr-1" /> RSVP'd
-                    </>
-                  ) : (
-                    e.cta
-                  )}
-                </Button>
+                {isRsvped ? (
+                  <Button
+                    onClick={() => handleCancel(e.id)}
+                    variant="outline"
+                    className="flex-1 h-11 font-bold border-primary/40 text-foreground"
+                  >
+                    <Check className="w-4 h-4 mr-1 text-primary" /> RSVP'd · Cancel
+                    <X className="w-3.5 h-3.5 ml-1 opacity-70" />
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={() => handleRsvp(e.id, e.href)}
+                    className="flex-1 bg-gradient-primary shadow-soft h-11 font-bold"
+                  >
+                    {e.cta}
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="outline" size="icon" className="h-11 w-11 shrink-0" aria-label="Add to calendar">
