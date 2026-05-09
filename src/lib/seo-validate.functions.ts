@@ -9,7 +9,7 @@ export type ValidationResult = {
   jsonLdBlocks: number;
   detected: { breadcrumbs: number; faqs: number; other: string[] };
   issues: ValidationIssue[];
-  rawSchemas: unknown[];
+  rawSchemas: string;
 };
 
 function extractJsonLd(html: string): unknown[] {
