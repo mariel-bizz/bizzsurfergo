@@ -115,6 +115,48 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_inquiries: {
+        Row: {
+          action_type: string
+          company: string | null
+          created_at: string
+          email: string
+          id: string
+          listing_category: string
+          listing_id: string
+          listing_title: string
+          message: string | null
+          name: string
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          company?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          listing_category: string
+          listing_id: string
+          listing_title: string
+          message?: string | null
+          name: string
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          company?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          listing_category?: string
+          listing_id?: string
+          listing_title?: string
+          message?: string | null
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       outbound_clicks: {
         Row: {
           created_at: string
