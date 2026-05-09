@@ -88,18 +88,25 @@ export function AppShell() {
 
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
-          <div className="mx-auto max-w-md flex items-center justify-between px-4 py-2.5">
-            <Link to="/" className="flex items-center" aria-label="BizzSurfer Go! home">
-              <img src={logo} alt="BizzSurfer Go!" className="h-8 w-auto object-contain" />
+          <div className="mx-auto max-w-md flex items-center justify-between gap-3 px-3 sm:px-4 py-2 sm:py-2.5">
+            <Link to="/" className="flex items-center shrink min-w-0" aria-label="BizzSurfer Go! home">
+              <img
+                src={logo}
+                alt="BizzSurfer Go!"
+                className="h-7 sm:h-9 w-auto max-w-[180px] sm:max-w-[220px] object-contain"
+              />
             </Link>
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
-                <span className="text-xs">🔥</span>
-                <span className="text-xs font-bold text-accent-foreground">{game.state.streak}</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+              <div className="flex items-center gap-1 rounded-full bg-accent px-2 sm:px-2.5 py-1" title={`${game.state.streak} day streak`}>
+                <span className="text-xs leading-none">🔥</span>
+                <span className="text-[11px] sm:text-xs font-bold text-accent-foreground tabular-nums">{game.state.streak}</span>
               </div>
-              <div className="flex items-center gap-1 rounded-full bg-gradient-primary px-2.5 py-1 shadow-soft">
-                <span className="text-xs">⚡</span>
-                <span className="text-xs font-bold text-primary-foreground">{game.state.xp} XP</span>
+              <div className="flex items-center gap-1 rounded-full bg-gradient-primary px-2 sm:px-2.5 py-1 shadow-soft" title={`${game.state.xp} XP`}>
+                <span className="text-xs leading-none">⚡</span>
+                <span className="text-[11px] sm:text-xs font-bold text-primary-foreground tabular-nums">
+                  {game.state.xp}
+                  <span className="hidden sm:inline"> XP</span>
+                </span>
               </div>
             </div>
           </div>
