@@ -4,7 +4,7 @@ import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
 import { Toaster } from "@/components/ui/sonner";
-import logo from "@/assets/bizzsurfer-logo.png";
+import logo from "@/assets/bizzsurfer-go-logo-horizontal.png";
 
 export type TabKey = "home" | "chat" | "events" | "marketplace" | "pricing" | "profile";
 
