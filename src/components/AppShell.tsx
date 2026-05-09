@@ -7,7 +7,7 @@ import { EventsTab } from "./tabs/EventsTab";
 import { PricingTab } from "./tabs/PricingTab";
 import { ProfileTab } from "./tabs/ProfileTab";
 import { Toaster } from "@/components/ui/sonner";
-import logo from "@/assets/bizzsurfer-logo.webp";
+import logo from "@/assets/bizzsurfer-logo.png";
 
 export type TabKey = "home" | "chat" | "events" | "pricing" | "profile";
 
