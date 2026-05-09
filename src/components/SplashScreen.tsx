@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import logo from "@/assets/bizzsurfer-logo.webp";
+import logo from "@/assets/bizzsurfer-logo.png";
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const [fade, setFade] = useState(false);
