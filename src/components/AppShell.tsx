@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Outlet, useLocation } from "@tanstack/react-router";
+import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
 import { Toaster } from "@/components/ui/sonner";
-import logo from "@/assets/bizzsurfer-logo.png";
+import logo from "@/assets/bizzsurfer-go-logo-horizontal.png";
 
 export type TabKey = "home" | "chat" | "events" | "marketplace" | "pricing" | "profile";
 
@@ -89,13 +89,9 @@ export function AppShell() {
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
           <div className="mx-auto max-w-md flex items-center justify-between px-4 py-2.5">
-            <div className="flex items-center gap-2">
-              <img src={logo} alt="" className="w-9 h-9 object-contain" />
-              <div className="leading-tight">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">BizzSurfer</p>
-                <p className="text-base font-bold text-foreground -mt-0.5">Go!</p>
-              </div>
-            </div>
+            <Link to="/" className="flex items-center" aria-label="BizzSurfer Go! home">
+              <img src={logo} alt="BizzSurfer Go!" className="h-8 w-auto object-contain" />
+            </Link>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
                 <span className="text-xs">🔥</span>
