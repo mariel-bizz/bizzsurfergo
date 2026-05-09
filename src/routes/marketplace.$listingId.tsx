@@ -127,13 +127,19 @@ function ListingDetail() {
           <p className="text-base font-bold text-white">{listing.price}</p>
         </div>
         <Button
-          onClick={handleAction}
+          onClick={() => setDialogOpen(true)}
           className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
         >
           <ActionIcon className="w-4 h-4 mr-1.5" />
           {listing.cta}
         </Button>
       </div>
+
+      <ListingActionDialog
+        listing={listing}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
     </div>
   );
 }
