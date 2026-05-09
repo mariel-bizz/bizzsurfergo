@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import logo from "@/assets/bizzsurfer-logo.png";
+import logo from "@/assets/bizzsurfer-go-logo.png";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇬🇧" },
@@ -51,10 +51,9 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
     <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-wave transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"}`}>
       <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="relative animate-float">
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-3xl" />
-        <img src={logo} alt="BizzSurfer" className="relative w-44 h-44 object-contain" />
+        <img src={logo} alt="BizzSurfer Go!" className="relative w-64 h-auto object-contain" />
       </a>
-      <div className="mt-8 px-8 text-center max-w-sm">
-        <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary mb-3">BizzSurfer Go!</p>
+      <div className="mt-6 px-8 text-center max-w-sm">
         <h1 className="text-2xl font-bold text-foreground text-balance leading-tight">
           Agentic AI Intelligence for Business Transformation
         </h1>
