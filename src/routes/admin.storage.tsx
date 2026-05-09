@@ -163,6 +163,8 @@ function AdminStoragePage() {
 
   const [search, setSearch] = useState("");
   const [mimeFilter, setMimeFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"name" | "size" | "updated">("name");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
 
   const availableCategories = Array.from(
     new Set(allFiles.map((f) => mimeCategory(f.metadata?.mimetype)))
@@ -177,7 +179,24 @@ function AdminStoragePage() {
     if (mimeFilter !== "all" && mimeCategory(f.metadata?.mimetype) !== mimeFilter) return false;
     return true;
   });
-  const totalShown = filteredFolders.length + filteredFiles.length;
+
+  const dir = sortDir === "asc" ? 1 : -1;
+  const sortedFolders = [...filteredFolders].sort(
+    (a, b) => a.name.localeCompare(b.name) * (sortBy === "name" ? dir : 1)
+  );
+  const sortedFiles = [...filteredFiles].sort((a, b) => {
+    if (sortBy === "size") {
+      return ((a.metadata?.size ?? 0) - (b.metadata?.size ?? 0)) * dir;
+    }
+    if (sortBy === "updated") {
+      const at = a.updated_at ?? a.created_at ?? "";
+      const bt = b.updated_at ?? b.created_at ?? "";
+      return at.localeCompare(bt) * dir;
+    }
+    return a.name.localeCompare(b.name) * dir;
+  });
+
+  const totalShown = sortedFolders.length + sortedFiles.length;
   const isFiltering = q !== "" || mimeFilter !== "all";
 
   return (
