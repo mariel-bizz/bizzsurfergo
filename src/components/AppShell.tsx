@@ -70,6 +70,7 @@ const PATH_TO_TAB: Record<string, TabKey> = {
   "/": "home",
   "/chat": "chat",
   "/events": "events",
+  "/marketplace": "marketplace",
   "/pricing": "pricing",
   "/profile": "profile",
 };
