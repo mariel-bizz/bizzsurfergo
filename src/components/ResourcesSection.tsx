@@ -137,6 +137,18 @@ export function ResourcesSection() {
           ))}
         </div>
       </div>
+
+      {/* Partners */}
+      <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
+        <div className="mt-3 flex flex-wrap gap-2">
+          {partners.map((p) => (
+            <span key={p} className="rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">
+              {p}
+            </span>
+          ))}
+        </div>
+      </div>
     </section>
   );
 }
