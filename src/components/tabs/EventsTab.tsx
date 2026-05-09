@@ -2,6 +2,8 @@ import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, Users, Mic, Linkedin } from "lucide-react";
 import event1 from "@/assets/event-mariel.png";
+import event2 from "@/assets/event-chro-playbook.png";
+import event3 from "@/assets/event-boards-csuite.png";
 import { toast } from "sonner";
 
 const events = [
@@ -24,12 +26,12 @@ const events = [
     badge: "ROUNDTABLE",
     title: "The CHRO playbook for Agentic AI",
     subtitle: "Closed roundtable for Chief People Officers redesigning the workforce.",
-    date: "Jun 11, 2026",
+    date: "Jun 4, 2026",
     time: "16:00 CET",
     location: "Virtual — Invite only",
     audience: "CHROs & Heads of People",
     speaker: "BizzSurfer Executive Circle",
-    image: null,
+    image: event2,
     cta: "Request invitation",
     href: "#",
   },
@@ -38,12 +40,12 @@ const events = [
     badge: "MASTERCLASS",
     title: "Agentic AI for Boards & C-Suite",
     subtitle: "A 90-minute executive masterclass: from strategy to orchestration.",
-    date: "Jul 02, 2026",
+    date: "Jun 18, 2026",
     time: "15:00 CET",
     location: "Live online",
     audience: "Board members, CEOs, COOs",
     speaker: "BizzSurfer Faculty",
-    image: null,
+    image: event3,
     cta: "Save my seat",
     href: "#",
   },
