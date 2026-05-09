@@ -83,6 +83,7 @@ export function MarketplaceTab() {
   const [saveOpen, setSaveOpen] = useState(false);
   const [presetName, setPresetName] = useState("");
   const [manageOpen, setManageOpen] = useState(false);
+  const [onboardingOpen, setOnboardingOpen] = useState(false);
 
   const allTags = useMemo(() => {
     const set = new Set<string>();
