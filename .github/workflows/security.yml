@@ -129,6 +129,10 @@ jobs:
   sbom:
     name: Generate SBOM (CycloneDX)
     runs-on: ubuntu-latest
+    outputs:
+      artifact-name: ${{ steps.upload.outputs.artifact-name }}
+      artifact-url: ${{ steps.upload.outputs.artifact-url }}
+      components: ${{ steps.summary.outputs.components }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
@@ -148,19 +152,27 @@ jobs:
             --output-file sbom/sbom.cdx.xml \
             --spec-version 1.5
       - name: Summarize SBOM
+        id: summary
         run: |
           components=$(jq '.components | length' sbom/sbom.cdx.json)
-          echo "## SBOM" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Format: CycloneDX 1.5" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Components: $components" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Commit: \`${GITHUB_SHA}\`" >> "$GITHUB_STEP_SUMMARY"
+          echo "components=$components" >> "$GITHUB_OUTPUT"
+          {
+            echo "## SBOM"
+            echo "- Format: CycloneDX 1.5"
+            echo "- Components: $components"
+            echo "- Commit: \`${GITHUB_SHA}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload SBOM artifact
+        id: upload
         uses: actions/upload-artifact@v4
         with:
           name: sbom-cyclonedx-${{ github.sha }}
           path: sbom/
           retention-days: 90
           if-no-files-found: error
+      - name: Expose artifact name
+        run: echo "artifact-name=sbom-cyclonedx-${{ github.sha }}" >> "$GITHUB_OUTPUT"
+        id: name
 
   # ---------------------------------------------------------------------------
   # 6. Summary gate — fails PR if any critical job failed
@@ -171,6 +183,28 @@ jobs:
     if: always()
     runs-on: ubuntu-latest
     steps:
+      - name: Write PR summary
+        if: always()
+        run: |
+          {
+            echo "## Security gate"
+            echo ""
+            echo "| Check | Result |"
+            echo "|---|---|"
+            echo "| Dependencies | ${{ needs.dependencies.result }} |"
+            echo "| CodeQL | ${{ needs.codeql.result }} |"
+            echo "| Secrets | ${{ needs.secrets.result }} |"
+            echo "| Migrations | ${{ needs.migrations.result }} |"
+            echo "| SBOM | ${{ needs.sbom.result }} |"
+            echo ""
+            if [ -n "${{ needs.sbom.outputs.artifact-url }}" ]; then
+              echo "### SBOM artifact"
+              echo ""
+              echo "[Download \`sbom-cyclonedx-${{ github.sha }}\` (${{ needs.sbom.outputs.components }} components)](${{ needs.sbom.outputs.artifact-url }})"
+            else
+              echo "_SBOM artifact not available for this run._"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
       - name: Verify all checks passed
         run: |
           if [[ "${{ needs.dependencies.result }}" != "success" || \
@@ -183,3 +217,4 @@ jobs:
             exit 1
           fi
           echo "All security checks passed."
+
