@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
-import { rsvpToEvent, listMyRsvps } from "@/lib/rsvp.functions";
+import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
 
@@ -27,6 +27,7 @@ export function EventsTab() {
   const game = useGame();
   const navigate = useNavigate();
   const rsvp = useServerFn(rsvpToEvent);
+  const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [authed, setAuthed] = useState(false);
