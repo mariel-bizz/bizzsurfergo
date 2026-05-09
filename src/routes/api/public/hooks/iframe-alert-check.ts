@@ -15,8 +15,8 @@ const ALERT_KIND = "iframe_failure_rate";
 export const Route = createFileRoute("/api/public/hooks/iframe-alert-check")({
   server: {
     handlers: {
-      POST: async ({ request }) => authorize(request) ?? runCheck(),
-      GET: async ({ request }) => authorize(request) ?? runCheck(),
+      POST: async ({ request }) => (await authorize(request)) ?? runCheck(),
+      GET: async ({ request }) => (await authorize(request)) ?? runCheck(),
     },
   },
 });
