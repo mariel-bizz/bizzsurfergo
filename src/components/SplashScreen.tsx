@@ -39,6 +39,7 @@ async function trackOutboundClick(source: string) {
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const [fade, setFade] = useState(false);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
