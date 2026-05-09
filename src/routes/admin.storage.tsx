@@ -198,6 +198,13 @@ function AdminStoragePage() {
 
   const totalShown = sortedFolders.length + sortedFiles.length;
   const isFiltering = q !== "" || mimeFilter !== "all";
+  const isCustomized = isFiltering || sortBy !== "name" || sortDir !== "asc";
+  const resetFilters = () => {
+    setSearch("");
+    setMimeFilter("all");
+    setSortBy("name");
+    setSortDir("asc");
+  };
 
   return (
     <main className="container mx-auto max-w-5xl space-y-4 p-4 pb-24">
@@ -314,6 +321,15 @@ function AdminStoragePage() {
               title={sortDir === "asc" ? "Ascending" : "Descending"}
             >
               {sortDir === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetFilters}
+              disabled={!isCustomized}
+              title="Reset search, type, and sorting"
+            >
+              Reset filters
             </Button>
           </div>
         </CardHeader>
