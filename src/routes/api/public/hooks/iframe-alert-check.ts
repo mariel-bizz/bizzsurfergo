@@ -84,7 +84,9 @@ async function runCheck(): Promise<Response> {
     metadata: summary as Record<string, unknown>,
   };
 
-  const { error: insertError } = await supabaseAdmin.from("admin_alerts").insert(alert);
+  const { error: insertError } = await supabaseAdmin
+    .from("admin_alerts")
+    .insert({ ...alert, metadata: alert.metadata as never });
   if (insertError) {
     console.error("[iframe-alert-check] insert failed", insertError);
     return Response.json({ ok: false, error: insertError.message }, { status: 500 });
