@@ -72,66 +72,68 @@ export function MarketplaceTab() {
         })}
       </div>
 
-      <div className="space-y-3">
-        {filtered.length === 0 && (
-          <p className="text-center text-sm text-muted-foreground py-10">
-            No listings match your search.
-          </p>
-        )}
-        {filtered.map((l) => {
-          const meta = categoryMeta[l.category];
-          const Icon = meta.icon;
-          return (
-            <Link
-              key={l.id}
-              to="/marketplace/$listingId"
-              params={{ listingId: l.id }}
-              className="block rounded-3xl bg-card border border-border shadow-card p-4 transition hover:border-primary/40 hover:shadow-soft"
-            >
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0">
-                  <Icon className="w-5 h-5 text-primary-foreground" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
-                      {meta.label}
-                    </span>
-                    <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-muted-foreground">
-                      <Star className="w-3 h-3 fill-current text-amber-500" />
-                      {l.rating.toFixed(1)}
-                    </span>
+      {filtered.length === 0 ? (
+        <p className="text-center text-sm text-muted-foreground py-10">
+          No listings match your search.
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+          {filtered.map((l) => {
+            const meta = categoryMeta[l.category];
+            const Icon = meta.icon;
+            return (
+              <Link
+                key={l.id}
+                to="/marketplace/$listingId"
+                params={{ listingId: l.id }}
+                className="group h-full flex flex-col rounded-3xl bg-card border border-border shadow-card p-4 transition hover:border-primary/40 hover:shadow-soft hover:-translate-y-0.5"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0">
+                    <Icon className="w-5 h-5 text-primary-foreground" />
                   </div>
-                  <h2 className="mt-0.5 text-base font-bold text-foreground truncate">
-                    {l.title}
-                  </h2>
-                  <p className="text-xs text-muted-foreground">by {l.provider}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-primary">
+                        {meta.label}
+                      </span>
+                      <span className="inline-flex items-center gap-0.5 text-[11px] font-semibold text-muted-foreground">
+                        <Star className="w-3 h-3 fill-current text-amber-500" />
+                        {l.rating.toFixed(1)}
+                      </span>
+                    </div>
+                    <h2 className="mt-0.5 text-base font-bold text-foreground truncate">
+                      {l.title}
+                    </h2>
+                    <p className="text-xs text-muted-foreground truncate">by {l.provider}</p>
+                  </div>
                 </div>
-              </div>
 
-              <p className="mt-3 text-sm text-foreground/90">{l.tagline}</p>
+                <p className="mt-3 text-sm text-foreground/90 line-clamp-3">{l.tagline}</p>
 
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {l.tags.map((t) => (
-                  <span
-                    key={t}
-                    className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground"
-                  >
-                    {t}
+                <div className="mt-3 flex flex-wrap gap-1.5">
+                  {l.tags.slice(0, 3).map((t) => (
+                    <span
+                      key={t}
+                      className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-semibold text-muted-foreground"
+                    >
+                      {t}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="mt-auto pt-4 flex items-center justify-between gap-3 border-t border-border/60 mt-4">
+                  <span className="text-sm font-bold text-foreground">{l.price}</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gradient-primary px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary-foreground shadow-soft transition group-hover:shadow-elegant">
+                    View details
+                    <span aria-hidden>→</span>
                   </span>
-                ))}
-              </div>
-
-              <div className="mt-4 flex items-center justify-between gap-3">
-                <span className="text-sm font-bold text-foreground">{l.price}</span>
-                <span className="text-xs font-bold uppercase tracking-widest text-primary">
-                  View details →
-                </span>
-              </div>
-            </Link>
-          );
-        })}
-      </div>
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      )}
 
       <div className="rounded-3xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant">
         <p className="text-xs font-bold uppercase tracking-widest text-white/80">
