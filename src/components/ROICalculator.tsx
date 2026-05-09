@@ -132,34 +132,38 @@ export function ROICalculator() {
         </div>
       </TooltipProvider>
 
-      {/* Live breakdown visualization */}
-      <div className="mt-5 rounded-xl border border-border bg-muted/30 p-3">
-        <p className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">
-          Live breakdown
-        </p>
-        <div className="space-y-2.5">
-          <BarRow
-            label="Lost annually"
-            value={fmt(live.annualLoss)}
-            pct={lossPct}
-            barClass="bg-destructive/80"
-          />
-          <BarRow
-            label="Recovered with BizzSurfer"
-            value={fmt(live.annualRecovery)}
-            pct={recPct}
-            barClass="bg-gradient-primary"
-          />
-        </div>
-        <p className="mt-2 text-[10px] text-muted-foreground">
-          Recovery factor: <span className="font-semibold text-foreground">{(live.recoveryFactor * 100).toFixed(0)}%</span>
-          {" "}· Updates as you move the sliders.
-        </p>
-      </div>
+      {/* Live breakdown visualization — only after calculate */}
+      {calculated && (
+        <>
+          <div className="mt-5 rounded-xl border border-border bg-muted/30 p-3 animate-fade-in">
+            <p className="text-[11px] uppercase tracking-widest font-semibold text-muted-foreground mb-2">
+              Live breakdown
+            </p>
+            <div className="space-y-2.5">
+              <BarRow
+                label="Lost annually"
+                value={fmt(live.annualLoss)}
+                pct={lossPct}
+                barClass="bg-destructive/80"
+              />
+              <BarRow
+                label="Recovered with BizzSurfer"
+                value={fmt(live.annualRecovery)}
+                pct={recPct}
+                barClass="bg-gradient-primary"
+              />
+            </div>
+            <p className="mt-2 text-[10px] text-muted-foreground">
+              Recovery factor: <span className="font-semibold text-foreground">{(live.recoveryFactor * 100).toFixed(0)}%</span>
+              {" "}· Updates as you move the sliders.
+            </p>
+          </div>
 
-      <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
-        <span className="font-semibold text-foreground">Recovery factor</span> = Efficiency Gain + (Automation Level ÷ 2), capped at 95%. Applied to your total annual loss to estimate yearly recovery.
-      </p>
+          <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed animate-fade-in">
+            <span className="font-semibold text-foreground">Recovery factor</span> = Efficiency Gain + (Automation Level ÷ 2), capped at 95%. Applied to your total annual loss to estimate yearly recovery.
+          </p>
+        </>
+      )}
 
       {calculated ? (
         <>
