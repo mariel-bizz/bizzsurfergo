@@ -44,6 +44,18 @@ export const Route = createFileRoute("/")({
               },
             },
             {
+              "@type": "BreadcrumbList",
+              "@id": "https://bizzsurfergo.lovable.app/#breadcrumbs",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Home",
+                  item: "https://bizzsurfergo.lovable.app/",
+                },
+              ],
+            },
+            {
               "@type": "FAQPage",
               "@id": "https://bizzsurfergo.lovable.app/#faq",
               mainEntity: [
