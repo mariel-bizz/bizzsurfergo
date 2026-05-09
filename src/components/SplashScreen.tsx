@@ -70,7 +70,9 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           </SelectTrigger>
           <SelectContent>
             {LANGUAGES.map((l) => (
-              <SelectItem key={l.code} value={l.code}>{l.label}</SelectItem>
+              <SelectItem key={l.code} value={l.code}>
+                <span className="mr-2" aria-hidden>{l.flag}</span>{l.label}
+              </SelectItem>
             ))}
           </SelectContent>
         </Select>
