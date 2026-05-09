@@ -167,6 +167,10 @@ function AdminSeoPage() {
           </Card>
         </>
       )}
+
+      <Separator className="my-4" />
+      <OutboundClicksPanel />
     </main>
   );
 }
+
