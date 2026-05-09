@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { Outlet, useLocation } from "@tanstack/react-router";
+import { Link, Outlet, useLocation } from "@tanstack/react-router";
 import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
