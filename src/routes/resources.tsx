@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { pageHead } from "@/lib/page-head";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ExternalLink, RefreshCw } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 const INSIGHTS_URL = "https://bizzsurfer.com/insights";
 const LOAD_TIMEOUT_MS = 8000;
@@ -21,33 +22,72 @@ export const Route = createFileRoute("/resources")({
 });
 
 type Status = "loading" | "loaded" | "error";
+type IframeEvent = "loaded" | "error" | "timeout" | "retry";
+
+function trackIframeEvent(event: IframeEvent, durationMs?: number) {
+  const path = durationMs != null ? `${event}?ms=${durationMs}` : event;
+  void supabase
+    .from("outbound_clicks")
+    .insert({
+      source: "resources_iframe",
+      destination: INSIGHTS_URL,
+      path,
+      referrer: typeof document !== "undefined" ? document.referrer || null : null,
+      user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+    })
+    .then(({ error }) => {
+      if (error) console.warn("[analytics] iframe event failed", event, error.message);
+    });
+}
 
 function ResourcesPage() {
   const [status, setStatus] = useState<Status>("loading");
   const [reloadKey, setReloadKey] = useState(0);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const startedAtRef = useRef<number>(Date.now());
+  const reportedRef = useRef<boolean>(false);
 
   useEffect(() => {
     setStatus("loading");
+    reportedRef.current = false;
+    startedAtRef.current = Date.now();
     timeoutRef.current = setTimeout(() => {
-      setStatus((s) => (s === "loading" ? "error" : s));
+      setStatus((s) => {
+        if (s === "loading" && !reportedRef.current) {
+          reportedRef.current = true;
+          trackIframeEvent("timeout", Date.now() - startedAtRef.current);
+          return "error";
+        }
+        return s;
+      });
     }, LOAD_TIMEOUT_MS);
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
   }, [reloadKey]);
 
-  const handleLoad = () => {
+  const handleLoad = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (!reportedRef.current) {
+      reportedRef.current = true;
+      trackIframeEvent("loaded", Date.now() - startedAtRef.current);
+    }
     setStatus("loaded");
-  };
+  }, []);
 
-  const handleError = () => {
+  const handleError = useCallback(() => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    if (!reportedRef.current) {
+      reportedRef.current = true;
+      trackIframeEvent("error", Date.now() - startedAtRef.current);
+    }
     setStatus("error");
-  };
+  }, []);
 
-  const retry = () => setReloadKey((k) => k + 1);
+  const retry = () => {
+    trackIframeEvent("retry");
+    setReloadKey((k) => k + 1);
+  };
 
   return (
     <section className="px-4 pt-4 pb-2">
