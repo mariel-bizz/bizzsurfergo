@@ -5,7 +5,6 @@ import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDow
 import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
-import { InlineWaitlistForm } from "../InlineWaitlistForm";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection } from "../ResourcesSection";
 
@@ -71,16 +70,6 @@ export function HomeTab() {
             </Button>
           </div>
         </div>
-      </section>
-
-      {/* Inline waitlist form with language selector */}
-      <section className="px-5">
-        <InlineWaitlistForm onJoined={() => {
-          game.update((s) => {
-            const badges = s.badges.includes("Early Adopter") ? s.badges : [...s.badges, "Early Adopter"];
-            return { ...s, xp: s.xp + 50, badges };
-          });
-        }} />
       </section>
 
 
