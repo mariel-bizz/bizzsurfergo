@@ -33,9 +33,20 @@ export function HomeTab() {
     <div className="space-y-8 pt-2">
       {/* Banner */}
       <section className="px-5 pt-2">
-        <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden shadow-card border border-border">
-          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
-        </a>
+        <div className="relative rounded-2xl overflow-hidden shadow-card border border-border">
+          <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="block">
+            <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
+          </a>
+          <div className="absolute inset-x-0 top-0 flex justify-center p-3 pointer-events-none">
+            <Button
+              size="sm"
+              onClick={() => setWaitOpen(true)}
+              className="pointer-events-auto bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-9 px-4 text-xs font-bold"
+            >
+              Join the Waitlist <ArrowRight className="ml-1 w-3.5 h-3.5" />
+            </Button>
+          </div>
+        </div>
       </section>
 
       {/* Hero */}
