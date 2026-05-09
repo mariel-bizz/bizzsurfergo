@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
+import { upsertHubspotWaitlistContact } from "@/lib/hubspot.functions";
 import { toast } from "sonner";
 import { Rocket, CheckCircle2 } from "lucide-react";
 
