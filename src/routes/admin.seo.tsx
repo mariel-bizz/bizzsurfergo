@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
+import { AdminGate } from "@/components/AdminGate";
 
 const SITE = "https://bizzsurfergo.lovable.app";
 const PRESET_PATHS = ["/", "/chat", "/events", "/pricing", "/profile"];
@@ -19,7 +20,11 @@ export const Route = createFileRoute("/admin/seo")({
       { name: "robots", content: "noindex, nofollow" },
     ],
   }),
-  component: AdminSeoPage,
+  component: () => (
+    <AdminGate>
+      <AdminSeoPage />
+    </AdminGate>
+  ),
 });
 
 function severityIcon(s: string) {
