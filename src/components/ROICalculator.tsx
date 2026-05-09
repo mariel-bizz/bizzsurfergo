@@ -1,22 +1,26 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { Calculator, TrendingUp } from "lucide-react";
 
 export function ROICalculator() {
   const [employees, setEmployees] = useState(500);
   const [avgSalary, setAvgSalary] = useState(85000);
   const [hoursWasted, setHoursWasted] = useState(6);
+  const [efficiencyGain, setEfficiencyGain] = useState(45);
+  const [automationLevel, setAutomationLevel] = useState(30);
+  const [result, setResult] = useState<{ annualLoss: number; annualRecovery: number } | null>(null);
 
-  const result = useMemo(() => {
+  const calculate = () => {
     const hourlyRate = avgSalary / 2080;
     const weeklyLoss = employees * hoursWasted * hourlyRate;
     const annualLoss = weeklyLoss * 48;
-    // BizzSurfer recovers ~45% of wasted hours
-    const annualRecovery = annualLoss * 0.45;
-    return {
+    // Combined recovery factor: efficiency gain plus automation uplift
+    const recoveryFactor = Math.min(0.95, (efficiencyGain / 100) + (automationLevel / 100) * 0.5);
+    const annualRecovery = annualLoss * recoveryFactor;
+    setResult({
       annualLoss: Math.round(annualLoss),
       annualRecovery: Math.round(annualRecovery),
-    };
-  }, [employees, avgSalary, hoursWasted]);
+    });
+  };
 
   const fmt = (n: number) =>
     new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(n);
@@ -34,18 +38,36 @@ export function ROICalculator() {
         <Field label="Employees impacted" value={employees} min={10} max={50000} step={10} onChange={setEmployees} />
         <Field label="Avg. annual salary (USD)" value={avgSalary} min={30000} max={300000} step={1000} onChange={setAvgSalary} />
         <Field label="Hours wasted per week / person" value={hoursWasted} min={1} max={20} step={1} onChange={setHoursWasted} />
+        <Field label="Expected Efficiency Gain (%)" value={efficiencyGain} min={5} max={90} step={1} onChange={setEfficiencyGain} />
+        <Field label="Level expected of automations (%)" value={automationLevel} min={0} max={100} step={1} onChange={setAutomationLevel} />
       </div>
 
-      <div className="mt-5 rounded-xl bg-gradient-deep p-4 text-primary-foreground">
-        <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Estimated annual recovery</p>
-        <div className="flex items-baseline gap-2 mt-1">
-          <p className="text-2xl font-bold">{fmt(result.annualRecovery)}</p>
-          <TrendingUp className="w-4 h-4 opacity-80" />
-        </div>
-        <p className="mt-1 text-[11px] opacity-80">
-          Out of {fmt(result.annualLoss)} lost annually to disconnected workflows.
-        </p>
-      </div>
+      {result ? (
+        <button
+          type="button"
+          onClick={calculate}
+          className="mt-5 w-full text-left rounded-xl bg-gradient-deep p-4 text-primary-foreground transition-transform hover:scale-[1.01] active:scale-[0.99]"
+          aria-label="Recalculate ROI"
+        >
+          <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Estimated annual recovery</p>
+          <div className="flex items-baseline gap-2 mt-1">
+            <p className="text-2xl font-bold">{fmt(result.annualRecovery)}</p>
+            <TrendingUp className="w-4 h-4 opacity-80" />
+          </div>
+          <p className="mt-1 text-[11px] opacity-80">
+            Out of {fmt(result.annualLoss)} lost annually to disconnected workflows. Tap to recalculate.
+          </p>
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={calculate}
+          className="mt-5 w-full rounded-xl bg-gradient-deep p-4 text-primary-foreground font-semibold transition-transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2"
+        >
+          <Calculator className="w-4 h-4" />
+          Calculate my ROI
+        </button>
+      )}
     </div>
   );
 }
