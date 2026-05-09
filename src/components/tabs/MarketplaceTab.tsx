@@ -152,6 +152,8 @@ export function MarketplaceTab() {
     saveLastPresetId(bestPresetId);
     toast.success(`Tailored marketplace for ${label}`);
   }
+
+  function handleSavePreset() {
     const name = presetName.trim();
     if (!name) return;
     const id = `custom-${Date.now()}`;
