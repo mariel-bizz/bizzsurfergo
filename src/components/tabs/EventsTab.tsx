@@ -26,7 +26,7 @@ const events = [
     badge: "ROUNDTABLE",
     title: "The CHRO playbook for Agentic AI",
     subtitle: "Closed roundtable for Chief People Officers redesigning the workforce.",
-    date: "Jun 4, 2026",
+    date: "Jun 18, 2026",
     time: "16:00 CET",
     location: "Virtual — Invite only",
     audience: "CHROs & Heads of People",
@@ -34,7 +34,6 @@ const events = [
     image: event2,
     cta: "Request invitation",
     href: "#",
-    date_override: true,
   },
   {
     id: 3,
