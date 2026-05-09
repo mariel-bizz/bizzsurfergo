@@ -193,24 +193,7 @@ export function ResourcesSection() {
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
-            <div
-              key={p.name}
-              title={p.name}
-              className="flex h-14 items-center justify-center rounded-xl border border-border bg-background px-2"
-            >
-              {p.slug ? (
-                <img
-                  src={`https://cdn.simpleicons.org/${p.slug}`}
-                  alt={`${p.name} logo`}
-                  loading="lazy"
-                  className="max-h-7 max-w-full object-contain opacity-80"
-                />
-              ) : (
-                <span className="text-center text-[11px] font-bold text-foreground leading-tight">
-                  {p.name}
-                </span>
-              )}
-            </div>
+            <PartnerLogo key={p.name} name={p.name} slug={p.slug} />
           ))}
         </div>
       </div>
