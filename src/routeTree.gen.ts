@@ -22,6 +22,8 @@ import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
+import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
+import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -88,6 +90,17 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
   path: '/admin/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminAlertsRoute = AdminAlertsRouteImport.update({
+  id: '/admin/alerts',
+  path: '/admin/alerts',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiPublicHooksIframeAlertCheckRoute =
+  ApiPublicHooksIframeAlertCheckRouteImport.update({
+    id: '/api/public/hooks/iframe-alert-check',
+    path: '/api/public/hooks/iframe-alert-check',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -101,8 +114,10 @@ export interface FileRoutesByFullPath {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/alerts': typeof AdminAlertsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -116,8 +131,10 @@ export interface FileRoutesByTo {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/alerts': typeof AdminAlertsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -132,8 +149,10 @@ export interface FileRoutesById {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/alerts': typeof AdminAlertsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -149,8 +168,10 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/admin/alerts'
     | '/admin/seo'
     | '/admin/storage'
+    | '/api/public/hooks/iframe-alert-check'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -164,8 +185,10 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/admin/alerts'
     | '/admin/seo'
     | '/admin/storage'
+    | '/api/public/hooks/iframe-alert-check'
   id:
     | '__root__'
     | '/'
@@ -179,8 +202,10 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/admin/alerts'
     | '/admin/seo'
     | '/admin/storage'
+    | '/api/public/hooks/iframe-alert-check'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -195,8 +220,10 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminAlertsRoute: typeof AdminAlertsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
+  ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -292,6 +319,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/alerts': {
+      id: '/admin/alerts'
+      path: '/admin/alerts'
+      fullPath: '/admin/alerts'
+      preLoaderRoute: typeof AdminAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/hooks/iframe-alert-check': {
+      id: '/api/public/hooks/iframe-alert-check'
+      path: '/api/public/hooks/iframe-alert-check'
+      fullPath: '/api/public/hooks/iframe-alert-check'
+      preLoaderRoute: typeof ApiPublicHooksIframeAlertCheckRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -307,8 +348,10 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminAlertsRoute: AdminAlertsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
+  ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -14,6 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_alerts: {
+        Row: {
+          acknowledged_at: string | null
+          acknowledged_by: string | null
+          created_at: string
+          id: string
+          kind: string
+          message: string
+          metadata: Json
+          severity: string
+          title: string
+        }
+        Insert: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          message: string
+          metadata?: Json
+          severity?: string
+          title: string
+        }
+        Update: {
+          acknowledged_at?: string | null
+          acknowledged_by?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          message?: string
+          metadata?: Json
+          severity?: string
+          title?: string
+        }
+        Relationships: []
+      }
       outbound_clicks: {
         Row: {
           created_at: string
