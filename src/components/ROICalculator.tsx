@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Calculator, TrendingUp } from "lucide-react";
+import { Calculator, TrendingUp, Info } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export function ROICalculator() {
   const [employees, setEmployees] = useState(500);
