@@ -93,6 +93,9 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Agentic AI Intelligence for Business Transformation
         </p>
+        <p className="mt-3 text-sm font-medium text-foreground">
+          Please share your Name, Email and Language to get started! 🙂
+        </p>
       </div>
 
       <div className="mt-6 w-full max-w-sm rounded-2xl bg-card/80 backdrop-blur border border-border p-4 shadow-card space-y-4">
@@ -105,6 +108,19 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Alex"
             autoComplete="given-name"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="splash-email" className="text-xs font-semibold">Email</Label>
+          <Input
+            id="splash-email"
+            type="email"
+            value={email}
+            maxLength={255}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            autoComplete="email"
           />
         </div>
 
