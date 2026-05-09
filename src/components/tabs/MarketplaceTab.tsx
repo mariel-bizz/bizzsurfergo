@@ -276,6 +276,14 @@ export function MarketplaceTab() {
           </div>
           <div className="flex items-center gap-1 shrink-0">
             <button
+              onClick={() => setOnboardingOpen(true)}
+              className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold bg-accent text-accent-foreground"
+              title="Personalize via a quick 3-step wizard"
+            >
+              <Wand2 className="w-3.5 h-3.5" />
+              Personalize
+            </button>
+            <button
               onClick={() => setSaveOpen(true)}
               className="inline-flex items-center gap-1 rounded-full h-8 px-3 text-[11px] font-bold bg-gradient-primary text-primary-foreground shadow-soft"
               title="Save current filters as a preset"
