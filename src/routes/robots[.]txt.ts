@@ -11,6 +11,7 @@ Allow: /
 Disallow: /admin/
 
 Sitemap: ${SITE}/sitemap.xml
+Sitemap: ${SITE}/feed.xml
 `;
         return new Response(body, {
           headers: {
