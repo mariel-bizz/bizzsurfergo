@@ -6,10 +6,10 @@ export const Route = createFileRoute("/pricing")({
   head: () =>
     pageHead({
       path: "/pricing",
-      title: "Pricing — BizzSurfer Go!",
+      title: "Upgrade — BizzSurfer Go!",
       description:
-        "BizzSurfer Go! pricing for enterprise transformation teams adopting Agentic AI.",
-      breadcrumbName: "Pricing",
+        "Upgrade BizzSurfer Go! for enterprise transformation teams adopting Agentic AI.",
+      breadcrumbName: "Upgrade",
     }),
   component: PricingTab,
 });
