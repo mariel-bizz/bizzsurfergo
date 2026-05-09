@@ -43,7 +43,7 @@ export const Route = createFileRoute("/marketplace/$listingId")({
 });
 
 function ListingDetail() {
-  const { listing } = Route.useLoaderData();
+  const { listing } = Route.useLoaderData() as { listing: Listing };
   const meta = categoryMeta[listing.category];
   const Icon = meta.icon;
   const isDownload = listing.category === "templates";
