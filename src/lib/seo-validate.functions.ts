@@ -1,4 +1,33 @@
 import { createServerFn } from "@tanstack/react-start";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+// Only same-app domains may be fetched by the validator. This is an admin-only
+// endpoint, but we still constrain the URL to prevent SSRF if auth is ever
+// loosened.
+const ALLOWED_HOSTS = new Set([
+  "bizzsurfergo.lovable.app",
+  "bizzsurfer.com",
+  "www.bizzsurfer.com",
+]);
+
+function assertAllowedUrl(raw: string): URL {
+  let parsed: URL;
+  try {
+    parsed = new URL(raw);
+  } catch {
+    throw new Response("Invalid URL", { status: 400 });
+  }
+  if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+    throw new Response("Only http(s) URLs are allowed", { status: 400 });
+  }
+  if (!ALLOWED_HOSTS.has(parsed.hostname)) {
+    throw new Response(
+      `Host not allowed. Permitted: ${[...ALLOWED_HOSTS].join(", ")}`,
+      { status: 400 },
+    );
+  }
+  return parsed;
+}
 
 export type Severity = "error" | "warning" | "info";
 export type ValidationIssue = { schema: string; severity: Severity; message: string };
