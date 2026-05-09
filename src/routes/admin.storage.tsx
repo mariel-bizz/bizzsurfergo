@@ -296,6 +296,25 @@ function AdminStoragePage() {
                 ))}
               </SelectContent>
             </Select>
+            <Select value={sortBy} onValueChange={(v) => setSortBy(v as typeof sortBy)}>
+              <SelectTrigger className="sm:w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="name">Sort: Name</SelectItem>
+                <SelectItem value="size">Sort: Size</SelectItem>
+                <SelectItem value="updated">Sort: Modified</SelectItem>
+              </SelectContent>
+            </Select>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setSortDir((d) => (d === "asc" ? "desc" : "asc"))}
+              aria-label={`Sort ${sortDir === "asc" ? "ascending" : "descending"}`}
+              title={sortDir === "asc" ? "Ascending" : "Descending"}
+            >
+              {sortDir === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
