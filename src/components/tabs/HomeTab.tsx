@@ -6,7 +6,7 @@ import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
-import { ResourcesSection } from "../ResourcesSection";
+import { ResourcesSection, TrustedPartnersSection } from "../ResourcesSection";
 
 const painPoints = [
   { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
@@ -60,8 +60,6 @@ export function HomeTab() {
           </div>
         </div>
       </section>
-
-
 
       {/* Pain points */}
       <section className="px-5">
@@ -160,6 +158,9 @@ export function HomeTab() {
           </Button>
         </div>
       </section>
+
+      <TrustedPartnersSection />
+
 
       <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {
         game.update((s) => {

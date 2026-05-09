@@ -187,8 +187,13 @@ export function ResourcesSection() {
           ))}
         </div>
       </div>
+    </section>
+  );
+}
 
-      {/* Partners */}
+export function TrustedPartnersSection() {
+  return (
+    <section className="px-5">
       <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
