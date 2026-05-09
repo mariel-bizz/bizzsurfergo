@@ -1,0 +1,145 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Weekly full scan, Mondays 06:00 UTC
+    - cron: "0 6 * * 1"
+
+permissions:
+  contents: read
+  security-events: write
+  pull-requests: read
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # 1. Dependency vulnerabilities (npm advisory DB)
+  # ---------------------------------------------------------------------------
+  dependencies:
+    name: Dependency audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+      - run: bun install --frozen-lockfile
+      - name: Audit (high + critical)
+        run: bunx --bun audit-ci --high --report-type summary
+
+  # ---------------------------------------------------------------------------
+  # 2. Static code analysis (CodeQL — JS/TS)
+  # ---------------------------------------------------------------------------
+  codeql:
+    name: CodeQL (JavaScript/TypeScript)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended,security-and-quality
+      - uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:javascript-typescript"
+
+  # ---------------------------------------------------------------------------
+  # 3. Secret scanning (Gitleaks) — fails the build on any committed secret
+  # ---------------------------------------------------------------------------
+  secrets:
+    name: Secret scan (Gitleaks)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # ---------------------------------------------------------------------------
+  # 4. Database migration safety
+  #    - Validates Supabase SQL migrations with sqlfluff
+  #    - Flags risky patterns (RLS disabled, wide-open policies, public-schema
+  #      extensions, ALTER DATABASE, etc.)
+  # ---------------------------------------------------------------------------
+  migrations:
+    name: Migration safety
+    runs-on: ubuntu-latest
+    if: hashFiles('supabase/migrations/**/*.sql') != ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install sqlfluff
+        run: pip install sqlfluff==3.2.5
+
+      - name: Lint migrations (PostgreSQL dialect)
+        run: sqlfluff lint --dialect postgres supabase/migrations || true
+
+      - name: Risky migration patterns
+        shell: bash
+        run: |
+          set -euo pipefail
+          fail=0
+          files=$(ls supabase/migrations/*.sql 2>/dev/null || true)
+          [ -z "$files" ] && { echo "No migrations."; exit 0; }
+
+          check() {
+            local label="$1" pattern="$2"
+            if grep -InE "$pattern" $files; then
+              echo "::error title=Risky migration::$label detected"
+              fail=1
+            fi
+          }
+
+          # New tables must have RLS enabled in the same migration
+          while IFS= read -r f; do
+            if grep -qiE "create[[:space:]]+table[[:space:]]+(public\.)?[a-z_]+" "$f"; then
+              if ! grep -qiE "enable[[:space:]]+row[[:space:]]+level[[:space:]]+security" "$f"; then
+                echo "::error file=$f::CREATE TABLE without ENABLE ROW LEVEL SECURITY"
+                fail=1
+              fi
+            fi
+          done <<< "$files"
+
+          check "Wide-open RLS policy (USING true / WITH CHECK true)" \
+            "(USING|WITH CHECK)[[:space:]]*\(\s*true\s*\)"
+          check "ALTER DATABASE statement (forbidden)" \
+            "ALTER[[:space:]]+DATABASE"
+          check "Extension created in public schema" \
+            "CREATE[[:space:]]+EXTENSION([^;]*)(WITH[[:space:]]+)?SCHEMA[[:space:]]+public"
+          check "Disabling RLS" \
+            "DISABLE[[:space:]]+ROW[[:space:]]+LEVEL[[:space:]]+SECURITY"
+          check "GRANT ALL to PUBLIC / anon" \
+            "GRANT[[:space:]]+ALL[[:space:]]+.*TO[[:space:]]+(PUBLIC|anon)"
+
+          exit $fail
+
+  # ---------------------------------------------------------------------------
+  # 5. Summary gate — fails PR if any critical job failed
+  # ---------------------------------------------------------------------------
+  gate:
+    name: Security gate
+    needs: [dependencies, codeql, secrets, migrations]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify all checks passed
+        run: |
+          if [[ "${{ needs.dependencies.result }}" != "success" || \
+                "${{ needs.codeql.result }}"       != "success" || \
+                "${{ needs.secrets.result }}"      != "success" || \
+                ( "${{ needs.migrations.result }}" != "success" && \
+                  "${{ needs.migrations.result }}" != "skipped" ) ]]; then
+            echo "One or more security checks failed."
+            exit 1
+          fi
+          echo "All security checks passed."
