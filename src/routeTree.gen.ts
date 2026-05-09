@@ -21,6 +21,7 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -88,6 +89,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
+  id: '/$listingId',
+  path: '/$listingId',
+  getParentRoute: () => MarketplaceRoute,
+} as any)
 const AdminStorageRoute = AdminStorageRouteImport.update({
   id: '/admin/storage',
   path: '/admin/storage',
@@ -128,7 +134,7 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
@@ -138,6 +144,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -148,7 +155,7 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
@@ -158,6 +165,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -169,7 +177,7 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRoute
+  '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/resources': typeof ResourcesRoute
@@ -179,6 +187,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -201,6 +210,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/marketplace/$listingId'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   fileRoutesByTo: FileRoutesByTo
@@ -221,6 +231,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/marketplace/$listingId'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   id:
@@ -241,6 +252,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/marketplace/$listingId'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   fileRoutesById: FileRoutesById
@@ -252,7 +264,7 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   LoginRoute: typeof LoginRoute
-  MarketplaceRoute: typeof MarketplaceRoute
+  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   ResourcesRoute: typeof ResourcesRoute
@@ -352,6 +364,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/$listingId': {
+      id: '/marketplace/$listingId'
+      path: '/$listingId'
+      fullPath: '/marketplace/$listingId'
+      preLoaderRoute: typeof MarketplaceListingIdRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/admin/storage': {
       id: '/admin/storage'
       path: '/admin/storage'
@@ -397,6 +416,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface MarketplaceRouteChildren {
+  MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
+}
+
+const MarketplaceRouteChildren: MarketplaceRouteChildren = {
+  MarketplaceListingIdRoute: MarketplaceListingIdRoute,
+}
+
+const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
+  MarketplaceRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtomDotxmlRoute: AtomDotxmlRoute,
@@ -404,7 +435,7 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   LoginRoute: LoginRoute,
-  MarketplaceRoute: MarketplaceRoute,
+  MarketplaceRoute: MarketplaceRouteWithChildren,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   ResourcesRoute: ResourcesRoute,
