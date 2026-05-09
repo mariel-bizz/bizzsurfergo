@@ -66,6 +66,16 @@ export function EventsTab() {
     }
   };
 
+  const handleCancel = async (id: number) => {
+    try {
+      await cancel({ data: { eventId: id } });
+      setRsvpedIds((prev) => prev.filter((x) => x !== id));
+      toast.success("RSVP cancelled. No more reminders for this event.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Cancel failed");
+    }
+  };
+
   return (
     <div className="px-5 py-5 space-y-5">
       <div>
