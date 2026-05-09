@@ -49,22 +49,7 @@ function ListingDetail() {
   const Icon = meta.icon;
   const isDownload = listing.category === "templates";
   const ActionIcon = isDownload ? Download : ArrowRight;
-
-  const handleAction = () => {
-    if (isDownload) {
-      toast.success(`${listing.title} download starting…`, {
-        description: "Check your email for the file link.",
-      });
-    } else if (listing.category === "agents") {
-      toast.success(`${listing.title} installed`, {
-        description: "Open your workspace to configure it.",
-      });
-    } else {
-      toast.success("Intro requested", {
-        description: `${listing.provider} will reach out within 1 business day.`,
-      });
-    }
-  };
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   return (
     <div className="px-5 py-5 space-y-5">
