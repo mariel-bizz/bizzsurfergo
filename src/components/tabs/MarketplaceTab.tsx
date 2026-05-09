@@ -14,8 +14,13 @@ import {
   BookmarkPlus,
   RotateCcw,
   Trash2,
+  Wand2,
 } from "lucide-react";
 import { listings, categoryMeta, type Category } from "@/lib/marketplace-data";
+import {
+  MarketplaceOnboarding,
+  hasCompletedMarketplaceOnboarding,
+} from "@/components/marketplace/MarketplaceOnboarding";
 import {
   builtInPresets,
   defaultState,
