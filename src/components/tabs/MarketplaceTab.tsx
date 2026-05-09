@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,8 +10,33 @@ import {
   Search,
   ArrowUpDown,
   X,
+  Bookmark,
+  BookmarkPlus,
+  RotateCcw,
+  Trash2,
 } from "lucide-react";
 import { listings, categoryMeta, type Category } from "@/lib/marketplace-data";
+import {
+  builtInPresets,
+  defaultState,
+  loadCustomPresets,
+  loadLastPresetId,
+  saveCustomPresets,
+  saveLastPresetId,
+  statesEqual,
+  type Preset,
+  type PresetState,
+} from "@/lib/marketplace-presets";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
 const categories: { key: Category | "all"; label: string; icon: typeof Bot }[] = [
   { key: "all", label: "All", icon: Sparkles },
