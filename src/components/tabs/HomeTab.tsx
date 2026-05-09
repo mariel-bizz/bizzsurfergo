@@ -1,4 +1,5 @@
-import type { TabKey, GameState } from "../AppShell";
+import { useGame } from "../AppShell";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket } from "lucide-react";
 import { useState } from "react";
@@ -6,8 +7,6 @@ import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection } from "../ResourcesSection";
-
-type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 
 const painPoints = [
   { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
