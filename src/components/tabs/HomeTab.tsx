@@ -45,20 +45,8 @@ export function HomeTab() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [waitOpen, setWaitOpen] = useState(false);
-  const [contact, setContact] = useState({ name: "", email: "", message: "", language: "en" });
-  const [contactSent, setContactSent] = useState(false);
-
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!contact.name.trim() || !contact.email.trim() || !contact.message.trim()) {
-      toast.error("Please fill in all fields");
-      return;
-    }
-    setContactSent(true);
-    toast.success("Thanks! We'll be in touch.", {
-      description: `Replying in ${LANGUAGES.find((l) => l.code === contact.language)?.label}.`,
-    });
-  };
+  const [visitor, setVisitor] = useState({ name: "", language: "en" });
+  const selectedLang = LANGUAGES.find((l) => l.code === visitor.language) ?? LANGUAGES[0];
 
   return (
     <div className="space-y-8 pt-2">
