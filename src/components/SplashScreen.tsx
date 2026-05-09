@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import logo from "@/assets/bizzsurfer-logo.png";
+import logo from "@/assets/bizzsurfer-go-logo.png";
 
 const LANGUAGES = [
   { code: "en", label: "English", flag: "🇬🇧" },
