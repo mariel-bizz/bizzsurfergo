@@ -40,14 +40,17 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
   const [fade, setFade] = useState(false);
   const [name, setName] = useState("");
   const [language, setLanguage] = useState("en");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       const savedName = window.localStorage.getItem("bs_visitor_name");
       const savedLang = window.localStorage.getItem("bs_visitor_lang");
+      const savedEmail = window.localStorage.getItem("bs_visitor_email");
       if (savedName) setName(savedName);
       if (savedLang) setLanguage(savedLang);
+      if (savedEmail) setEmail(savedEmail);
     } catch {
       // ignore
     }
@@ -60,6 +63,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
       try {
         window.localStorage.setItem("bs_visitor_name", name.trim().slice(0, 60));
         window.localStorage.setItem("bs_visitor_lang", language);
+        window.localStorage.setItem("bs_visitor_email", email.trim().slice(0, 255));
       } catch {
         // ignore
       }
@@ -93,6 +97,9 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Agentic AI Intelligence for Business Transformation
         </p>
+        <p className="mt-3 text-sm font-medium text-foreground">
+          Please share your Name, Email and Language to get started! 🙂
+        </p>
       </div>
 
       <div className="mt-6 w-full max-w-sm rounded-2xl bg-card/80 backdrop-blur border border-border p-4 shadow-card space-y-4">
@@ -105,6 +112,19 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Alex"
             autoComplete="given-name"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="splash-email" className="text-xs font-semibold">Email</Label>
+          <Input
+            id="splash-email"
+            type="email"
+            value={email}
+            maxLength={255}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            autoComplete="email"
           />
         </div>
 
