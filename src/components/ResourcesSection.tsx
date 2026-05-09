@@ -5,41 +5,43 @@ import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Plug, Youtube,
 } from "lucide-react";
 
-const partners = [
-  "Notion",
-  "Apollo.io",
-  "Google for Startups",
-  "Google Maps Cloud Program",
-  "NVIDIA",
-  "GitLab",
-  "Scaleway",
-  "HubSpot for Startups",
-  "MongoDB",
-  "NVIDIA Inception",
-  "Miro",
-  "Microsoft Azure",
-  "Databricks",
-  "DevRev",
-  "Datadog",
-  "Nebius",
-  "Bubble",
-  "Loom",
-  "Atlassian",
-  "Zendesk",
-  "Salesforce",
-  "CircleCI",
-  "Amplitude",
-  "Lambda",
-  "Auth0",
-  "AWS",
-  "QuantPI",
-  "Perplexity",
-  "Deel",
-  "Grafana",
-  "Porter",
-  "Cloudflare",
-  "Confluent",
-  "Intercom",
+// Logos served from simple-icons CDN (https://simpleicons.org). Brands without a
+// matching slug fall back to a styled text chip so layout stays consistent.
+const partners: { name: string; slug?: string }[] = [
+  { name: "Notion", slug: "notion" },
+  { name: "Apollo.io" },
+  { name: "Google for Startups", slug: "google" },
+  { name: "Google Maps Cloud Program", slug: "googlemaps" },
+  { name: "NVIDIA", slug: "nvidia" },
+  { name: "GitLab", slug: "gitlab" },
+  { name: "Scaleway", slug: "scaleway" },
+  { name: "HubSpot for Startups", slug: "hubspot" },
+  { name: "MongoDB", slug: "mongodb" },
+  { name: "NVIDIA Inception", slug: "nvidia" },
+  { name: "Miro", slug: "miro" },
+  { name: "Microsoft Azure", slug: "microsoftazure" },
+  { name: "Databricks", slug: "databricks" },
+  { name: "DevRev" },
+  { name: "Datadog", slug: "datadog" },
+  { name: "Nebius" },
+  { name: "Bubble" },
+  { name: "Loom", slug: "loom" },
+  { name: "Atlassian", slug: "atlassian" },
+  { name: "Zendesk", slug: "zendesk" },
+  { name: "Salesforce", slug: "salesforce" },
+  { name: "CircleCI", slug: "circleci" },
+  { name: "Amplitude", slug: "amplitude" },
+  { name: "Lambda", slug: "awslambda" },
+  { name: "Auth0", slug: "auth0" },
+  { name: "AWS", slug: "amazonwebservices" },
+  { name: "QuantPI" },
+  { name: "Perplexity", slug: "perplexity" },
+  { name: "Deel" },
+  { name: "Grafana", slug: "grafana" },
+  { name: "Porter" },
+  { name: "Cloudflare", slug: "cloudflare" },
+  { name: "Confluent" },
+  { name: "Intercom", slug: "intercom" },
 ];
 
 const resources = [
@@ -141,11 +143,26 @@ export function ResourcesSection() {
       {/* Partners */}
       <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
-        <div className="mt-3 flex flex-wrap gap-2">
+        <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
-            <span key={p} className="rounded-full bg-accent px-3 py-1.5 text-xs font-bold text-accent-foreground">
-              {p}
-            </span>
+            <div
+              key={p.name}
+              title={p.name}
+              className="flex h-14 items-center justify-center rounded-xl border border-border bg-background px-2"
+            >
+              {p.slug ? (
+                <img
+                  src={`https://cdn.simpleicons.org/${p.slug}`}
+                  alt={`${p.name} logo`}
+                  loading="lazy"
+                  className="max-h-7 max-w-full object-contain opacity-80"
+                />
+              ) : (
+                <span className="text-center text-[11px] font-bold text-foreground leading-tight">
+                  {p.name}
+                </span>
+              )}
+            </div>
           ))}
         </div>
       </div>
