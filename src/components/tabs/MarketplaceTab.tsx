@@ -110,7 +110,11 @@ export function MarketplaceTab() {
       if (found) {
         applyState(found.state);
         setActivePresetId(found.id);
+        return;
       }
+    }
+    if (!hasCompletedMarketplaceOnboarding()) {
+      setOnboardingOpen(true);
     }
   }, []);
 
