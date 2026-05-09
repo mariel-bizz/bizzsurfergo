@@ -15,6 +15,7 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
   const [form, setForm] = useState({ name: "", email: "", role: "", company: "" });
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const syncHubspot = useServerFn(upsertHubspotWaitlistContact);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,12 +24,18 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
     const { error } = await supabase.from("waitlist").insert({
       name: form.name, email: form.email, role: form.role || null, company: form.company || null,
     });
-    setLoading(false);
     if (error) {
+      setLoading(false);
       if (error.code === "23505") { toast.error("This email is already on the list."); return; }
       toast.error("Something went wrong. Try again.");
       return;
     }
+    try {
+      await syncHubspot({ data: { name: form.name, email: form.email, role: form.role || null, company: form.company || null } });
+    } catch (err) {
+      console.warn("HubSpot sync failed", err);
+    }
+    setLoading(false);
     setDone(true);
     onJoined?.();
     toast.success("You're on the list! +50 XP earned.");
