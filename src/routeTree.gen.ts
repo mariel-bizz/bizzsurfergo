@@ -14,8 +14,10 @@ import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 
@@ -44,6 +46,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
+  id: '/feed.xml',
+  path: '/feed.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -52,6 +59,11 @@ const EventsRoute = EventsRouteImport.update({
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
+  id: '/atom.xml',
+  path: '/atom.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -67,8 +79,10 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atom.xml': typeof AtomDotxmlRoute
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -78,8 +92,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atom.xml': typeof AtomDotxmlRoute
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -90,8 +106,10 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atom.xml': typeof AtomDotxmlRoute
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
+  '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -103,8 +121,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atom.xml'
     | '/chat'
     | '/events'
+    | '/feed.xml'
     | '/login'
     | '/pricing'
     | '/profile'
@@ -114,8 +134,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atom.xml'
     | '/chat'
     | '/events'
+    | '/feed.xml'
     | '/login'
     | '/pricing'
     | '/profile'
@@ -125,8 +147,10 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/atom.xml'
     | '/chat'
     | '/events'
+    | '/feed.xml'
     | '/login'
     | '/pricing'
     | '/profile'
@@ -137,8 +161,10 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtomDotxmlRoute: typeof AtomDotxmlRoute
   ChatRoute: typeof ChatRoute
   EventsRoute: typeof EventsRoute
+  FeedDotxmlRoute: typeof FeedDotxmlRoute
   LoginRoute: typeof LoginRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
@@ -184,6 +210,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/feed.xml': {
+      id: '/feed.xml'
+      path: '/feed.xml'
+      fullPath: '/feed.xml'
+      preLoaderRoute: typeof FeedDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/events': {
       id: '/events'
       path: '/events'
@@ -196,6 +229,13 @@ declare module '@tanstack/react-router' {
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atom.xml': {
+      id: '/atom.xml'
+      path: '/atom.xml'
+      fullPath: '/atom.xml'
+      preLoaderRoute: typeof AtomDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -217,8 +257,10 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtomDotxmlRoute: AtomDotxmlRoute,
   ChatRoute: ChatRoute,
   EventsRoute: EventsRoute,
+  FeedDotxmlRoute: FeedDotxmlRoute,
   LoginRoute: LoginRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
@@ -229,3 +271,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
