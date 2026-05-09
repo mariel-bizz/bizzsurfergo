@@ -39,26 +39,39 @@ export function ResourcesSection() {
       <div>
         <h2 className="text-xl font-bold text-foreground mb-3">Explore & download</h2>
         <div className="grid grid-cols-2 gap-3">
-          {resources.map((r) => (
-            <a
-              key={r.title}
-              href={r.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="rounded-2xl bg-card border border-border p-4 shadow-card flex flex-col gap-2 active:scale-[0.98] transition-transform"
-            >
-              <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
-                <r.icon className="w-4 h-4 text-primary-foreground" />
-              </div>
-              <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
-              <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
-              {r.download && (
-                <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-auto">
-                  <Download className="w-3 h-3" /> Download
-                </span>
-              )}
-            </a>
-          ))}
+          {resources.map((r) => {
+            const inner = (
+              <>
+                <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
+                  <r.icon className="w-4 h-4 text-primary-foreground" />
+                </div>
+                <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
+                <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
+                {r.download && (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-auto">
+                    <Download className="w-3 h-3" /> Download
+                  </span>
+                )}
+              </>
+            );
+            const className =
+              "rounded-2xl bg-card border border-border p-4 shadow-card flex flex-col gap-2 active:scale-[0.98] transition-transform";
+            return r.internal ? (
+              <Link key={r.title} to={r.href} className={className}>
+                {inner}
+              </Link>
+            ) : (
+              <a
+                key={r.title}
+                href={r.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+              >
+                {inner}
+              </a>
+            );
+          })}
         </div>
       </div>
 
