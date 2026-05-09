@@ -1,4 +1,5 @@
-import type { TabKey, GameState } from "../AppShell";
+import { useGame } from "../AppShell";
+import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket } from "lucide-react";
 import { useState } from "react";
@@ -6,8 +7,6 @@ import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection } from "../ResourcesSection";
-
-type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 
 const painPoints = [
   { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
@@ -24,7 +23,9 @@ const faqs = [
   { q: "What ROI should leaders expect?", a: "Outcomes vary by organisation and use case. The platform is designed to shorten execution cycles, speed up decisions, and improve adoption of change initiatives." },
 ];
 
-export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void; game: Game }) {
+export function HomeTab() {
+  const game = useGame();
+  const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [waitOpen, setWaitOpen] = useState(false);
 
@@ -43,7 +44,7 @@ export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void;
             Connect your enterprise systems. Let Agentic AI orchestrate decisions, adoption and execution — at the speed of the boardroom.
           </p>
           <div className="mt-5 flex flex-col gap-2.5">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-sm font-bold" onClick={() => onNavigate("chat")}>
+            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-sm font-bold" onClick={() => navigate({ to: "/chat" })}>
               Talk to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
             <Button size="lg" variant="outline" className="h-12 text-sm font-semibold" onClick={() => setWaitOpen(true)}>
@@ -93,7 +94,7 @@ export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void;
               <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Executive Surfer</p>
               <p className="text-lg font-bold">Level {Math.floor(game.state.xp / 100) + 1}</p>
             </div>
-            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => onNavigate("profile")}>
+            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => navigate({ to: "/profile" })}>
               View
             </Button>
           </div>

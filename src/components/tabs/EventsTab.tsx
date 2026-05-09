@@ -1,10 +1,8 @@
-import type { GameState } from "../AppShell";
+import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, MapPin, Users, Mic, Linkedin } from "lucide-react";
 import event1 from "@/assets/event-mariel.png";
 import { toast } from "sonner";
-
-type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 
 const events = [
   {
@@ -51,7 +49,8 @@ const events = [
   },
 ];
 
-export function EventsTab({ game }: { game: Game }) {
+export function EventsTab() {
+  const game = useGame();
   const register = (id: number, href: string) => {
     game.update((s) => {
       const badges = s.badges.includes("Event Insider") ? s.badges : [...s.badges, "Event Insider"];

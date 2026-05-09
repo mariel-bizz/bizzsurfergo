@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import type { GameState } from "../AppShell";
+import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
 import { Send, Sparkles, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 
-type Game = { state: GameState; update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void };
 type Msg = { role: "user" | "assistant"; content: string };
 
 const PRESETS = [
@@ -18,7 +17,8 @@ const PRESETS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-chat`;
 
-export function ChatTab({ game }: { game: Game }) {
+export function ChatTab() {
+  const game = useGame();
   const [messages, setMessages] = useState<Msg[]>([
     { role: "assistant", content: "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started." },
   ]);
