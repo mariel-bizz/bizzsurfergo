@@ -44,7 +44,7 @@ export function HomeTab() {
             Connect your enterprise systems. Let Agentic AI orchestrate decisions, adoption and execution — at the speed of the boardroom.
           </p>
           <div className="mt-5 flex flex-col gap-2.5">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-sm font-bold" onClick={() => onNavigate("chat")}>
+            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-sm font-bold" onClick={() => navigate({ to: "/chat" })}>
               Talk to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
             <Button size="lg" variant="outline" className="h-12 text-sm font-semibold" onClick={() => setWaitOpen(true)}>
@@ -94,7 +94,7 @@ export function HomeTab() {
               <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Executive Surfer</p>
               <p className="text-lg font-bold">Level {Math.floor(game.state.xp / 100) + 1}</p>
             </div>
-            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => onNavigate("profile")}>
+            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => navigate({ to: "/profile" })}>
               View
             </Button>
           </div>
