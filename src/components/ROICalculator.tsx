@@ -35,13 +35,36 @@ export function ROICalculator() {
         <h3 className="text-base font-bold text-foreground">ROI Calculator</h3>
       </div>
 
-      <div className="space-y-3">
-        <Field label="Employees impacted" value={employees} min={10} max={50000} step={10} onChange={setEmployees} />
-        <Field label="Avg. annual salary (USD)" value={avgSalary} min={30000} max={300000} step={1000} onChange={setAvgSalary} />
-        <Field label="Hours wasted per week / person" value={hoursWasted} min={1} max={20} step={1} onChange={setHoursWasted} />
-        <Field label="Expected Efficiency Gain (%)" value={efficiencyGain} min={5} max={90} step={1} onChange={setEfficiencyGain} />
-        <Field label="Level expected of automations (%)" value={automationLevel} min={0} max={100} step={1} onChange={setAutomationLevel} />
-      </div>
+      <TooltipProvider delayDuration={150}>
+        <div className="space-y-3">
+          <Field label="Employees impacted" value={employees} min={10} max={50000} step={10} onChange={setEmployees} />
+          <Field label="Avg. annual salary (USD)" value={avgSalary} min={30000} max={300000} step={1000} onChange={setAvgSalary} />
+          <Field label="Hours wasted per week / person" value={hoursWasted} min={1} max={20} step={1} onChange={setHoursWasted} />
+          <Field
+            label="Expected Efficiency Gain (%)"
+            value={efficiencyGain}
+            min={5}
+            max={90}
+            step={1}
+            onChange={setEfficiencyGain}
+            tooltip="Share of wasted hours BizzSurfer helps you reclaim through better workflows. Contributes 1:1 to the recovery factor (e.g. 45% efficiency gain = 0.45)."
+          />
+          <Field
+            label="Level expected of automations (%)"
+            value={automationLevel}
+            min={0}
+            max={100}
+            step={1}
+            onChange={setAutomationLevel}
+            tooltip="How much of your repetitive work you plan to automate. Adds half its value to the recovery factor (e.g. 30% automation = +0.15). Total recovery is capped at 95%."
+          />
+        </div>
+      </TooltipProvider>
+
+      <p className="mt-3 text-[11px] text-muted-foreground leading-relaxed">
+        <span className="font-semibold text-foreground">Recovery factor</span> = Efficiency Gain + (Automation Level ÷ 2), capped at 95%. Applied to your total annual loss to estimate yearly recovery.
+      </p>
+
 
       {result ? (
         <button
