@@ -159,7 +159,26 @@ function AdminStoragePage() {
   };
 
   const folders = entries.filter((e) => e.id === null);
-  const files = entries.filter((e) => e.id !== null);
+  const allFiles = entries.filter((e) => e.id !== null);
+
+  const [search, setSearch] = useState("");
+  const [mimeFilter, setMimeFilter] = useState<string>("all");
+
+  const availableCategories = Array.from(
+    new Set(allFiles.map((f) => mimeCategory(f.metadata?.mimetype)))
+  ).sort();
+
+  const q = search.trim().toLowerCase();
+  const filteredFolders = q
+    ? folders.filter((f) => f.name.toLowerCase().includes(q))
+    : folders;
+  const filteredFiles = allFiles.filter((f) => {
+    if (q && !f.name.toLowerCase().includes(q)) return false;
+    if (mimeFilter !== "all" && mimeCategory(f.metadata?.mimetype) !== mimeFilter) return false;
+    return true;
+  });
+  const totalShown = filteredFolders.length + filteredFiles.length;
+  const isFiltering = q !== "" || mimeFilter !== "all";
 
   return (
     <main className="container mx-auto max-w-5xl space-y-4 p-4 pb-24">
