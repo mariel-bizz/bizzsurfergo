@@ -9,6 +9,8 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
+import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as EventsRouteImport } from './routes/events'
@@ -16,6 +18,16 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
+  id: '/robots.txt',
+  path: '/robots.txt',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -53,6 +65,8 @@ export interface FileRoutesByFullPath {
   '/events': typeof EventsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/seo': typeof AdminSeoRoute
 }
 export interface FileRoutesByTo {
@@ -61,6 +75,8 @@ export interface FileRoutesByTo {
   '/events': typeof EventsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/seo': typeof AdminSeoRoute
 }
 export interface FileRoutesById {
@@ -70,13 +86,31 @@ export interface FileRoutesById {
   '/events': typeof EventsRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/robots.txt': typeof RobotsDottxtRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/seo': typeof AdminSeoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/events' | '/pricing' | '/profile' | '/admin/seo'
+  fullPaths:
+    | '/'
+    | '/chat'
+    | '/events'
+    | '/pricing'
+    | '/profile'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/admin/seo'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/events' | '/pricing' | '/profile' | '/admin/seo'
+  to:
+    | '/'
+    | '/chat'
+    | '/events'
+    | '/pricing'
+    | '/profile'
+    | '/robots.txt'
+    | '/sitemap.xml'
+    | '/admin/seo'
   id:
     | '__root__'
     | '/'
@@ -84,6 +118,8 @@ export interface FileRouteTypes {
     | '/events'
     | '/pricing'
     | '/profile'
+    | '/robots.txt'
+    | '/sitemap.xml'
     | '/admin/seo'
   fileRoutesById: FileRoutesById
 }
@@ -93,11 +129,27 @@ export interface RootRouteChildren {
   EventsRoute: typeof EventsRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
+  RobotsDottxtRoute: typeof RobotsDottxtRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminSeoRoute: typeof AdminSeoRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/robots.txt': {
+      id: '/robots.txt'
+      path: '/robots.txt'
+      fullPath: '/robots.txt'
+      preLoaderRoute: typeof RobotsDottxtRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/profile': {
       id: '/profile'
       path: '/profile'
@@ -149,8 +201,20 @@ const rootRouteChildren: RootRouteChildren = {
   EventsRoute: EventsRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
+  RobotsDottxtRoute: RobotsDottxtRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminSeoRoute: AdminSeoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
