@@ -62,6 +62,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
     if (typeof window !== "undefined") {
       try {
         window.localStorage.setItem("bs_visitor_name", name.trim().slice(0, 60));
+        window.localStorage.setItem("bs_visitor_email", email.trim().slice(0, 255));
         window.localStorage.setItem("bs_visitor_lang", language);
       } catch {
         // ignore
