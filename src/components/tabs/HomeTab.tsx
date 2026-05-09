@@ -61,9 +61,6 @@ export function HomeTab() {
         </div>
       </section>
 
-      <TrustedPartnersSection />
-
-
 
       {/* Pain points */}
       <section className="px-5">
