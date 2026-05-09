@@ -8,7 +8,16 @@
 | `codeql` | GitHub CodeQL | Static analysis for JS/TS (security-extended) |
 | `secrets` | Gitleaks | Committed API keys, tokens, secrets |
 | `migrations` | sqlfluff + custom rules | Supabase SQL migration safety |
+| `sbom` | CycloneDX npm | Generates SBOM (JSON + XML), uploaded as build artifact |
 | `gate` | — | Fails the PR if any check above failed |
+
+## SBOM
+
+Each run produces a CycloneDX 1.5 SBOM (`sbom.cdx.json` + `sbom.cdx.xml`)
+listing every npm dependency with version, license, and PURL. Download from
+the workflow run page → Artifacts → `sbom-cyclonedx-<sha>` (kept 90 days).
+Use it for vulnerability tracking, license review, or feeding tools like
+Dependency-Track / Grype.
 
 ## Migration safety rules
 
