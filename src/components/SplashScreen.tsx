@@ -83,7 +83,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <img src={logo} alt="BizzSurfer" className="relative w-32 h-32 object-contain" />
       </a>
 
-      <div className="mt-6 text-center max-w-sm">
+      <div className="mt-1 text-center max-w-sm">
         <p className="mb-3 text-4xl sm:text-5xl font-extrabold tracking-tight bg-gradient-primary bg-clip-text text-transparent drop-shadow-sm animate-float">
           BizzSurfer <span className="italic">Go!</span>
         </p>
