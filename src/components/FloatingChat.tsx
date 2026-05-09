@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "@tanstack/react-router";
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from "@/components/ui/sheet";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
+
 import { MessageCircle } from "lucide-react";
 import { ChatTab } from "./tabs/ChatTab";
 
@@ -29,9 +29,7 @@ export function FloatingChat() {
         side="bottom"
         className="p-0 h-[88vh] max-w-md mx-auto rounded-t-3xl border-t border-border bg-background"
       >
-        <VisuallyHidden>
-          <SheetTitle>BizzSurfer Go! Chat</SheetTitle>
-        </VisuallyHidden>
+        <SheetTitle className="sr-only">BizzSurfer Go! Chat</SheetTitle>
         <div className="h-full overflow-hidden">
           <ChatTab />
         </div>
