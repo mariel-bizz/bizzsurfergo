@@ -6,8 +6,19 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ChevronRight, Folder, FileIcon, Upload, Trash2, Download, RefreshCw, ArrowLeft } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ChevronRight, Folder, FileIcon, Upload, Trash2, Download, RefreshCw, ArrowLeft, Search, X } from "lucide-react";
 import { toast } from "sonner";
+
+function mimeCategory(m?: string): string {
+  if (!m) return "other";
+  if (m.startsWith("image/")) return "image";
+  if (m.startsWith("video/")) return "video";
+  if (m.startsWith("audio/")) return "audio";
+  if (m === "application/pdf") return "pdf";
+  if (m.startsWith("text/") || m.includes("json") || m.includes("xml") || m.includes("javascript")) return "text";
+  return "other";
+}
 
 const BUCKET = "storage";
 
@@ -148,7 +159,26 @@ function AdminStoragePage() {
   };
 
   const folders = entries.filter((e) => e.id === null);
-  const files = entries.filter((e) => e.id !== null);
+  const allFiles = entries.filter((e) => e.id !== null);
+
+  const [search, setSearch] = useState("");
+  const [mimeFilter, setMimeFilter] = useState<string>("all");
+
+  const availableCategories = Array.from(
+    new Set(allFiles.map((f) => mimeCategory(f.metadata?.mimetype)))
+  ).sort();
+
+  const q = search.trim().toLowerCase();
+  const filteredFolders = q
+    ? folders.filter((f) => f.name.toLowerCase().includes(q))
+    : folders;
+  const filteredFiles = allFiles.filter((f) => {
+    if (q && !f.name.toLowerCase().includes(q)) return false;
+    if (mimeFilter !== "all" && mimeCategory(f.metadata?.mimetype) !== mimeFilter) return false;
+    return true;
+  });
+  const totalShown = filteredFolders.length + filteredFiles.length;
+  const isFiltering = q !== "" || mimeFilter !== "all";
 
   return (
     <main className="container mx-auto max-w-5xl space-y-4 p-4 pb-24">
@@ -208,20 +238,57 @@ function AdminStoragePage() {
       </Card>
 
       <Card>
-        <CardHeader>
+        <CardHeader className="space-y-3">
           <CardTitle className="text-base flex items-center justify-between">
             <span>Contents</span>
-            <Badge variant="secondary">{entries.length} item{entries.length === 1 ? "" : "s"}</Badge>
+            <Badge variant="secondary">
+              {isFiltering ? `${totalShown} of ${entries.length}` : `${entries.length} item${entries.length === 1 ? "" : "s"}`}
+            </Badge>
           </CardTitle>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Search by filename…"
+                className="pl-8 pr-8"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch("")}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  aria-label="Clear search"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <Select value={mimeFilter} onValueChange={setMimeFilter}>
+              <SelectTrigger className="sm:w-44">
+                <SelectValue placeholder="All types" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All types</SelectItem>
+                {availableCategories.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {c.charAt(0).toUpperCase() + c.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           {loading ? (
             <p className="text-sm text-muted-foreground">Loading…</p>
           ) : entries.length === 0 ? (
             <p className="text-sm text-muted-foreground">This folder is empty.</p>
+          ) : totalShown === 0 ? (
+            <p className="text-sm text-muted-foreground">No items match your filters.</p>
           ) : (
             <ul className="divide-y">
-              {folders.map((e) => (
+              {filteredFolders.map((e) => (
                 <li key={`f-${e.name}`} className="flex items-center justify-between gap-2 py-2">
                   <button
                     onClick={() => enterFolder(e.name)}
@@ -232,7 +299,7 @@ function AdminStoragePage() {
                   </button>
                 </li>
               ))}
-              {files.map((e) => (
+              {filteredFiles.map((e) => (
                 <li key={`x-${e.name}`} className="flex flex-wrap items-center justify-between gap-2 py-2">
                   <button
                     onClick={() => handlePreview(e)}
