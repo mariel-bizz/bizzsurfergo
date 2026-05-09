@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Plug, Youtube,
@@ -7,7 +8,7 @@ import {
 const partners = ["NVIDIA Inception", "Atlassian", "GitLab", "AWS"];
 
 const resources = [
-  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "https://www.bizzsurfer.com/blog" },
+  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/resources", internal: true },
   { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true },
   { icon: Headphones, title: "Podcast", desc: "Conversations with operators behind enterprise AI.", href: "https://www.bizzsurfer.com/podcast" },
   { icon: Briefcase, title: "Careers", desc: "Help us build the agentic future. We're hiring.", href: "https://www.bizzsurfer.com/careers" },
