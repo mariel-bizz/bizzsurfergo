@@ -337,7 +337,7 @@ function AdminStoragePage() {
                   </button>
                 </li>
               ))}
-              {filteredFiles.map((e) => (
+              {sortedFiles.map((e) => (
                 <li key={`x-${e.name}`} className="flex flex-wrap items-center justify-between gap-2 py-2">
                   <button
                     onClick={() => handlePreview(e)}
