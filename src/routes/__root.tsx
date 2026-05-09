@@ -82,10 +82,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "BizzSurfer Go!  Agentic AI & Business Transformation" },
       { name: "twitter:description", content: "BizzSurfer Go! Agentic AI Intelligence for Business Transformation leaders. Connect your enterprise systems and let Agentic AI orchestrate your transformation." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/372cdf7b-4a78-4f93-8fb4-bfb2c675ee46/id-preview-dce76e76--93cf30e3-bdcc-47f4-a14e-e80c68d0be7a.lovable.app-1778180566801.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/372cdf7b-4a78-4f93-8fb4-bfb2c675ee46/id-preview-dce76e76--93cf30e3-bdcc-47f4-a14e-e80c68d0be7a.lovable.app-1778180566801.png" },
+      { property: "og:image", content: "/og-image.png" },
+      { name: "twitter:image", content: "/og-image.png" },
     ],
     links: [
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://cdn.gpteng.co", crossOrigin: "anonymous" },
       { rel: "dns-prefetch", href: "https://cdn.gpteng.co" },
       {
