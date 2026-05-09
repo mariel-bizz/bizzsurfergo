@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import logo from "@/assets/bizzsurfer-logo.png";
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
@@ -8,6 +10,11 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
     const t2 = setTimeout(onDone, 2400);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [onDone]);
+
+  const handleContinue = () => {
+    setFade(true);
+    setTimeout(onDone, 300);
+  };
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-wave transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"}`}>
@@ -21,7 +28,14 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           Agentic AI Intelligence for Business Transformation
         </h1>
       </div>
-      <div className="mt-10 flex gap-1.5">
+      <Button
+        size="lg"
+        onClick={handleContinue}
+        className="mt-8 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 px-6 text-sm font-bold"
+      >
+        Continue to BizzSurfer Go <ArrowRight className="ml-1 w-4 h-4" />
+      </Button>
+      <div className="mt-6 flex gap-1.5">
         {[0, 1, 2].map((i) => (
           <span key={i} className="w-2 h-2 rounded-full bg-primary animate-pulse" style={{ animationDelay: `${i * 200}ms` }} />
         ))}
