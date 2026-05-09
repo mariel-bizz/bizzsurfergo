@@ -5,12 +5,24 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import logo from "@/assets/bizzsurfer-logo.png";
 
 const LANGUAGES = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Español" },
-  { code: "fr", label: "Français" },
-  { code: "de", label: "Deutsch" },
-  { code: "pt", label: "Português" },
-  { code: "it", label: "Italiano" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "zh", label: "中文 (Mandarin)", flag: "🇨🇳" },
+  { code: "hi", label: "हिन्दी (Hindi)", flag: "🇮🇳" },
+  { code: "es", label: "Español", flag: "🇪🇸" },
+  { code: "ar", label: "العربية", flag: "🇸🇦" },
+  { code: "fr", label: "Français", flag: "🇫🇷" },
+  { code: "bn", label: "বাংলা (Bengali)", flag: "🇧🇩" },
+  { code: "pt", label: "Português", flag: "🇵🇹" },
+  { code: "ru", label: "Русский", flag: "🇷🇺" },
+  { code: "ur", label: "اردو", flag: "🇵🇰" },
+  { code: "id", label: "Bahasa Indonesia", flag: "🇮🇩" },
+  { code: "de", label: "Deutsch", flag: "🇩🇪" },
+  { code: "ja", label: "日本語", flag: "🇯🇵" },
+  { code: "sw", label: "Kiswahili", flag: "🇰🇪" },
+  { code: "tr", label: "Türkçe", flag: "🇹🇷" },
+  { code: "it", label: "Italiano", flag: "🇮🇹" },
+  { code: "ko", label: "한국어", flag: "🇰🇷" },
+  { code: "nl", label: "Nederlands", flag: "🇳🇱" },
 ];
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
