@@ -97,12 +97,26 @@ export function ROICalculator() {
 }
 
 function Field({
-  label, value, min, max, step, onChange,
-}: { label: string; value: number; min: number; max: number; step: number; onChange: (n: number) => void }) {
+  label, value, min, max, step, onChange, tooltip,
+}: { label: string; value: number; min: number; max: number; step: number; onChange: (n: number) => void; tooltip?: string }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <label className="text-xs font-semibold text-foreground">{label}</label>
+        <div className="flex items-center gap-1.5">
+          <label className="text-xs font-semibold text-foreground">{label}</label>
+          {tooltip && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button type="button" aria-label={`About ${label}`} className="text-muted-foreground hover:text-primary">
+                  <Info className="w-3.5 h-3.5" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-[240px] text-xs leading-snug">
+                {tooltip}
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
         <input
           type="number"
           value={value}
