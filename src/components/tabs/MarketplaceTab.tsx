@@ -89,12 +89,121 @@ export function MarketplaceTab() {
         !l.tags.some((t) => t.toLowerCase().includes(q))
       )
         return false;
-      if (selectedTags.length && !selectedTags.every((t) => l.tags.includes(t)))
-        return false;
-      if (freeOnly && priceValue(l.price) > 0) return false;
-      if (l.rating < minRating) return false;
-      return true;
-    });
+type SortKey = PresetState["sort"];
+
+const sortOptions: { value: SortKey; label: string }[] = [
+  { value: "recommended", label: "Recommended" },
+  { value: "rating", label: "Top rated" },
+  { value: "price-asc", label: "Price: low to high" },
+  { value: "price-desc", label: "Price: high to low" },
+  { value: "title", label: "Name (A–Z)" },
+];
+
+// Extract a numeric price from strings like "€39 / mo", "Free", "Included with Hero".
+function priceValue(price: string): number {
+  const lower = price.toLowerCase();
+  if (lower.includes("free") || lower.includes("included")) return 0;
+  const match = price.match(/(\d[\d,.]*)/);
+  if (!match) return Number.POSITIVE_INFINITY;
+  return parseFloat(match[1].replace(/,/g, ""));
+}
+
+export function MarketplaceTab() {
+  const [active, setActive] = useState<Category | "all">("all");
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortKey>("recommended");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [freeOnly, setFreeOnly] = useState(false);
+  const [minRating, setMinRating] = useState(0);
+
+  const [customPresets, setCustomPresets] = useState<Preset[]>([]);
+  const [activePresetId, setActivePresetId] = useState<string | null>(null);
+  const [saveOpen, setSaveOpen] = useState(false);
+  const [presetName, setPresetName] = useState("");
+  const [manageOpen, setManageOpen] = useState(false);
+
+  // Load saved presets on mount and apply last-used preset.
+  useEffect(() => {
+    const saved = loadCustomPresets();
+    setCustomPresets(saved);
+    const lastId = loadLastPresetId();
+    if (lastId) {
+      const all = [...builtInPresets, ...saved];
+      const found = all.find((p) => p.id === lastId);
+      if (found) {
+        applyState(found.state);
+        setActivePresetId(found.id);
+      }
+    }
+  }, []);
+
+  const currentState: PresetState = {
+    category: active,
+    query,
+    sort,
+    selectedTags,
+    freeOnly,
+    minRating,
+  };
+
+  function applyState(s: PresetState) {
+    setActive(s.category);
+    setQuery(s.query);
+    setSort(s.sort);
+    setSelectedTags(s.selectedTags);
+    setFreeOnly(s.freeOnly);
+    setMinRating(s.minRating);
+  }
+
+  function applyPreset(p: Preset) {
+    // Intersect tag selection with tags actually present in the catalog.
+    const validTags = new Set<string>();
+    listings.forEach((l) => l.tags.forEach((t) => validTags.add(t)));
+    const filteredTags = p.state.selectedTags.filter((t) => validTags.has(t));
+    applyState({ ...p.state, selectedTags: filteredTags });
+    setActivePresetId(p.id);
+    saveLastPresetId(p.id);
+  }
+
+  function resetFilters() {
+    applyState(defaultState);
+    setActivePresetId(null);
+    saveLastPresetId(null);
+  }
+
+  function handleSavePreset() {
+    const name = presetName.trim();
+    if (!name) return;
+    const id = `custom-${Date.now()}`;
+    const next: Preset = { id, name, group: "Custom", state: currentState };
+    const updated = [...customPresets, next];
+    setCustomPresets(updated);
+    saveCustomPresets(updated);
+    setActivePresetId(id);
+    saveLastPresetId(id);
+    setPresetName("");
+    setSaveOpen(false);
+    toast.success(`Saved preset "${name}"`);
+  }
+
+  function deletePreset(id: string) {
+    const updated = customPresets.filter((p) => p.id !== id);
+    setCustomPresets(updated);
+    saveCustomPresets(updated);
+    if (activePresetId === id) {
+      setActivePresetId(null);
+      saveLastPresetId(null);
+    }
+  }
+
+  // Track if current state still matches the active preset; if not, mark as modified.
+  const activePreset = useMemo(() => {
+    const all = [...builtInPresets, ...customPresets];
+    return all.find((p) => p.id === activePresetId) ?? null;
+  }, [activePresetId, customPresets]);
+  const presetModified = activePreset
+    ? !statesEqual(activePreset.state, currentState)
+    : false;
 
     const sorted = [...result];
     switch (sort) {
