@@ -1,26 +1,12 @@
 import { useGame } from "../AppShell";
 import { useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Languages } from "lucide-react";
+import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket } from "lucide-react";
 import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection } from "../ResourcesSection";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-
-const LANGUAGES = [
-  { code: "en", label: "English", flag: "🇬🇧", greeting: "Hi" },
-  { code: "es", label: "Español", flag: "🇪🇸", greeting: "Hola" },
-  { code: "fr", label: "Français", flag: "🇫🇷", greeting: "Salut" },
-  { code: "de", label: "Deutsch", flag: "🇩🇪", greeting: "Hallo" },
-  { code: "pt", label: "Português", flag: "🇵🇹", greeting: "Olá" },
-  { code: "it", label: "Italiano", flag: "🇮🇹", greeting: "Ciao" },
-  { code: "nl", label: "Nederlands", flag: "🇳🇱", greeting: "Hoi" },
-  { code: "zh", label: "中文", flag: "🇨🇳", greeting: "你好" },
-  { code: "ja", label: "日本語", flag: "🇯🇵", greeting: "こんにちは" },
-];
 
 const painPoints = [
   { icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
@@ -42,27 +28,14 @@ export function HomeTab() {
   const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [waitOpen, setWaitOpen] = useState(false);
-  const [visitor, setVisitor] = useState({ name: "", language: "en" });
-  const selectedLang = LANGUAGES.find((l) => l.code === visitor.language) ?? LANGUAGES[0];
 
   return (
     <div className="space-y-8 pt-2">
       {/* Banner */}
       <section className="px-5 pt-2">
-        <div className="relative rounded-2xl overflow-hidden shadow-card border border-border">
-          <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="block">
-            <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
-          </a>
-          <div className="absolute inset-x-0 top-0 flex justify-center p-3 pointer-events-none">
-            <Button
-              size="sm"
-              onClick={() => setWaitOpen(true)}
-              className="pointer-events-auto bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-9 px-4 text-xs font-bold"
-            >
-              Join the Waitlist <ArrowRight className="ml-1 w-3.5 h-3.5" />
-            </Button>
-          </div>
-        </div>
+        <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden shadow-card border border-border">
+          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
+        </a>
       </section>
 
       {/* Hero */}
@@ -88,62 +61,6 @@ export function HomeTab() {
         </div>
       </section>
 
-
-
-      {/* Say hi — name + language */}
-      <section className="px-5">
-        <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="text-3xl" aria-hidden>{selectedLang.flag}</div>
-            <div>
-              <h2 className="text-lg font-bold text-foreground">
-                {selectedLang.greeting}{visitor.name.trim() ? `, ${visitor.name.trim()}` : " there"} 👋
-              </h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Tell us your name and pick your language.</p>
-            </div>
-          </div>
-
-          <div className="space-y-1.5 mb-4">
-            <Label htmlFor="visitor-name" className="text-xs font-semibold">Your name</Label>
-            <Input
-              id="visitor-name"
-              value={visitor.name}
-              maxLength={60}
-              onChange={(e) => setVisitor({ ...visitor, name: e.target.value })}
-              placeholder="e.g. Alex"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold flex items-center gap-1.5">
-              <Languages className="w-3.5 h-3.5" /> Language
-            </Label>
-            <div className="grid grid-cols-3 gap-2">
-              {LANGUAGES.map((l) => {
-                const active = visitor.language === l.code;
-                return (
-                  <button
-                    key={l.code}
-                    type="button"
-                    onClick={() => setVisitor({ ...visitor, language: l.code })}
-                    aria-pressed={active}
-                    className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-2.5 transition-all ${
-                      active
-                        ? "border-primary bg-primary/10 shadow-soft"
-                        : "border-border bg-background hover:bg-accent"
-                    }`}
-                  >
-                    <span className="text-2xl leading-none" aria-hidden>{l.flag}</span>
-                    <span className={`text-[11px] font-semibold ${active ? "text-primary" : "text-foreground"}`}>
-                      {l.label}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </section>
 
 
       {/* Pain points */}

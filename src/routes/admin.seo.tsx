@@ -9,8 +9,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { AdminGate } from "@/components/AdminGate";
-import { OutboundClicksPanel } from "@/components/admin/OutboundClicksPanel";
-import { Separator } from "@/components/ui/separator";
 
 const SITE = "https://bizzsurfergo.lovable.app";
 const PRESET_PATHS = ["/", "/chat", "/events", "/pricing", "/profile"];
@@ -167,10 +165,6 @@ function AdminSeoPage() {
           </Card>
         </>
       )}
-
-      <Separator className="my-4" />
-      <OutboundClicksPanel />
     </main>
   );
 }
-
