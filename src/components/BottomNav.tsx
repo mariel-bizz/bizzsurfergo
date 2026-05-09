@@ -1,11 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Home, MessageCircle, Calendar, Tag, User } from "lucide-react";
+import { Home, MessageCircle, Calendar, Store, Tag, User } from "lucide-react";
 import type { TabKey } from "./AppShell";
 
 const tabs: { key: TabKey; label: string; icon: typeof Home; to: string }[] = [
   { key: "home", label: "Home", icon: Home, to: "/" },
-  { key: "chat", label: "Go!", icon: MessageCircle, to: "/chat" },
   { key: "events", label: "Events", icon: Calendar, to: "/events" },
+  { key: "chat", label: "Go!", icon: MessageCircle, to: "/chat" },
+  { key: "marketplace", label: "Market", icon: Store, to: "/marketplace" },
   { key: "pricing", label: "Upgrade", icon: Tag, to: "/pricing" },
   { key: "profile", label: "Profile", icon: User, to: "/profile" },
 ];
@@ -13,7 +14,7 @@ const tabs: { key: TabKey; label: string; icon: typeof Home; to: string }[] = [
 export function BottomNav({ active }: { active: TabKey }) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 mx-auto max-w-md bg-card/90 backdrop-blur-xl border-t border-border shadow-elegant">
-      <div className="grid grid-cols-5">
+      <div className="grid grid-cols-6">
         {tabs.map(({ key, label, icon: Icon, to }) => {
           const isActive = active === key;
           const isChat = key === "chat";

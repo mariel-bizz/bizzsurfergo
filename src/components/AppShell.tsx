@@ -6,7 +6,7 @@ import { FloatingChat } from "./FloatingChat";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/bizzsurfer-logo.png";
 
-export type TabKey = "home" | "chat" | "events" | "pricing" | "profile";
+export type TabKey = "home" | "chat" | "events" | "marketplace" | "pricing" | "profile";
 
 const STORAGE = "bizzsurfer_state";
 
@@ -70,6 +70,7 @@ const PATH_TO_TAB: Record<string, TabKey> = {
   "/": "home",
   "/chat": "chat",
   "/events": "events",
+  "/marketplace": "marketplace",
   "/pricing": "pricing",
   "/profile": "profile",
 };
