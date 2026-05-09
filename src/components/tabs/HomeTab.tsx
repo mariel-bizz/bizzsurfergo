@@ -23,7 +23,9 @@ const faqs = [
   { q: "What ROI should leaders expect?", a: "Outcomes vary by organisation and use case. The platform is designed to shorten execution cycles, speed up decisions, and improve adoption of change initiatives." },
 ];
 
-export function HomeTab({ onNavigate, game }: { onNavigate: (t: TabKey) => void; game: Game }) {
+export function HomeTab() {
+  const game = useGame();
+  const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState<number | null>(0);
   const [waitOpen, setWaitOpen] = useState(false);
 
