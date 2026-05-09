@@ -100,6 +100,10 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="mt-6 w-full max-w-sm rounded-2xl bg-card/80 backdrop-blur border border-border p-4 shadow-card space-y-4">
+        <p className="text-sm font-medium text-foreground text-center">
+          Please share your Name, Email and Language to get started! :)
+        </p>
+
         <div className="space-y-1.5">
           <Label htmlFor="splash-name" className="text-xs font-semibold">Your name</Label>
           <Input
@@ -109,6 +113,19 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Alex"
             autoComplete="given-name"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="splash-email" className="text-xs font-semibold">Your email</Label>
+          <Input
+            id="splash-email"
+            type="email"
+            value={email}
+            maxLength={255}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="alex@company.com"
+            autoComplete="email"
           />
         </div>
 
