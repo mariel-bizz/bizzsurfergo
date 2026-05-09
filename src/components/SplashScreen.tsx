@@ -39,14 +39,17 @@ async function trackOutboundClick(source: string) {
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const [fade, setFade] = useState(false);
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [language, setLanguage] = useState("en");
 
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       const savedName = window.localStorage.getItem("bs_visitor_name");
+      const savedEmail = window.localStorage.getItem("bs_visitor_email");
       const savedLang = window.localStorage.getItem("bs_visitor_lang");
       if (savedName) setName(savedName);
+      if (savedEmail) setEmail(savedEmail);
       if (savedLang) setLanguage(savedLang);
     } catch {
       // ignore
@@ -59,6 +62,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
     if (typeof window !== "undefined") {
       try {
         window.localStorage.setItem("bs_visitor_name", name.trim().slice(0, 60));
+        window.localStorage.setItem("bs_visitor_email", email.trim().slice(0, 255));
         window.localStorage.setItem("bs_visitor_lang", language);
       } catch {
         // ignore
@@ -96,6 +100,10 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
       </div>
 
       <div className="mt-6 w-full max-w-sm rounded-2xl bg-card/80 backdrop-blur border border-border p-4 shadow-card space-y-4">
+        <p className="text-sm font-medium text-foreground text-center">
+          Please share your Name, Email and Language to get started! :)
+        </p>
+
         <div className="space-y-1.5">
           <Label htmlFor="splash-name" className="text-xs font-semibold">Your name</Label>
           <Input
@@ -105,6 +113,19 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             onChange={(e) => setName(e.target.value)}
             placeholder="e.g. Alex"
             autoComplete="given-name"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <Label htmlFor="splash-email" className="text-xs font-semibold">Your email</Label>
+          <Input
+            id="splash-email"
+            type="email"
+            value={email}
+            maxLength={255}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="alex@company.com"
+            autoComplete="email"
           />
         </div>
 
