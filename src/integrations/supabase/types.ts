@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      outbound_clicks: {
+        Row: {
+          created_at: string
+          destination: string
+          id: string
+          path: string | null
+          referrer: string | null
+          source: string
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          destination: string
+          id?: string
+          path?: string | null
+          referrer?: string | null
+          source: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          destination?: string
+          id?: string
+          path?: string | null
+          referrer?: string | null
+          source?: string
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string

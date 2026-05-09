@@ -1,7 +1,26 @@
 import { useEffect, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 import logo from "@/assets/bizzsurfer-logo.png";
+
+const OUTBOUND_URL = "https://www.bizzsurfer.com";
+
+async function trackOutboundClick(source: string) {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase.from("outbound_clicks").insert({
+      source,
+      destination: OUTBOUND_URL,
+      user_id: user?.id ?? null,
+      referrer: typeof document !== "undefined" ? document.referrer || null : null,
+      user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
+      path: typeof window !== "undefined" ? window.location.pathname : null,
+    });
+  } catch (err) {
+    console.warn("outbound click tracking failed", err);
+  }
+}
 
 export function SplashScreen({ onDone }: { onDone: () => void }) {
   const [fade, setFade] = useState(false);
@@ -18,7 +37,15 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
 
   return (
     <div className={`fixed inset-0 z-50 flex flex-col items-center justify-center bg-gradient-wave transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"}`}>
-      <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="relative animate-float">
+      <a
+        href={OUTBOUND_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label="Open bizzsurfer.com"
+        onClick={() => { void trackOutboundClick("splash_logo"); }}
+        onAuxClick={() => { void trackOutboundClick("splash_logo"); }}
+        className="relative animate-float"
+      >
         <div className="absolute inset-0 rounded-full bg-primary/20 blur-3xl" />
         <img src={logo} alt="BizzSurfer" className="relative w-44 h-44 object-contain" />
       </a>
