@@ -3,6 +3,7 @@ import { ChatTab } from "@/components/tabs/ChatTab";
 import { pageHead } from "@/lib/page-head";
 
 export const Route = createFileRoute("/chat")({
+  validateSearch: (s: Record<string, unknown>) => ({ q: typeof s.q === "string" ? s.q : undefined }),
   head: () =>
     pageHead({
       path: "/chat",
@@ -11,5 +12,10 @@ export const Route = createFileRoute("/chat")({
         "Chat with BizzSurfer Go!, an Agentic AI advisor for enterprise transformation leaders. Ask about strategy, adoption, KPIs, and Agentic AI rollouts.",
       breadcrumbName: "Chat",
     }),
-  component: ChatTab,
+  component: ChatRoute,
 });
+
+function ChatRoute() {
+  const { q } = Route.useSearch();
+  return <ChatTab seedPrompt={q} />;
+}
