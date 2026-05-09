@@ -5,6 +5,7 @@ import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/bizzsurfer-logo.png";
+import headerLogo from "@/assets/bizzsurfer-go-logo.png";
 
 export type TabKey = "home" | "chat" | "events" | "marketplace" | "pricing" | "profile";
 
@@ -89,12 +90,8 @@ export function AppShell() {
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
           <div className="mx-auto max-w-md flex items-center justify-between px-4 py-2.5">
-            <div className="flex items-center gap-2">
-              <img src={logo} alt="" className="w-9 h-9 object-contain" />
-              <div className="leading-tight">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">BizzSurfer</p>
-                <p className="text-base font-bold text-foreground -mt-0.5">Go!</p>
-              </div>
+            <div className="flex items-center">
+              <img src={headerLogo} alt="BizzSurfer Go!" className="h-9 w-auto object-contain" />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
