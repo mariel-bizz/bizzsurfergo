@@ -142,7 +142,16 @@ export function MarketplaceTab() {
     saveLastPresetId(null);
   }
 
-  function handleSavePreset() {
+  function handleOnboardingApply(
+    state: PresetState,
+    bestPresetId: string | null,
+    label: string,
+  ) {
+    applyState(state);
+    setActivePresetId(bestPresetId);
+    saveLastPresetId(bestPresetId);
+    toast.success(`Tailored marketplace for ${label}`);
+  }
     const name = presetName.trim();
     if (!name) return;
     const id = `custom-${Date.now()}`;
