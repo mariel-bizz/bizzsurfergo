@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Rocket, CheckCircle2 } from "lucide-react";
@@ -11,12 +12,17 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
   open: boolean; onOpenChange: (v: boolean) => void; onJoined?: () => void;
 }) {
   const [form, setForm] = useState({ name: "", email: "", role: "", company: "" });
+  const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.email) return;
+    if (!consent) {
+      toast.error("Please accept the terms to continue.");
+      return;
+    }
     setLoading(true);
     const { error } = await supabase.from("waitlist").insert({
       name: form.name, email: form.email, role: form.role || null, company: form.company || null,
@@ -30,8 +36,13 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
     setDone(true);
     onJoined?.();
     toast.success("You're on the list! +50 XP earned.");
-    setTimeout(() => { onOpenChange(false); setDone(false); setForm({ name: "", email: "", role: "", company: "" }); }, 1800);
+    setTimeout(() => {
+      onOpenChange(false); setDone(false);
+      setForm({ name: "", email: "", role: "", company: "" });
+      setConsent(false);
+    }, 1800);
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -73,7 +84,22 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
                   <Input id="company" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="mt-1" />
                 </div>
               </div>
-              <Button type="submit" disabled={loading} className="w-full h-11 bg-gradient-primary font-bold mt-2">
+              <div className="flex items-start gap-2 pt-1">
+                <Checkbox
+                  id="consent"
+                  checked={consent}
+                  onCheckedChange={(v) => setConsent(v === true)}
+                  className="mt-0.5"
+                />
+                <Label htmlFor="consent" className="text-xs leading-snug font-normal text-muted-foreground cursor-pointer">
+                  I agree to BizzSurfer's{" "}
+                  <a href="https://www.bizzsurfer.com/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">Terms</a>{" "}
+                  and{" "}
+                  <a href="https://www.bizzsurfer.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a>{" "}
+                  and consent to be contacted about the launch (GDPR).
+                </Label>
+              </div>
+              <Button type="submit" disabled={loading || !consent} className="w-full h-11 bg-gradient-primary font-bold mt-2">
                 {loading ? "Adding you..." : "Join waitlist"}
               </Button>
             </form>
