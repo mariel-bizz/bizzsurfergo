@@ -60,10 +60,19 @@ async function authorize(request: Request): Promise<Response | undefined> {
 }
 
 function timingSafeEqualStr(a: string, b: string): boolean {
-  if (a.length !== b.length) return false;
-  let mismatch = 0;
-  for (let i = 0; i < a.length; i++) mismatch |= a.charCodeAt(i) ^ b.charCodeAt(i);
-  return mismatch === 0;
+  // Constant-time-ish compare that does not short-circuit on length mismatch,
+  // so the cron-secret byte length cannot be inferred from response timing.
+  const enc = new TextEncoder();
+  const aBuf = enc.encode(a);
+  const bBuf = enc.encode(b);
+  const len = Math.max(aBuf.byteLength, bBuf.byteLength, 32);
+  let mismatch = aBuf.byteLength ^ bBuf.byteLength;
+  for (let i = 0; i < len; i++) {
+    const av = i < aBuf.byteLength ? aBuf[i] : 0;
+    const bv = i < bBuf.byteLength ? bBuf[i] : 0;
+    mismatch |= av ^ bv;
+  }
+  return mismatch === 0 && aBuf.byteLength === bBuf.byteLength;
 }
 
 async function runCheck(): Promise<Response> {
