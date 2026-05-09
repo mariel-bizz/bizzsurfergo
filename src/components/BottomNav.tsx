@@ -6,7 +6,7 @@ const tabs: { key: TabKey; label: string; icon: typeof Home; to: string }[] = [
   { key: "home", label: "Home", icon: Home, to: "/" },
   { key: "chat", label: "Go!", icon: MessageCircle, to: "/chat" },
   { key: "events", label: "Events", icon: Calendar, to: "/events" },
-  { key: "pricing", label: "Pricing", icon: Tag, to: "/pricing" },
+  { key: "pricing", label: "Upgrade", icon: Tag, to: "/pricing" },
   { key: "profile", label: "Profile", icon: User, to: "/profile" },
 ];
 
