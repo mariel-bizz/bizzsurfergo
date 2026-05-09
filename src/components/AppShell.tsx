@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { Outlet, useLocation } from "@tanstack/react-router";
 import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
+import { FloatingChat } from "./FloatingChat";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/bizzsurfer-logo.png";
 
@@ -111,6 +112,7 @@ export function AppShell() {
           <Outlet />
         </main>
 
+        <FloatingChat />
         <BottomNav active={activeTab} />
         <Toaster position="top-center" />
       </div>
