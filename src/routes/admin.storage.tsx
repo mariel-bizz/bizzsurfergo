@@ -322,6 +322,15 @@ function AdminStoragePage() {
             >
               {sortDir === "asc" ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />}
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={resetFilters}
+              disabled={!isCustomized}
+              title="Reset search, type, and sorting"
+            >
+              Reset filters
+            </Button>
           </div>
         </CardHeader>
         <CardContent>
