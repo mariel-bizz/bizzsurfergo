@@ -1,9 +1,57 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Plug, Youtube,
 } from "lucide-react";
+
+function PartnerLogo({ name, slug }: { name: string; slug?: string }) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
+    slug ? "loading" : "error",
+  );
+  const showImage = slug && status !== "error";
+  return (
+    <div
+      title={name}
+      className="relative flex h-14 items-center justify-center rounded-xl border border-border bg-background px-2"
+    >
+      {status === "loading" && (
+        <Skeleton className="absolute inset-1 rounded-lg" />
+      )}
+      {showImage ? (
+        <img
+          src={`https://cdn.simpleicons.org/${slug}`}
+          alt={`${name} logo`}
+          width={28}
+          height={28}
+          loading="lazy"
+          decoding="async"
+          // @ts-expect-error fetchpriority is a valid HTML hint not yet typed
+          fetchpriority="low"
+          onLoad={() => setStatus("loaded")}
+          onError={() => setStatus("error")}
+          className={`max-h-7 max-w-full object-contain opacity-80 transition-opacity duration-200 ${
+            status === "loaded" ? "opacity-80" : "opacity-0"
+          }`}
+        />
+      ) : (
+        !slug && (
+          <span className="text-center text-[11px] font-bold text-foreground leading-tight">
+            {name}
+          </span>
+        )
+      )}
+      {slug && status === "error" && (
+        <span className="text-center text-[11px] font-bold text-foreground leading-tight">
+          {name}
+        </span>
+      )}
+    </div>
+  );
+}
+
 
 // Logos served from simple-icons CDN (https://simpleicons.org). Brands without a
 // matching slug fall back to a styled text chip so layout stays consistent.
@@ -145,24 +193,7 @@ export function ResourcesSection() {
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
-            <div
-              key={p.name}
-              title={p.name}
-              className="flex h-14 items-center justify-center rounded-xl border border-border bg-background px-2"
-            >
-              {p.slug ? (
-                <img
-                  src={`https://cdn.simpleicons.org/${p.slug}`}
-                  alt={`${p.name} logo`}
-                  loading="lazy"
-                  className="max-h-7 max-w-full object-contain opacity-80"
-                />
-              ) : (
-                <span className="text-center text-[11px] font-bold text-foreground leading-tight">
-                  {p.name}
-                </span>
-              )}
-            </div>
+            <PartnerLogo key={p.name} name={p.name} slug={p.slug} />
           ))}
         </div>
       </div>
