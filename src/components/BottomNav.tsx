@@ -1,25 +1,26 @@
+import { Link } from "@tanstack/react-router";
 import { Home, MessageCircle, Calendar, Tag, User } from "lucide-react";
 import type { TabKey } from "./AppShell";
 
-const tabs: { key: TabKey; label: string; icon: typeof Home }[] = [
-  { key: "home", label: "Home", icon: Home },
-  { key: "chat", label: "Go!", icon: MessageCircle },
-  { key: "events", label: "Events", icon: Calendar },
-  { key: "pricing", label: "Pricing", icon: Tag },
-  { key: "profile", label: "Profile", icon: User },
+const tabs: { key: TabKey; label: string; icon: typeof Home; to: string }[] = [
+  { key: "home", label: "Home", icon: Home, to: "/" },
+  { key: "chat", label: "Go!", icon: MessageCircle, to: "/chat" },
+  { key: "events", label: "Events", icon: Calendar, to: "/events" },
+  { key: "pricing", label: "Pricing", icon: Tag, to: "/pricing" },
+  { key: "profile", label: "Profile", icon: User, to: "/profile" },
 ];
 
-export function BottomNav({ active, onChange }: { active: TabKey; onChange: (t: TabKey) => void }) {
+export function BottomNav({ active }: { active: TabKey }) {
   return (
     <nav className="fixed bottom-0 inset-x-0 z-40 mx-auto max-w-md bg-card/90 backdrop-blur-xl border-t border-border shadow-elegant">
       <div className="grid grid-cols-5">
-        {tabs.map(({ key, label, icon: Icon }) => {
+        {tabs.map(({ key, label, icon: Icon, to }) => {
           const isActive = active === key;
           const isChat = key === "chat";
           return (
-            <button
+            <Link
               key={key}
-              onClick={() => onChange(key)}
+              to={to}
               className="relative flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors"
             >
               {isChat ? (
@@ -32,7 +33,7 @@ export function BottomNav({ active, onChange }: { active: TabKey; onChange: (t: 
               <span className={`text-[10px] font-semibold ${isActive ? "text-primary" : "text-muted-foreground"} ${isChat ? "mt-1" : ""}`}>
                 {label}
               </span>
-            </button>
+            </Link>
           );
         })}
       </div>

@@ -1,11 +1,7 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
+import { Outlet, useLocation } from "@tanstack/react-router";
 import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
-import { HomeTab } from "./tabs/HomeTab";
-import { ChatTab } from "./tabs/ChatTab";
-import { EventsTab } from "./tabs/EventsTab";
-import { PricingTab } from "./tabs/PricingTab";
-import { ProfileTab } from "./tabs/ProfileTab";
 import { Toaster } from "@/components/ui/sonner";
 import logo from "@/assets/bizzsurfer-logo.png";
 
@@ -23,7 +19,12 @@ export type GameState = {
 
 const defaultState: GameState = { xp: 0, streak: 0, badges: [], questionsAsked: 0, lastVisit: null };
 
-export function useGameState() {
+export type Game = {
+  state: GameState;
+  update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void;
+};
+
+export function useGameStateInternal(): Game {
   const [state, setState] = useState<GameState>(defaultState);
 
   useEffect(() => {
@@ -56,48 +57,63 @@ export function useGameState() {
   return { state, update };
 }
 
+const GameContext = createContext<Game | null>(null);
+
+export function useGame(): Game {
+  const ctx = useContext(GameContext);
+  if (!ctx) throw new Error("useGame must be used within AppShell");
+  return ctx;
+}
+
+const PATH_TO_TAB: Record<string, TabKey> = {
+  "/": "home",
+  "/chat": "chat",
+  "/events": "events",
+  "/pricing": "pricing",
+  "/profile": "profile",
+};
+
 export function AppShell() {
   const [splash, setSplash] = useState(true);
-  const [tab, setTab] = useState<TabKey>("home");
-  const game = useGameState();
+  const game = useGameStateInternal();
+  const location = useLocation();
+  const activeTab: TabKey = PATH_TO_TAB[location.pathname] ?? "home";
 
   return (
-    <div className="min-h-screen bg-background relative">
-      {splash && <SplashScreen onDone={() => setSplash(false)} />}
+    <GameContext.Provider value={game}>
+      <div className="min-h-screen bg-background relative">
+        {splash && <SplashScreen onDone={() => setSplash(false)} />}
 
-      {/* Top bar */}
-      <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
-        <div className="mx-auto max-w-md flex items-center justify-between px-4 py-2.5">
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="" className="w-9 h-9 object-contain" />
-            <div className="leading-tight">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">BizzSurfer</p>
-              <p className="text-base font-bold text-foreground -mt-0.5">Go!</p>
+        {/* Top bar */}
+        <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
+          <div className="mx-auto max-w-md flex items-center justify-between px-4 py-2.5">
+            <div className="flex items-center gap-2">
+              <img src={logo} alt="" className="w-9 h-9 object-contain" />
+              <div className="leading-tight">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">BizzSurfer</p>
+                <p className="text-base font-bold text-foreground -mt-0.5">Go!</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
+                <span className="text-xs">🔥</span>
+                <span className="text-xs font-bold text-accent-foreground">{game.state.streak}</span>
+              </div>
+              <div className="flex items-center gap-1 rounded-full bg-gradient-primary px-2.5 py-1 shadow-soft">
+                <span className="text-xs">⚡</span>
+                <span className="text-xs font-bold text-primary-foreground">{game.state.xp} XP</span>
+              </div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
-              <span className="text-xs">🔥</span>
-              <span className="text-xs font-bold text-accent-foreground">{game.state.streak}</span>
-            </div>
-            <div className="flex items-center gap-1 rounded-full bg-gradient-primary px-2.5 py-1 shadow-soft">
-              <span className="text-xs">⚡</span>
-              <span className="text-xs font-bold text-primary-foreground">{game.state.xp} XP</span>
-            </div>
-          </div>
-        </div>
-      </header>
+        </header>
 
-      <main className="mx-auto max-w-md pb-28">
-        {tab === "home" && <HomeTab onNavigate={setTab} game={game} />}
-        {tab === "chat" && <ChatTab game={game} />}
-        {tab === "events" && <EventsTab game={game} />}
-        {tab === "pricing" && <PricingTab />}
-        {tab === "profile" && <ProfileTab game={game} />}
-      </main>
+        <main className="mx-auto max-w-md pb-28">
+          <Outlet />
+        </main>
 
-      <BottomNav active={tab} onChange={setTab} />
-      <Toaster position="top-center" />
-    </div>
+        <BottomNav active={activeTab} />
+        <Toaster position="top-center" />
+      </div>
+    </GameContext.Provider>
   );
 }
