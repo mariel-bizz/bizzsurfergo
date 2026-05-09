@@ -186,6 +186,7 @@ export function ResourcesSection() {
             </a>
           ))}
         </div>
+      </div>
     </section>
   );
 }
