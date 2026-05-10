@@ -188,3 +188,34 @@ export const listings: Listing[] = [
 export function getListing(id: string): Listing | undefined {
   return listings.find((l) => l.id === id);
 }
+
+/**
+ * Parse a freeform listing price string into a chargeable amount in cents
+ * and an interval. Returns null when the listing isn't directly payable
+ * (free, included, or "Custom" / "From €X" quotes that need an intro).
+ */
+export function parseListingPrice(price: string): {
+  amountInCents: number;
+  currency: "eur";
+  interval: "month" | null;
+  display: string;
+} | null {
+  const lower = price.toLowerCase().trim();
+  if (!lower || lower.includes("free") || lower.includes("included") || lower.includes("custom")) {
+    return null;
+  }
+  // "From €18,000" → quote-only, not a fixed price the user can self-checkout.
+  if (lower.startsWith("from")) return null;
+  const match = price.match(/(\d[\d,.]*)/);
+  if (!match) return null;
+  const amount = parseFloat(match[1].replace(/,/g, ""));
+  if (!Number.isFinite(amount) || amount <= 0) return null;
+  const interval = /\bmo\b|month/.test(lower) ? "month" : null;
+  return {
+    amountInCents: Math.round(amount * 100),
+    currency: "eur",
+    interval,
+    display: price,
+  };
+}
+
