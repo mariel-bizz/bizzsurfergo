@@ -1,106 +1,466 @@
+import { useEffect, useState } from "react";
 import { useGame } from "../AppShell";
-import { Trophy, Flame, Zap, Award, Target, MessageCircle, Calendar, Rocket, Sparkles } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Trophy,
+  Flame,
+  Zap,
+  MessageCircle,
+  LogIn,
+  Save,
+  UserPlus,
+  Trash2,
+  Mail,
+  Sparkles,
+} from "lucide-react";
+import { useNavigate } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  getMyPreferences,
+  upsertMyPreferences,
+  listMyTeam,
+  inviteTeamMember,
+  removeTeamMember,
+} from "@/lib/profile.functions";
 
-const ALL_BADGES = [
-  { id: "First Question", label: "First Question", icon: MessageCircle, desc: "Asked your first question to BizzSurfer Go!" },
-  { id: "Curious Mind", label: "Curious Mind", icon: Sparkles, desc: "Asked 5+ executive questions" },
-  { id: "Strategic Thinker", label: "Strategic Thinker", icon: Target, desc: "Asked 15+ executive questions" },
-  { id: "Consistency", label: "Consistency", icon: Flame, desc: "3-day visit streak" },
-  { id: "Event Insider", label: "Event Insider", icon: Calendar, desc: "Registered for an executive event" },
-  { id: "Early Adopter", label: "Early Adopter", icon: Rocket, desc: "Joined the Agentic AI launch waitlist" },
+const TOPIC_OPTIONS = [
+  "Agentic AI",
+  "Board & C-suite Strategy",
+  "Operating Model Redesign",
+  "AI Governance & Risk",
+  "People & Change",
+  "Customer Experience",
+  "Data & Platforms",
+  "Finance Transformation",
+  "Sustainability",
+  "GenAI for Sales",
+  "Procurement & Supply Chain",
+  "Cybersecurity",
 ];
 
+const LANGUAGE_OPTIONS = [
+  { code: "en", label: "English" },
+  { code: "es", label: "Español" },
+  { code: "pt", label: "Português" },
+  { code: "fr", label: "Français" },
+  { code: "de", label: "Deutsch" },
+  { code: "it", label: "Italiano" },
+];
+
+type TeamRow = {
+  id: string;
+  email: string;
+  name: string | null;
+  role: "member" | "admin";
+  status: "pending" | "active" | "revoked";
+  invited_at: string;
+};
+
 export function ProfileTab() {
+  const navigate = useNavigate();
   const game = useGame();
-  const level = Math.floor(game.state.xp / 100) + 1;
-  const xpInLevel = game.state.xp % 100;
+  const [authed, setAuthed] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => setAuthed(!!data.session));
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) =>
+      setAuthed(!!session),
+    );
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  if (authed === null) {
+    return <div className="px-5 py-10 text-sm text-muted-foreground">Loading…</div>;
+  }
+
+  if (!authed) {
+    return (
+      <div className="px-5 py-8">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <LogIn className="w-5 h-5 text-primary" /> Sign in to view your profile
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <p className="text-sm text-muted-foreground">
+              Track XP, manage your transformation interests, languages, and invite
+              teammates to BizzSurfer Go!
+            </p>
+            <Button
+              className="w-full"
+              onClick={() => navigate({ to: "/login", search: { redirect: "/profile" } })}
+            >
+              Sign in or create account
+            </Button>
+          </CardContent>
+        </Card>
+        <GameSummary />
+      </div>
+    );
+  }
+
+  return <SignedInProfile />;
+}
+
+function SignedInProfile() {
+  const game = useGame();
+  const navigate = useNavigate();
+  const fetchPrefs = useServerFn(getMyPreferences);
+  const savePrefs = useServerFn(upsertMyPreferences);
+  const fetchTeam = useServerFn(listMyTeam);
+  const invite = useServerFn(inviteTeamMember);
+  const removeMember = useServerFn(removeTeamMember);
+
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState("");
+  const [jobTitle, setJobTitle] = useState("");
+  const [company, setCompany] = useState("");
+  const [topics, setTopics] = useState<string[]>([]);
+  const [languages, setLanguages] = useState<string[]>(["en"]);
+  const [emailUpdates, setEmailUpdates] = useState(true);
+  const [eventReminders, setEventReminders] = useState(true);
+  const [insightsDigest, setInsightsDigest] = useState(true);
+
+  const [team, setTeam] = useState<TeamRow[]>([]);
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteName, setInviteName] = useState("");
+  const [inviteRole, setInviteRole] = useState<"member" | "admin">("member");
+  const [inviting, setInviting] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all([fetchPrefs(), fetchTeam()])
+      .then(([prefs, t]) => {
+        if (cancelled) return;
+        setEmail(prefs.account.email);
+        const p = prefs.preferences;
+        if (p) {
+          setDisplayName(p.display_name ?? "");
+          setJobTitle(p.job_title ?? "");
+          setCompany(p.company ?? "");
+          setTopics(p.topics ?? []);
+          setLanguages(p.languages?.length ? p.languages : ["en"]);
+          setEmailUpdates(p.email_updates);
+          setEventReminders(p.event_reminders);
+          setInsightsDigest(p.insights_digest);
+        }
+        setTeam((t.team ?? []) as TeamRow[]);
+      })
+      .catch((e) => toast.error(e instanceof Error ? e.message : "Failed to load profile"))
+      .finally(() => !cancelled && setLoading(false));
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchPrefs, fetchTeam]);
+
+  const toggleTopic = (t: string) =>
+    setTopics((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  const toggleLanguage = (code: string) =>
+    setLanguages((prev) => (prev.includes(code) ? prev.filter((x) => x !== code) : [...prev, code]));
+
+  const onSave = async () => {
+    setSaving(true);
+    try {
+      await savePrefs({
+        data: {
+          display_name: displayName || null,
+          job_title: jobTitle || null,
+          company: company || null,
+          topics,
+          languages: languages.length ? languages : ["en"],
+          email_updates: emailUpdates,
+          event_reminders: eventReminders,
+          insights_digest: insightsDigest,
+        },
+      });
+      toast.success("Preferences saved");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const onInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteEmail.trim()) return;
+    setInviting(true);
+    try {
+      await invite({
+        data: { email: inviteEmail.trim(), name: inviteName.trim() || undefined, role: inviteRole },
+      });
+      toast.success(`Invited ${inviteEmail.trim()}`);
+      setInviteEmail("");
+      setInviteName("");
+      setInviteRole("member");
+      const t = await fetchTeam();
+      setTeam((t.team ?? []) as TeamRow[]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Invite failed");
+    } finally {
+      setInviting(false);
+    }
+  };
+
+  const onRemove = async (id: string) => {
+    try {
+      await removeMember({ data: { id } });
+      setTeam((prev) => prev.filter((m) => m.id !== id));
+      toast.success("Removed");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not remove");
+    }
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login", search: { redirect: "/profile" } });
+  };
+
+  if (loading) {
+    return <div className="px-5 py-10 text-sm text-muted-foreground">Loading your profile…</div>;
+  }
 
   return (
-    <div className="px-5 py-5 space-y-5">
-      {/* Profile header */}
-      <div className="rounded-3xl bg-gradient-deep p-6 text-primary-foreground shadow-elegant relative overflow-hidden">
-        <div className="absolute -right-12 -top-12 w-44 h-44 rounded-full bg-white/10 blur-3xl" />
-        <div className="relative flex items-center gap-4">
-          <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center text-2xl font-bold">
-            🏄
+    <div className="px-5 py-5 space-y-5 pb-24">
+      {/* Account */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Account</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="text-sm">
+            <p className="text-muted-foreground">Signed in as</p>
+            <p className="font-medium">{email ?? "—"}</p>
           </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Executive Surfer</p>
-            <p className="text-xl font-bold">Level {level}</p>
-            <p className="text-xs opacity-90 mt-0.5">Keep riding the Agentic wave</p>
+          <div className="grid grid-cols-1 gap-3">
+            <div>
+              <Label htmlFor="display_name">Display name</Label>
+              <Input id="display_name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="job_title">Position / title</Label>
+              <Input id="job_title" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />
+            </div>
+            <div>
+              <Label htmlFor="company">Company</Label>
+              <Input id="company" value={company} onChange={(e) => setCompany(e.target.value)} />
+            </div>
           </div>
-        </div>
-        <div className="relative mt-4">
-          <div className="flex justify-between text-[10px] uppercase tracking-widest opacity-90 mb-1.5 font-semibold">
-            <span>{xpInLevel} / 100 XP</span>
-            <span>Next: Level {level + 1}</span>
-          </div>
-          <div className="h-2 rounded-full bg-white/20 overflow-hidden">
-            <div className="h-full bg-white rounded-full transition-all" style={{ width: `${xpInLevel}%` }} />
-          </div>
-        </div>
-      </div>
+          <Button variant="outline" size="sm" onClick={signOut}>Sign out</Button>
+        </CardContent>
+      </Card>
 
-      {/* Stats */}
-      <div className="grid grid-cols-3 gap-3">
-        <Stat icon={Zap} value={game.state.xp} label="Total XP" />
-        <Stat icon={Flame} value={game.state.streak} label="Day streak" />
-        <Stat icon={MessageCircle} value={game.state.questionsAsked} label="Questions" />
-      </div>
+      {/* Transformation interests */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-primary" /> Transformation topics
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">Pick the topics you want curated insights and event invites for.</p>
+          <div className="flex flex-wrap gap-2">
+            {TOPIC_OPTIONS.map((t) => {
+              const on = topics.includes(t);
+              return (
+                <button
+                  key={t}
+                  type="button"
+                  onClick={() => toggleTopic(t)}
+                  className={`text-xs rounded-full px-3 py-1.5 border transition ${
+                    on
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card text-foreground border-border hover:bg-muted"
+                  }`}
+                >
+                  {t}
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Daily missions */}
-      <div>
-        <h2 className="text-lg font-bold text-foreground mb-3">Daily missions</h2>
-        <div className="space-y-2">
-          <Mission label="Open BizzSurfer Go!" reward={10} done />
-          <Mission label="Ask one question to the AI advisor" reward={15} done={game.state.questionsAsked > 0} />
-          <Mission label="Read one FAQ" reward={5} />
-          <Mission label="Register for an event" reward={25} done={game.state.badges.includes("Event Insider")} />
-        </div>
-      </div>
+      {/* Languages */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Languages</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-2">
+          <p className="text-xs text-muted-foreground">We'll prioritize content in these languages.</p>
+          <div className="flex flex-wrap gap-2">
+            {LANGUAGE_OPTIONS.map((l) => {
+              const on = languages.includes(l.code);
+              return (
+                <button
+                  key={l.code}
+                  type="button"
+                  onClick={() => toggleLanguage(l.code)}
+                  className={`text-xs rounded-full px-3 py-1.5 border transition ${
+                    on
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-card text-foreground border-border hover:bg-muted"
+                  }`}
+                >
+                  {l.label}
+                </button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-      {/* Badges */}
-      <div>
-        <h2 className="text-lg font-bold text-foreground mb-3 flex items-center gap-2">
-          <Trophy className="w-5 h-5 text-primary" /> Badges
-        </h2>
-        <div className="grid grid-cols-3 gap-3">
-          {ALL_BADGES.map((b) => {
-            const earned = game.state.badges.includes(b.id);
-            return (
-              <div key={b.id} className={`rounded-2xl p-3 text-center border ${
-                earned ? "bg-gradient-primary text-primary-foreground border-primary shadow-soft" : "bg-card border-border opacity-60"
-              }`}>
-                <b.icon className="w-6 h-6 mx-auto" />
-                <p className="text-[11px] font-bold mt-1.5 leading-tight">{b.label}</p>
-                <p className={`text-[9px] mt-1 leading-tight ${earned ? "opacity-90" : "text-muted-foreground"}`}>{b.desc}</p>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* Notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Notifications</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <ToggleRow label="Product & feature updates" checked={emailUpdates} onCheckedChange={setEmailUpdates} />
+          <ToggleRow label="Event reminders" checked={eventReminders} onCheckedChange={setEventReminders} />
+          <ToggleRow label="Weekly insights digest" checked={insightsDigest} onCheckedChange={setInsightsDigest} />
+        </CardContent>
+      </Card>
+
+      <Button className="w-full" onClick={onSave} disabled={saving}>
+        <Save className="w-4 h-4 mr-2" />
+        {saving ? "Saving…" : "Save preferences"}
+      </Button>
+
+      {/* Team */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="w-5 h-5 text-primary" /> Team members
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-xs text-muted-foreground">
+            Invite teammates so your organization can explore Agentic AI together. Invitations are recorded here; they'll appear with status <em>pending</em> until they sign in with the same email.
+          </p>
+          <form onSubmit={onInvite} className="space-y-2">
+            <div className="grid grid-cols-1 gap-2">
+              <Input
+                type="email"
+                placeholder="teammate@company.com"
+                value={inviteEmail}
+                onChange={(e) => setInviteEmail(e.target.value)}
+                required
+              />
+              <Input
+                placeholder="Name (optional)"
+                value={inviteName}
+                onChange={(e) => setInviteName(e.target.value)}
+              />
+              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "member" | "admin")}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="member">Member</SelectItem>
+                  <SelectItem value="admin">Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button type="submit" className="w-full" disabled={inviting}>
+              <Mail className="w-4 h-4 mr-2" />
+              {inviting ? "Sending…" : "Send invite"}
+            </Button>
+          </form>
+
+          {team.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">No teammates yet.</p>
+          ) : (
+            <ul className="space-y-2">
+              {team.map((m) => (
+                <li
+                  key={m.id}
+                  className="flex items-center justify-between rounded-xl border border-border bg-card p-3"
+                >
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">{m.name || m.email}</p>
+                    <p className="text-xs text-muted-foreground truncate">{m.email}</p>
+                    <div className="flex gap-1.5 mt-1">
+                      <Badge variant="secondary" className="text-[10px]">{m.role}</Badge>
+                      <Badge
+                        variant={m.status === "active" ? "default" : "outline"}
+                        className="text-[10px]"
+                      >
+                        {m.status}
+                      </Badge>
+                    </div>
+                  </div>
+                  <Button variant="ghost" size="icon" onClick={() => onRemove(m.id)} aria-label="Remove">
+                    <Trash2 className="w-4 h-4 text-destructive" />
+                  </Button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Gamification summary */}
+      <GameSummary />
     </div>
+  );
+}
+
+function ToggleRow({
+  label,
+  checked,
+  onCheckedChange,
+}: {
+  label: string;
+  checked: boolean;
+  onCheckedChange: (v: boolean) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm">{label}</span>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  );
+}
+
+function GameSummary() {
+  const game = useGame();
+  const level = Math.floor(game.state.xp / 100) + 1;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Trophy className="w-5 h-5 text-primary" /> Your progress
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-3 gap-3">
+          <Stat icon={Zap} value={game.state.xp} label="XP" />
+          <Stat icon={Flame} value={game.state.streak} label="Streak" />
+          <Stat icon={MessageCircle} value={game.state.questionsAsked} label="Questions" />
+        </div>
+        <p className="text-xs text-muted-foreground mt-3 text-center">Level {level}</p>
+      </CardContent>
+    </Card>
   );
 }
 
 function Stat({ icon: Icon, value, label }: { icon: typeof Zap; value: number; label: string }) {
   return (
-    <div className="rounded-2xl bg-card border border-border p-3 text-center shadow-card">
+    <div className="rounded-2xl bg-muted/40 p-3 text-center">
       <Icon className="w-5 h-5 text-primary mx-auto" />
-      <p className="text-xl font-bold text-foreground mt-1">{value}</p>
+      <p className="text-lg font-bold mt-1">{value}</p>
       <p className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">{label}</p>
-    </div>
-  );
-}
-
-function Mission({ label, reward, done }: { label: string; reward: number; done?: boolean }) {
-  return (
-    <div className={`flex items-center gap-3 rounded-2xl p-3 border ${done ? "bg-success/10 border-success/30" : "bg-card border-border"}`}>
-      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ${done ? "bg-success text-success-foreground" : "bg-muted text-muted-foreground"}`}>
-        {done ? "✓" : <Award className="w-4 h-4" />}
-      </div>
-      <p className="flex-1 text-sm font-medium text-foreground">{label}</p>
-      <span className={`text-xs font-bold ${done ? "text-success" : "text-primary"}`}>+{reward} XP</span>
     </div>
   );
 }
