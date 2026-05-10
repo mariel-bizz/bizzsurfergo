@@ -1,6 +1,9 @@
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
+import { ArticleEngagement } from "@/components/insights/ArticleEngagement";
+import { trackInsightView, marketingUrlForSlug } from "@/lib/insights-engagement";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
 import type { Block, Inline } from "@contentful/rich-text-types";
@@ -120,6 +123,9 @@ const richTextOptions = {
 function ArticlePage() {
   const { slug } = Route.useParams();
   const fetchPost = useServerFn(getBlogPost);
+  useEffect(() => {
+    trackInsightView(slug);
+  }, [slug]);
   const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["blog-post", slug],
     queryFn: async () => {
@@ -215,6 +221,8 @@ function ArticlePage() {
           )}
         </div>
 
+        <ArticleEngagement slug={data.slug} articleTitle={data.title} />
+
         <CtaBlock />
       </article>
     </>
@@ -224,7 +232,8 @@ function ArticlePage() {
 function ArticleHead({ post }: { post: { metaTitle: string | null; title: string; metaDescription: string | null; excerpt: string; featuredImage: { url: string } | null; slug: string } }) {
   const title = post.metaTitle || `${post.title} — BizzSurfer Go!`;
   const desc = post.metaDescription || post.excerpt;
-  const url = `https://bizzsurfergo.lovable.app/insights/${post.slug}`;
+  // Canonical points to the marketing site so SEO/views consolidate on www.bizzsurfer.com.
+  const url = marketingUrlForSlug(post.slug);
   const image = post.featuredImage ? `${post.featuredImage.url}?w=1200&fm=jpg&q=80` : null;
   return (
     <>
