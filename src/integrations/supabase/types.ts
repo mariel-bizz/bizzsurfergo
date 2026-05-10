@@ -259,6 +259,84 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          email: string
+          id: string
+          invited_at: string
+          name: string | null
+          owner_id: string
+          role: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          email: string
+          id?: string
+          invited_at?: string
+          name?: string | null
+          owner_id: string
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          email?: string
+          id?: string
+          invited_at?: string
+          name?: string | null
+          owner_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      user_preferences: {
+        Row: {
+          company: string | null
+          created_at: string
+          display_name: string | null
+          email_updates: boolean
+          event_reminders: boolean
+          id: string
+          insights_digest: boolean
+          job_title: string | null
+          languages: string[]
+          topics: string[]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          email_updates?: boolean
+          event_reminders?: boolean
+          id?: string
+          insights_digest?: boolean
+          job_title?: string | null
+          languages?: string[]
+          topics?: string[]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          display_name?: string | null
+          email_updates?: boolean
+          event_reminders?: boolean
+          id?: string
+          insights_digest?: boolean
+          job_title?: string | null
+          languages?: string[]
+          topics?: string[]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
