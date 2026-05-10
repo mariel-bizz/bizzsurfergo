@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Rocket, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { Check, Crown, Rocket, Sparkles, X, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Link } from "@tanstack/react-router";
 
 const tiers = [
   {
