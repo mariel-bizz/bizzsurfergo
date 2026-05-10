@@ -124,9 +124,9 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
       automatic_tax: { enabled: true },
       customer: customerId,
       customer_update: { address: "auto", name: "auto" },
-      metadata: { userId, listingId: data.listingId },
+      metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle },
       ...(isRecurring && {
-        subscription_data: { metadata: { userId, listingId: data.listingId } },
+        subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle } },
       }),
     });
 
