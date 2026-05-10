@@ -41,9 +41,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
 
   const handleLanguage = (val: string) => {
     setLanguage(val);
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("bizzsurfer.lang", val);
-    }
+    setAppLanguage(val);
   };
 
   const handleContinue = () => {
