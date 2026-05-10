@@ -73,15 +73,28 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
 
   const profile = useMemo(() => loadProfile() ?? profileFromSession(session), [session]);
 
-  const likesQ = useQuery({
-    queryKey: ["insights-likes", slug],
+  const likeCountQ = useQuery({
+    queryKey: ["insights-like-count", slug],
     queryFn: async () => {
+      const { data, error } = await supabase.rpc("get_insights_like_count", { _slug: slug });
+      if (error) throw error;
+      return Number(data ?? 0);
+    },
+  });
+
+  const myLikeQ = useQuery({
+    queryKey: ["insights-my-like", slug, session?.user?.id ?? null],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      if (!session?.user?.id) return null;
       const { data, error } = await supabase
         .from("insights_likes")
-        .select("id,user_id")
-        .eq("article_slug", slug);
+        .select("id")
+        .eq("article_slug", slug)
+        .eq("user_id", session.user.id)
+        .maybeSingle();
       if (error) throw error;
-      return (data ?? []) as Like[];
+      return (data as Like | null) ?? null;
     },
   });
 
@@ -98,8 +111,8 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
     },
   });
 
-  const myLike = likesQ.data?.find((l) => l.user_id === session?.user?.id);
-  const likeCount = likesQ.data?.length ?? 0;
+  const myLike = myLikeQ.data ?? null;
+  const likeCount = likeCountQ.data ?? 0;
 
   const requireAuth = (next: "like" | "comment") => {
     if (!session) {
@@ -135,7 +148,10 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
       await trackInsightAction(slug, "like");
       return "added";
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["insights-likes", slug] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["insights-like-count", slug] });
+      qc.invalidateQueries({ queryKey: ["insights-my-like", slug] });
+    },
     onError: (e: Error) => toast.error(e.message),
   });
 
