@@ -57,21 +57,21 @@ function LoginPage() {
     }
   };
 
-  const google = async () => {
+  const oauth = async (provider: "google" | "apple") => {
     setError(null);
     setLoading(true);
     try {
-      const result = await lovable.auth.signInWithOAuth("google", {
+      const result = await lovable.auth.signInWithOAuth(provider, {
         redirect_uri: `${window.location.origin}${redirect}`,
       });
       if (result.error) {
-        setError(result.error instanceof Error ? result.error.message : "Google sign-in failed");
+        setError(result.error instanceof Error ? result.error.message : `${provider} sign-in failed`);
         return;
       }
-      if (result.redirected) return; // browser is navigating
+      if (result.redirected) return;
       navigate({ to: redirect });
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Google sign-in failed");
+      setError(err instanceof Error ? err.message : `${provider} sign-in failed`);
     } finally {
       setLoading(false);
     }
@@ -98,8 +98,11 @@ function LoginPage() {
               {loading ? "…" : mode === "signin" ? "Sign in" : "Sign up"}
             </Button>
           </form>
-          <Button variant="outline" className="w-full" onClick={google}>
+          <Button variant="outline" className="w-full" onClick={() => oauth("google")} disabled={loading}>
             Continue with Google
+          </Button>
+          <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
+            Continue with Apple
           </Button>
           <button
             type="button"
