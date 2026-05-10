@@ -155,10 +155,17 @@ function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
-        <CardHeader>
+        <CardHeader className="space-y-2">
           <CardTitle>
             {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset your password"}
           </CardTitle>
+          {isUpgradeFlow && mode !== "forgot" && (
+            <p className="text-sm text-muted-foreground">
+              {mode === "signup"
+                ? "Create your account to continue with your upgrade."
+                : "Sign in to continue with your upgrade."}
+            </p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={submit} className="space-y-3">
