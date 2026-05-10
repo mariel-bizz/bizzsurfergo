@@ -135,6 +135,17 @@ export function EventsTab() {
                 <Mic className="w-4 h-4 text-primary" />
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
+              {isRsvped && meetLinks[e.id] && (
+                <a
+                  href={meetLinks[e.id]}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 rounded-xl bg-primary/10 border border-primary/30 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+                >
+                  <Video className="w-4 h-4" /> Join Google Meet
+                  <span className="ml-auto truncate opacity-70">{meetLinks[e.id].replace(/^https?:\/\//, "")}</span>
+                </a>
+              )}
               <div className="flex gap-2 pt-1">
                 {isRsvped ? (
                   <Button
