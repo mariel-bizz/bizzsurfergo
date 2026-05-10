@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import "@/integrations/supabase/server-fn-fetch.client";
 import { AppShell } from "@/components/AppShell";
+import { TranslationProvider } from "@/components/TranslationProvider";
 
 function NotFoundComponent() {
   return (
@@ -128,7 +129,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell />
+      <TranslationProvider>
+        <AppShell />
+      </TranslationProvider>
     </QueryClientProvider>
   );
 }
