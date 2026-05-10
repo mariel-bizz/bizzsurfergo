@@ -20,10 +20,11 @@ export const Route = createFileRoute("/login")({
 function LoginPage() {
   const navigate = useNavigate();
   const { redirect } = useSearch({ from: "/login" });
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -89,6 +90,7 @@ function LoginPage() {
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setInfo(null);
     setLoading(true);
     try {
       if (mode === "signup") {
@@ -98,7 +100,13 @@ function LoginPage() {
           options: { emailRedirectTo: `${window.location.origin}${redirect}` },
         });
         if (error) throw error;
-        setError("Check your email to confirm your account.");
+        setInfo("Check your email to confirm your account.");
+      } else if (mode === "forgot") {
+        const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          redirectTo: `${window.location.origin}/reset-password`,
+        });
+        if (error) throw error;
+        setInfo("If that email exists, a reset link is on its way.");
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
@@ -135,7 +143,9 @@ function LoginPage() {
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>{mode === "signin" ? "Sign in" : "Create account"}</CardTitle>
+          <CardTitle>
+            {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset your password"}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={submit} className="space-y-3">
@@ -143,27 +153,59 @@ function LoginPage() {
               <Label htmlFor="email">Email</Label>
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
             </div>
-            <div className="space-y-1">
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
-            </div>
+            {mode !== "forgot" && (
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">Password</Label>
+                  {mode === "signin" && (
+                    <button
+                      type="button"
+                      className="text-xs text-muted-foreground hover:text-foreground"
+                      onClick={() => { setMode("forgot"); setError(null); setInfo(null); }}
+                    >
+                      Forgot password?
+                    </button>
+                  )}
+                </div>
+                <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+              </div>
+            )}
             {error && <p className="text-sm text-destructive">{error}</p>}
+            {info && <p className="text-sm text-primary">{info}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "…" : mode === "signin" ? "Sign in" : "Sign up"}
+              {loading
+                ? "…"
+                : mode === "signin"
+                  ? "Sign in"
+                  : mode === "signup"
+                    ? "Sign up"
+                    : "Send reset link"}
             </Button>
           </form>
-          <Button variant="outline" className="w-full" onClick={() => oauth("google")} disabled={loading}>
-            Continue with Google
-          </Button>
-          <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
-            Continue with Apple
-          </Button>
+          {mode !== "forgot" && (
+            <>
+              <Button variant="outline" className="w-full" onClick={() => oauth("google")} disabled={loading}>
+                Continue with Google
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
+                Continue with Apple
+              </Button>
+            </>
+          )}
           <button
             type="button"
             className="w-full text-xs text-muted-foreground hover:text-foreground"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            onClick={() => {
+              setError(null);
+              setInfo(null);
+              setMode(mode === "signin" ? "signup" : "signin");
+            }}
           >
-            {mode === "signin" ? "Need an account? Sign up" : "Have an account? Sign in"}
+            {mode === "forgot"
+              ? "Back to sign in"
+              : mode === "signin"
+                ? "Need an account? Sign up"
+                : "Have an account? Sign in"}
           </button>
         </CardContent>
       </Card>
