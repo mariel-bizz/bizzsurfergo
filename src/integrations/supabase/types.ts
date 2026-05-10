@@ -50,6 +50,39 @@ export type Database = {
         }
         Relationships: []
       }
+      event_meet_links: {
+        Row: {
+          calendar_id: string
+          created_at: string
+          event_id: number
+          google_event_id: string
+          html_link: string | null
+          id: string
+          meet_link: string | null
+          updated_at: string
+        }
+        Insert: {
+          calendar_id?: string
+          created_at?: string
+          event_id: number
+          google_event_id: string
+          html_link?: string | null
+          id?: string
+          meet_link?: string | null
+          updated_at?: string
+        }
+        Update: {
+          calendar_id?: string
+          created_at?: string
+          event_id?: number
+          google_event_id?: string
+          html_link?: string | null
+          id?: string
+          meet_link?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       event_reminder_log: {
         Row: {
           id: string

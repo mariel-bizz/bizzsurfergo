@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X, Video } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
@@ -30,6 +30,7 @@ export function EventsTab() {
   const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
+  const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
@@ -37,7 +38,12 @@ export function EventsTab() {
       const isAuthed = !!data.session;
       setAuthed(isAuthed);
       if (isAuthed) {
-        listRsvps().then((r) => setRsvpedIds(r.eventIds)).catch(() => {});
+        listRsvps()
+          .then((r) => {
+            setRsvpedIds(r.eventIds);
+            setMeetLinks(r.meetLinks ?? {});
+          })
+          .catch(() => {});
       }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -53,13 +59,16 @@ export function EventsTab() {
       return;
     }
     try {
-      await rsvp({ data: { eventId: id } });
+      const res = await rsvp({ data: { eventId: id } });
       setRsvpedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      if (res?.meet_link) {
+        setMeetLinks((prev) => ({ ...prev, [id]: res.meet_link as string }));
+      }
       game.update((s) => {
         const badges = s.badges.includes("Event Insider") ? s.badges : [...s.badges, "Event Insider"];
         return { ...s, xp: s.xp + 25, badges };
       });
-      toast.success("You're in! Reminders 24h and 1h before. +25 XP");
+      toast.success("You're in! Calendar invite sent. +25 XP");
       if (href !== "#") window.open(href, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
@@ -70,6 +79,11 @@ export function EventsTab() {
     try {
       await cancel({ data: { eventId: id } });
       setRsvpedIds((prev) => prev.filter((x) => x !== id));
+      setMeetLinks((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       toast.success("RSVP cancelled. No more reminders for this event.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
@@ -121,6 +135,17 @@ export function EventsTab() {
                 <Mic className="w-4 h-4 text-primary" />
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
+              {isRsvped && meetLinks[e.id] && (
+                <a
+                  href={meetLinks[e.id]}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 rounded-xl bg-primary/10 border border-primary/30 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+                >
+                  <Video className="w-4 h-4" /> Join Google Meet
+                  <span className="ml-auto truncate opacity-70">{meetLinks[e.id].replace(/^https?:\/\//, "")}</span>
+                </a>
+              )}
               <div className="flex gap-2 pt-1">
                 {isRsvped ? (
                   <Button
