@@ -99,7 +99,7 @@ export function PricingTab() {
   const handleSubscribe = (tierId: string) => {
     if (tierId === "go") return;
     if (!user) {
-      window.location.href = "/login";
+      window.location.href = "/login?redirect=/pricing";
       return;
     }
     const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
