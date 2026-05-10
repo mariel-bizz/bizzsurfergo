@@ -81,9 +81,38 @@ async function handleSubscriptionDeleted(subscription: any, env: StripeEnv) {
     .eq("environment", env);
 }
 
+async function handleCheckoutCompleted(session: any, env: StripeEnv) {
+  const userId = session.metadata?.userId ?? null;
+  const listingId = session.metadata?.listingId ?? null;
+  await getSupabase().from("orders").upsert(
+    {
+      user_id: userId,
+      listing_id: listingId,
+      listing_title: session.metadata?.listingTitle ?? null,
+      stripe_session_id: session.id,
+      stripe_customer_id: typeof session.customer === "string" ? session.customer : session.customer?.id ?? null,
+      stripe_payment_intent_id: typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id ?? null,
+      stripe_subscription_id: typeof session.subscription === "string" ? session.subscription : session.subscription?.id ?? null,
+      amount_total: session.amount_total ?? null,
+      currency: session.currency ?? null,
+      status: session.payment_status === "paid" || session.status === "complete" ? "completed" : (session.payment_status ?? session.status ?? "pending"),
+      mode: session.mode ?? null,
+      customer_email: session.customer_details?.email ?? session.customer_email ?? null,
+      environment: env,
+      metadata: session.metadata ?? {},
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "stripe_session_id" },
+  );
+}
+
 async function handleWebhook(req: Request, env: StripeEnv) {
   const event = await verifyWebhook(req, env);
   switch (event.type) {
+    case "checkout.session.completed":
+    case "checkout.session.async_payment_succeeded":
+      await handleCheckoutCompleted(event.data.object, env);
+      break;
     case "customer.subscription.created":
       await handleSubscriptionCreated(event.data.object, env);
       break;
