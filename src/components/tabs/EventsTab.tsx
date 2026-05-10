@@ -30,6 +30,7 @@ export function EventsTab() {
   const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
+  const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
   const [authed, setAuthed] = useState(false);
 
   useEffect(() => {
@@ -37,7 +38,12 @@ export function EventsTab() {
       const isAuthed = !!data.session;
       setAuthed(isAuthed);
       if (isAuthed) {
-        listRsvps().then((r) => setRsvpedIds(r.eventIds)).catch(() => {});
+        listRsvps()
+          .then((r) => {
+            setRsvpedIds(r.eventIds);
+            setMeetLinks(r.meetLinks ?? {});
+          })
+          .catch(() => {});
       }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -53,13 +59,16 @@ export function EventsTab() {
       return;
     }
     try {
-      await rsvp({ data: { eventId: id } });
+      const res = await rsvp({ data: { eventId: id } });
       setRsvpedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
+      if (res?.meet_link) {
+        setMeetLinks((prev) => ({ ...prev, [id]: res.meet_link as string }));
+      }
       game.update((s) => {
         const badges = s.badges.includes("Event Insider") ? s.badges : [...s.badges, "Event Insider"];
         return { ...s, xp: s.xp + 25, badges };
       });
-      toast.success("You're in! Reminders 24h and 1h before. +25 XP");
+      toast.success("You're in! Calendar invite sent. +25 XP");
       if (href !== "#") window.open(href, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
@@ -70,6 +79,11 @@ export function EventsTab() {
     try {
       await cancel({ data: { eventId: id } });
       setRsvpedIds((prev) => prev.filter((x) => x !== id));
+      setMeetLinks((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
       toast.success("RSVP cancelled. No more reminders for this event.");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
