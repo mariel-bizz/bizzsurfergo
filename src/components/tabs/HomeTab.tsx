@@ -6,7 +6,7 @@ import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
-import { ResourcesSection, TrustedPartnersSection } from "../ResourcesSection";
+import { ResourcesSection, TrustedPartnersSection, FollowSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
 
 const painPoints: PainItem[] = [
