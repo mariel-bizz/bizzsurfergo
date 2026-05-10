@@ -190,6 +190,7 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
     onSuccess: (data) => {
       setDraft("");
       qc.invalidateQueries({ queryKey: ["insights-comments", slug] });
+      qc.invalidateQueries({ queryKey: ["insights-my-comment-ids", slug] });
       if (data.status === "rejected") {
         toast.error("Your comment was hidden by automatic moderation. Keep it constructive please.");
       } else {
