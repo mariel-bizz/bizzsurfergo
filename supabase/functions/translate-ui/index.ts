@@ -10,9 +10,31 @@ const LANG_NAMES: Record<string, string> = {
   tr: "Turkish", it: "Italian", ko: "Korean",
 };
 
+const RATE_LIMIT = 30; // requests per minute per IP
+const WINDOW_MS = 60_000;
+const ipHits = new Map<string, { count: number; reset: number }>();
+
+function rateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = ipHits.get(ip);
+  if (!entry || entry.reset < now) {
+    ipHits.set(ip, { count: 1, reset: now + WINDOW_MS });
+    return true;
+  }
+  entry.count++;
+  return entry.count <= RATE_LIMIT;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
   try {
+    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+    if (!rateLimit(ip)) {
+      return new Response(JSON.stringify({ error: "rate_limit" }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
     const { texts, target } = await req.json();
     if (!Array.isArray(texts) || !target || target === "en") {
       return new Response(JSON.stringify({ translations: {} }), {
