@@ -71,7 +71,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({
+          messages: next,
+          language: typeof window !== "undefined" ? window.localStorage.getItem("bizzsurfer.lang") || "en" : "en",
+        }),
       });
 
       if (resp.status === 429) { toast.error("Rate limit reached. Try again shortly."); setStreaming(false); return; }
