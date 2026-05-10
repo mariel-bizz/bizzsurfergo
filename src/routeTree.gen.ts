@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResourcesRouteImport } from './routes/resources'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
@@ -23,6 +24,7 @@ import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
+import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
@@ -45,6 +47,11 @@ const RobotsDottxtRoute = RobotsDottxtRouteImport.update({
 const ResourcesRoute = ResourcesRouteImport.update({
   id: '/resources',
   path: '/resources',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileRoute = ProfileRouteImport.update({
@@ -102,6 +109,11 @@ const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
   path: '/$listingId',
   getParentRoute: () => MarketplaceRoute,
 } as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
   id: '/insights/$slug',
   path: '/insights/$slug',
@@ -155,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -164,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
@@ -179,6 +193,7 @@ export interface FileRoutesByTo {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -188,6 +203,7 @@ export interface FileRoutesByTo {
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/insights': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
@@ -204,6 +220,7 @@ export interface FileRoutesById {
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -213,6 +230,7 @@ export interface FileRoutesById {
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
@@ -230,6 +248,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/pricing'
     | '/profile'
+    | '/reset-password'
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -239,6 +258,7 @@ export interface FileRouteTypes {
     | '/admin/seo'
     | '/admin/storage'
     | '/insights/$slug'
+    | '/invite/$token'
     | '/marketplace/$listingId'
     | '/insights/'
     | '/api/public/events/$eventId.ics'
@@ -254,6 +274,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/pricing'
     | '/profile'
+    | '/reset-password'
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -263,6 +284,7 @@ export interface FileRouteTypes {
     | '/admin/seo'
     | '/admin/storage'
     | '/insights/$slug'
+    | '/invite/$token'
     | '/marketplace/$listingId'
     | '/insights'
     | '/api/public/events/$eventId.ics'
@@ -278,6 +300,7 @@ export interface FileRouteTypes {
     | '/marketplace'
     | '/pricing'
     | '/profile'
+    | '/reset-password'
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
@@ -287,6 +310,7 @@ export interface FileRouteTypes {
     | '/admin/seo'
     | '/admin/storage'
     | '/insights/$slug'
+    | '/invite/$token'
     | '/marketplace/$listingId'
     | '/insights/'
     | '/api/public/events/$eventId.ics'
@@ -303,6 +327,7 @@ export interface RootRouteChildren {
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   ResourcesRoute: typeof ResourcesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -312,6 +337,7 @@ export interface RootRouteChildren {
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
+  InviteTokenRoute: typeof InviteTokenRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
@@ -338,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/resources'
       fullPath: '/resources'
       preLoaderRoute: typeof ResourcesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profile': {
@@ -416,6 +449,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/marketplace/$listingId'
       preLoaderRoute: typeof MarketplaceListingIdRouteImport
       parentRoute: typeof MarketplaceRoute
+    }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/insights/$slug': {
       id: '/insights/$slug'
@@ -498,6 +538,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceRoute: MarketplaceRouteWithChildren,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   ResourcesRoute: ResourcesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -507,6 +548,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
   InsightsSlugRoute: InsightsSlugRoute,
+  InviteTokenRoute: InviteTokenRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,

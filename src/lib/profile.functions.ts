@@ -99,7 +99,9 @@ export const updateTeamMember = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const patch: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const patch: { updated_at: string; role?: string; status?: string } = {
+      updated_at: new Date().toISOString(),
+    };
     if (data.role) patch.role = data.role;
     if (data.status) patch.status = data.status;
     const { error } = await supabase
