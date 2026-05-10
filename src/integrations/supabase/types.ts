@@ -261,8 +261,10 @@ export type Database = {
       }
       team_members: {
         Row: {
+          accepted_at: string | null
           email: string
           id: string
+          invite_token: string
           invited_at: string
           name: string | null
           owner_id: string
@@ -271,8 +273,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          accepted_at?: string | null
           email: string
           id?: string
+          invite_token?: string
           invited_at?: string
           name?: string | null
           owner_id: string
@@ -281,8 +285,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          accepted_at?: string | null
           email?: string
           id?: string
+          invite_token?: string
           invited_at?: string
           name?: string | null
           owner_id?: string
