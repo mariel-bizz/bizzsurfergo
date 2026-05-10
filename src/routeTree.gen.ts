@@ -21,7 +21,9 @@ import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
+import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -89,10 +91,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/insights/',
+  path: '/insights/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
   id: '/$listingId',
   path: '/$listingId',
   getParentRoute: () => MarketplaceRoute,
+} as any)
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => InsightsRoute,
 } as any)
 const AdminStorageRoute = AdminStorageRouteImport.update({
   id: '/admin/storage',
@@ -144,7 +156,9 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -165,7 +179,9 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/insights': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -187,7 +203,9 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -210,7 +228,9 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/insights/$slug'
     | '/marketplace/$listingId'
+    | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   fileRoutesByTo: FileRoutesByTo
@@ -231,7 +251,9 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/insights/$slug'
     | '/marketplace/$listingId'
+    | '/insights'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   id:
@@ -252,7 +274,9 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/insights/$slug'
     | '/marketplace/$listingId'
+    | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   fileRoutesById: FileRoutesById
@@ -274,6 +298,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -364,12 +389,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights/': {
+      id: '/insights/'
+      path: '/insights'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/marketplace/$listingId': {
       id: '/marketplace/$listingId'
       path: '/$listingId'
       fullPath: '/marketplace/$listingId'
       preLoaderRoute: typeof MarketplaceListingIdRouteImport
       parentRoute: typeof MarketplaceRoute
+    }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof InsightsRoute
     }
     '/admin/storage': {
       id: '/admin/storage'
@@ -445,9 +484,20 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

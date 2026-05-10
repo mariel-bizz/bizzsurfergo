@@ -93,7 +93,7 @@ const partners: { name: string; slug?: string }[] = [
 ];
 
 const resources = [
-  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/resources", internal: true },
+  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true },
   { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true },
   { icon: Headphones, title: "Podcast", desc: "Conversations with operators behind enterprise AI.", href: "https://www.bizzsurfer.com/podcast" },
   { icon: Briefcase, title: "Careers", desc: "Help us build the agentic future. We're hiring.", href: "https://www.bizzsurfer.com/careers" },
