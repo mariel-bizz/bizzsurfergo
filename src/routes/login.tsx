@@ -27,10 +27,64 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Restore existing session on mount (handles OAuth redirect return).
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) navigate({ to: redirect });
     });
+    // Subscribe to auth state changes so a session created by an OAuth
+    // redirect (Apple/Google) is picked up immediately on this page.
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+        navigate({ to: redirect });
+      }
+    });
+    return () => sub.subscription.unsubscribe();
   }, [navigate, redirect]);
+
+  // Map raw OAuth/provider errors to actionable, user-friendly messages.
+  const friendlyOAuthError = (provider: "google" | "apple", raw: unknown): string => {
+    const msg = raw instanceof Error ? raw.message : String(raw ?? "");
+    const lower = msg.toLowerCase();
+    const label = provider === "apple" ? "Apple" : "Google";
+
+    if (
+      lower.includes("popup_closed") ||
+      lower.includes("user_cancelled") ||
+      lower.includes("user canceled") ||
+      lower.includes("user cancelled") ||
+      lower.includes("canceled") ||
+      lower.includes("cancelled") ||
+      lower.includes("access_denied")
+    ) {
+      return `${label} sign-in was canceled. Please try again.`;
+    }
+    if (lower.includes("invalid_nonce") || lower.includes("nonce")) {
+      return `${label} rejected the sign-in (invalid nonce). Clear cookies for this site and retry; if it persists, the provider's client secret may need to be regenerated.`;
+    }
+    if (
+      lower.includes("invalid_client") ||
+      lower.includes("invalid client") ||
+      lower.includes("client_secret") ||
+      lower.includes("invalid_grant")
+    ) {
+      return `${label} sign-in is misconfigured (client credentials). The Services ID / client secret JWT may be wrong or expired — regenerate it in the backend auth settings.`;
+    }
+    if (
+      lower.includes("redirect_uri") ||
+      lower.includes("redirect uri") ||
+      lower.includes("invalid_redirect") ||
+      lower.includes("callback")
+    ) {
+      return `${label} callback URL is not allowed. Add this app's domain and the backend callback URL to the ${label} provider configuration, then retry.`;
+    }
+    if (lower.includes("email") && lower.includes("exist")) {
+      return `An account with this email already exists. Sign in with your original method first — accounts are linked automatically when the email is verified.`;
+    }
+    if (lower.includes("network") || lower.includes("failed to fetch")) {
+      return `Network error reaching ${label}. Check your connection and try again.`;
+    }
+    return msg || `${label} sign-in failed. Please try again.`;
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -65,13 +119,13 @@ function LoginPage() {
         redirect_uri: `${window.location.origin}${redirect}`,
       });
       if (result.error) {
-        setError(result.error instanceof Error ? result.error.message : `${provider} sign-in failed`);
+        setError(friendlyOAuthError(provider, result.error));
         return;
       }
       if (result.redirected) return;
       navigate({ to: redirect });
     } catch (err) {
-      setError(err instanceof Error ? err.message : `${provider} sign-in failed`);
+      setError(friendlyOAuthError(provider, err));
     } finally {
       setLoading(false);
     }
