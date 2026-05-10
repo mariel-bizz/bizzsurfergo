@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,17 @@ function LoginPage() {
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isUpgradeFlow = redirect.startsWith("/pricing");
+  const notifySuccess = (mode: "signin" | "signup") => {
+    if (isUpgradeFlow) {
+      toast.success(
+        mode === "signup" ? "Account created — ready to upgrade" : "Welcome back — ready to upgrade",
+      );
+    } else {
+      toast.success(mode === "signup" ? "Account created" : "Welcome back");
+    }
+  };
+
   useEffect(() => {
     // Restore existing session on mount (handles OAuth redirect return).
     supabase.auth.getSession().then(({ data }) => {
@@ -35,7 +47,8 @@ function LoginPage() {
     // Subscribe to auth state changes so a session created by an OAuth
     // redirect (Apple/Google) is picked up immediately on this page.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+      if (session && event === "SIGNED_IN") {
+        notifySuccess("signin");
         navigate({ to: redirect });
       }
     });
@@ -142,10 +155,17 @@ function LoginPage() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
-        <CardHeader>
+        <CardHeader className="space-y-2">
           <CardTitle>
             {mode === "signin" ? "Sign in" : mode === "signup" ? "Create account" : "Reset your password"}
           </CardTitle>
+          {isUpgradeFlow && mode !== "forgot" && (
+            <p className="text-sm text-muted-foreground">
+              {mode === "signup"
+                ? "Create your account to continue with your upgrade."
+                : "Sign in to continue with your upgrade."}
+            </p>
+          )}
         </CardHeader>
         <CardContent className="space-y-4">
           <form onSubmit={submit} className="space-y-3">
