@@ -90,7 +90,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             })}
           </div>
 
-          <div className="mt-3">
+          <div className="mt-3" data-no-translate>
             <Select value={OTHER_LANGUAGES.some((o) => o.code === language) ? language : ""} onValueChange={handleLanguage}>
               <SelectTrigger className="bg-card/80 backdrop-blur border-border h-10">
                 <SelectValue placeholder="Or choose another language" />
