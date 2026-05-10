@@ -24,7 +24,6 @@ import { EngagementProfileDialog } from "./EngagementProfileDialog";
 type Like = { id: string; user_id: string };
 type Comment = {
   id: string;
-  user_id: string;
   name: string;
   position: string | null;
   company: string | null;
@@ -103,11 +102,25 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
     queryFn: async () => {
       const { data, error } = await supabase
         .from("insights_comments")
-        .select("id,user_id,name,position,company,body,created_at")
+        .select("id,name,position,company,body,created_at")
         .eq("article_slug", slug)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []) as Comment[];
+    },
+  });
+
+  const myCommentIdsQ = useQuery({
+    queryKey: ["insights-my-comment-ids", slug, session?.user?.id ?? null],
+    enabled: !!session?.user?.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("insights_comments")
+        .select("id")
+        .eq("article_slug", slug)
+        .eq("user_id", session!.user.id);
+      if (error) throw error;
+      return new Set((data ?? []).map((r) => r.id as string));
     },
   });
 
@@ -191,7 +204,10 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
       const { error } = await supabase.from("insights_comments").delete().eq("id", id);
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["insights-comments", slug] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["insights-comments", slug] });
+      qc.invalidateQueries({ queryKey: ["insights-my-comment-ids", slug] });
+    },
   });
 
   const onLike = () => {
@@ -333,7 +349,7 @@ export function ArticleEngagement({ slug, articleTitle }: { slug: string; articl
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-[11px] text-muted-foreground">{formatWhen(c.created_at)}</span>
-                  {session?.user?.id === c.user_id && (
+                  {myCommentIdsQ.data?.has(c.id) && (
                     <button
                       aria-label="Delete comment"
                       onClick={() => deleteCommentMut.mutate(c.id)}
