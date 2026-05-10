@@ -16,12 +16,14 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
+import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -64,6 +66,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const InsightsRoute = InsightsRouteImport.update({
+  id: '/insights',
+  path: '/insights',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
   id: '/feed.xml',
   path: '/feed.xml',
@@ -93,6 +100,11 @@ const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
   id: '/$listingId',
   path: '/$listingId',
   getParentRoute: () => MarketplaceRoute,
+} as any)
+const InsightsSlugRoute = InsightsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => InsightsRoute,
 } as any)
 const AdminStorageRoute = AdminStorageRouteImport.update({
   id: '/admin/storage',
@@ -133,6 +145,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -144,6 +157,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -154,6 +168,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -165,6 +180,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -176,6 +192,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
+  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -187,6 +204,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -199,6 +217,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
+    | '/insights'
     | '/login'
     | '/marketplace'
     | '/pricing'
@@ -210,6 +229,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/insights/$slug'
     | '/marketplace/$listingId'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -220,6 +240,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
+    | '/insights'
     | '/login'
     | '/marketplace'
     | '/pricing'
@@ -231,6 +252,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/insights/$slug'
     | '/marketplace/$listingId'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -241,6 +263,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
+    | '/insights'
     | '/login'
     | '/marketplace'
     | '/pricing'
@@ -252,6 +275,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/seo'
     | '/admin/storage'
+    | '/insights/$slug'
     | '/marketplace/$listingId'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -263,6 +287,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
+  InsightsRoute: typeof InsightsRouteWithChildren
   LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -329,6 +354,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/insights': {
+      id: '/insights'
+      path: '/insights'
+      fullPath: '/insights'
+      preLoaderRoute: typeof InsightsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/feed.xml': {
       id: '/feed.xml'
       path: '/feed.xml'
@@ -370,6 +402,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/marketplace/$listingId'
       preLoaderRoute: typeof MarketplaceListingIdRouteImport
       parentRoute: typeof MarketplaceRoute
+    }
+    '/insights/$slug': {
+      id: '/insights/$slug'
+      path: '/$slug'
+      fullPath: '/insights/$slug'
+      preLoaderRoute: typeof InsightsSlugRouteImport
+      parentRoute: typeof InsightsRoute
     }
     '/admin/storage': {
       id: '/admin/storage'
@@ -416,6 +455,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface InsightsRouteChildren {
+  InsightsSlugRoute: typeof InsightsSlugRoute
+}
+
+const InsightsRouteChildren: InsightsRouteChildren = {
+  InsightsSlugRoute: InsightsSlugRoute,
+}
+
+const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
+  InsightsRouteChildren,
+)
+
 interface MarketplaceRouteChildren {
   MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
 }
@@ -434,6 +485,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
+  InsightsRoute: InsightsRouteWithChildren,
   LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   PricingRoute: PricingRoute,
