@@ -82,9 +82,38 @@ const tiers = [
 
 export function PricingTab() {
   const [yearly, setYearly] = useState(false);
+  const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const { tier: currentTier, isActive } = useSubscription(user?.id ?? null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setUser({ id: data.user.id, email: data.user.email ?? undefined });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? undefined } : null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const handleSubscribe = (tierId: string) => {
+    if (tierId === "go") return;
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+    const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
+    openCheckout({
+      priceId,
+      customerEmail: user.email,
+      userId: user.id,
+      returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+    });
+  };
 
   return (
     <div className="px-5 py-5 space-y-5">
+      <PaymentTestModeBanner />
       <div className="text-center">
         <span className="inline-block rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground">
           Pricing
