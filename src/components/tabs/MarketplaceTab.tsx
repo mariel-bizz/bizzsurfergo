@@ -462,7 +462,7 @@ export function MarketplaceTab() {
           No listings match your search.
         </p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
           {filtered.map((l) => {
             const meta = categoryMeta[l.category];
             const Icon = meta.icon;
@@ -487,7 +487,7 @@ export function MarketplaceTab() {
                         {l.rating.toFixed(1)}
                       </span>
                     </div>
-                    <h2 className="mt-0.5 text-base font-bold text-foreground truncate">
+                    <h2 className="mt-0.5 text-base font-bold text-foreground line-clamp-2 break-words">
                       {l.title}
                     </h2>
                     <p className="text-xs text-muted-foreground truncate">by {l.provider}</p>
@@ -507,10 +507,10 @@ export function MarketplaceTab() {
                   ))}
                 </div>
 
-                <div className="mt-auto pt-4 flex items-center justify-between gap-3 border-t border-border/60 mt-4">
-                  <span className="text-sm font-bold text-foreground">{l.price}</span>
-                  <span className="inline-flex items-center gap-1 rounded-full bg-gradient-primary px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary-foreground shadow-soft transition group-hover:shadow-elegant">
-                    View details
+                <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60">
+                  <span className="text-sm font-bold text-foreground break-words">{l.price}</span>
+                  <span className="inline-flex items-center gap-1 rounded-full bg-gradient-primary px-3 py-1.5 text-[11px] font-bold uppercase tracking-widest text-primary-foreground shadow-soft transition group-hover:shadow-elegant whitespace-nowrap">
+                    View
                     <span aria-hidden>→</span>
                   </span>
                 </div>

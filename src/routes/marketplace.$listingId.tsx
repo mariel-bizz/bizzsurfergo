@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, Download, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CreditCard, Download, Loader2, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
-import { categoryMeta, getListing, type Listing } from "@/lib/marketplace-data";
+import { categoryMeta, getListing, parseListingPrice, type Listing } from "@/lib/marketplace-data";
 import { ListingActionDialog } from "@/components/marketplace/ListingActionDialog";
+import { MarketplaceCheckout } from "@/components/marketplace/MarketplaceCheckout";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/$listingId")({
   loader: ({ params }) => {
@@ -48,11 +53,59 @@ function ListingDetail() {
   const meta = categoryMeta[listing.category];
   const Icon = meta.icon;
   const isDownload = listing.category === "templates";
-  const ActionIcon = isDownload ? Download : ArrowRight;
+  const parsedPrice = parseListingPrice(listing.price);
+  const isPayable = !!parsedPrice;
+
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
+  const [isAuthed, setIsAuthed] = useState(false);
+
+  // Auto-prepare an order: as soon as we know the listing is payable and the
+  // user is signed in, the checkout dialog can be opened with a single tap
+  // (the embedded Stripe form fetches the client secret on mount).
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (!active) return;
+      setIsAuthed(!!data.user);
+      setAuthChecked(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setIsAuthed(!!session?.user);
+    });
+    return () => {
+      active = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  const handlePrimaryAction = () => {
+    if (isPayable) {
+      if (!authChecked) return;
+      if (!isAuthed) {
+        toast.info("Sign in to complete your purchase", {
+          description: "We'll bring you back to checkout.",
+        });
+        const next = encodeURIComponent(window.location.pathname);
+        window.location.href = `/login?next=${next}`;
+        return;
+      }
+      setCheckoutOpen(true);
+      return;
+    }
+    setDialogOpen(true);
+  };
+
+  const ActionIcon = isPayable ? CreditCard : isDownload ? Download : ArrowRight;
+  const ctaLabel = isPayable
+    ? `Pay ${parsedPrice.display}`
+    : listing.cta;
 
   return (
     <div className="px-5 py-5 space-y-5">
+      {isPayable && <PaymentTestModeBanner />}
+
       <Link
         to="/marketplace"
         className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
@@ -120,18 +173,18 @@ function ListingDetail() {
       </section>
 
       <div className="sticky bottom-4 rounded-3xl bg-gradient-deep p-4 text-primary-foreground shadow-elegant flex items-center justify-between gap-3">
-        <div>
+        <div className="min-w-0">
           <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-            Price
+            {isPayable ? (parsedPrice.interval === "month" ? "Monthly" : "Price") : "Price"}
           </p>
-          <p className="text-base font-bold text-white">{listing.price}</p>
+          <p className="text-base font-bold text-white truncate">{listing.price}</p>
         </div>
         <Button
-          onClick={() => setDialogOpen(true)}
-          className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
+          onClick={handlePrimaryAction}
+          className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold shrink-0"
         >
           <ActionIcon className="w-4 h-4 mr-1.5" />
-          {listing.cta}
+          {ctaLabel}
         </Button>
       </div>
 
@@ -140,6 +193,32 @@ function ListingDetail() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />
+
+      {isPayable && (
+        <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
+          <DialogContent className="max-w-lg p-0 overflow-hidden">
+            <DialogHeader className="px-5 pt-5">
+              <DialogTitle>Complete your order</DialogTitle>
+              <DialogDescription>
+                {listing.title} — {parsedPrice.display}
+              </DialogDescription>
+            </DialogHeader>
+            <div className="p-2 min-h-[500px]">
+              {checkoutOpen ? (
+                <MarketplaceCheckout
+                  listing={listing}
+                  returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-[500px]">
+                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+                </div>
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }
+
