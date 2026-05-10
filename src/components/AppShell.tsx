@@ -76,8 +76,20 @@ const PATH_TO_TAB: Record<string, TabKey> = {
   "/profile": "profile",
 };
 
+const SPLASH_KEY = "bizzsurfer.splashDone";
+
 export function AppShell() {
-  const [splash, setSplash] = useState(true);
+  const [splash, setSplash] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.localStorage.getItem(SPLASH_KEY)) setSplash(true);
+  }, []);
+  const dismissSplash = () => {
+    if (typeof window !== "undefined") {
+      try { window.localStorage.setItem(SPLASH_KEY, "1"); } catch { /* ignore */ }
+    }
+    setSplash(false);
+  };
   const game = useGameStateInternal();
   const location = useLocation();
   const activeTab: TabKey = PATH_TO_TAB[location.pathname] ?? "home";
