@@ -98,8 +98,11 @@ function LoginPage() {
               {loading ? "…" : mode === "signin" ? "Sign in" : "Sign up"}
             </Button>
           </form>
-          <Button variant="outline" className="w-full" onClick={google}>
+          <Button variant="outline" className="w-full" onClick={() => oauth("google")} disabled={loading}>
             Continue with Google
+          </Button>
+          <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
+            Continue with Apple
           </Button>
           <button
             type="button"
