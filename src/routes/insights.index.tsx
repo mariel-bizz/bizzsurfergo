@@ -12,14 +12,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/insights/")({
-  head: () =>
-    pageHead({
+  head: () => {
+    const base = pageHead({
       path: "/insights",
       title: "Blog & Insights — BizzSurfer Go!",
       description:
         "Playbooks, frameworks and insights for transformation leaders exploring Agentic AI.",
       breadcrumbName: "Insights",
-    }),
+    });
+    // Canonical points to marketing site so SEO/views consolidate on www.bizzsurfer.com.
+    return {
+      ...base,
+      links: [{ rel: "canonical", href: "https://www.bizzsurfer.com/insights" }],
+    };
+  },
   component: InsightsPage,
   errorComponent: ({ error, reset }) => {
     const router = useRouter();
