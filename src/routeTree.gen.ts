@@ -16,12 +16,12 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as InsightsRouteImport } from './routes/insights'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
@@ -66,11 +66,6 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const InsightsRoute = InsightsRouteImport.update({
-  id: '/insights',
-  path: '/insights',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
   id: '/feed.xml',
   path: '/feed.xml',
@@ -94,6 +89,11 @@ const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsIndexRoute = InsightsIndexRouteImport.update({
+  id: '/insights/',
+  path: '/insights/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
@@ -145,7 +145,6 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
-  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -159,6 +158,7 @@ export interface FileRoutesByFullPath {
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -168,7 +168,6 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
-  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -182,6 +181,7 @@ export interface FileRoutesByTo {
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/insights': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -192,7 +192,6 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
-  '/insights': typeof InsightsRouteWithChildren
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/pricing': typeof PricingRoute
@@ -206,6 +205,7 @@ export interface FileRoutesById {
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -217,7 +217,6 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
-    | '/insights'
     | '/login'
     | '/marketplace'
     | '/pricing'
@@ -231,6 +230,7 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/insights/$slug'
     | '/marketplace/$listingId'
+    | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   fileRoutesByTo: FileRoutesByTo
@@ -240,7 +240,6 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
-    | '/insights'
     | '/login'
     | '/marketplace'
     | '/pricing'
@@ -254,6 +253,7 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/insights/$slug'
     | '/marketplace/$listingId'
+    | '/insights'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   id:
@@ -263,7 +263,6 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
-    | '/insights'
     | '/login'
     | '/marketplace'
     | '/pricing'
@@ -277,6 +276,7 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/insights/$slug'
     | '/marketplace/$listingId'
+    | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
   fileRoutesById: FileRoutesById
@@ -287,7 +287,6 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
-  InsightsRoute: typeof InsightsRouteWithChildren
   LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PricingRoute: typeof PricingRoute
@@ -299,6 +298,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
+  InsightsIndexRoute: typeof InsightsIndexRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
 }
@@ -354,13 +354,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/insights': {
-      id: '/insights'
-      path: '/insights'
-      fullPath: '/insights'
-      preLoaderRoute: typeof InsightsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/feed.xml': {
       id: '/feed.xml'
       path: '/feed.xml'
@@ -394,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights/': {
+      id: '/insights/'
+      path: '/insights'
+      fullPath: '/insights/'
+      preLoaderRoute: typeof InsightsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace/$listingId': {
@@ -455,18 +455,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface InsightsRouteChildren {
-  InsightsSlugRoute: typeof InsightsSlugRoute
-}
-
-const InsightsRouteChildren: InsightsRouteChildren = {
-  InsightsSlugRoute: InsightsSlugRoute,
-}
-
-const InsightsRouteWithChildren = InsightsRoute._addFileChildren(
-  InsightsRouteChildren,
-)
-
 interface MarketplaceRouteChildren {
   MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
 }
@@ -485,7 +473,6 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
-  InsightsRoute: InsightsRouteWithChildren,
   LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   PricingRoute: PricingRoute,
@@ -497,9 +484,20 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
+  InsightsIndexRoute: InsightsIndexRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
