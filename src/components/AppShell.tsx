@@ -89,9 +89,9 @@ export function AppShell() {
 
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
-          <div className="mx-auto max-w-md flex items-center justify-between gap-3 px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5">
+          <div className="mx-auto max-w-md flex items-center justify-between gap-2 px-3 sm:px-4 py-2">
             <div className="flex items-center min-w-0 flex-shrink">
-              <img src={headerLogo} alt="BizzSurfer Go!" className="h-12 sm:h-14 md:h-16 lg:h-20 w-auto max-w-[240px] sm:max-w-[300px] md:max-w-[360px] lg:max-w-[420px] object-contain shrink-0" />
+              <img src={headerLogo} alt="BizzSurfer Go!" className="h-11 sm:h-12 w-auto max-w-[220px] sm:max-w-[260px] object-contain shrink-0" />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
