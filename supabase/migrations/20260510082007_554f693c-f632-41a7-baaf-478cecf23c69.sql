@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.moderate_insights_comment() FROM PUBLIC, anon, authenticated;
