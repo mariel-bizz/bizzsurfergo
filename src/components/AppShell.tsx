@@ -76,8 +76,20 @@ const PATH_TO_TAB: Record<string, TabKey> = {
   "/profile": "profile",
 };
 
+const SPLASH_KEY = "bizzsurfer.splashDone";
+
 export function AppShell() {
-  const [splash, setSplash] = useState(true);
+  const [splash, setSplash] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!window.localStorage.getItem(SPLASH_KEY)) setSplash(true);
+  }, []);
+  const dismissSplash = () => {
+    if (typeof window !== "undefined") {
+      try { window.localStorage.setItem(SPLASH_KEY, "1"); } catch { /* ignore */ }
+    }
+    setSplash(false);
+  };
   const game = useGameStateInternal();
   const location = useLocation();
   const activeTab: TabKey = PATH_TO_TAB[location.pathname] ?? "home";
@@ -85,7 +97,7 @@ export function AppShell() {
   return (
     <GameContext.Provider value={game}>
       <div className="min-h-screen bg-background relative">
-        {splash && <SplashScreen onDone={() => setSplash(false)} />}
+        {splash && <SplashScreen onDone={dismissSplash} />}
 
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">

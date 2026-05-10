@@ -76,6 +76,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                   key={l.code}
                   type="button"
                   onClick={() => handleLanguage(l.code)}
+                  data-no-translate
                   className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-3 backdrop-blur transition shadow-sm ${
                     active
                       ? "bg-primary text-primary-foreground border-primary shadow-soft"
@@ -89,7 +90,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             })}
           </div>
 
-          <div className="mt-3">
+          <div className="mt-3" data-no-translate>
             <Select value={OTHER_LANGUAGES.some((o) => o.code === language) ? language : ""} onValueChange={handleLanguage}>
               <SelectTrigger className="bg-card/80 backdrop-blur border-border h-10">
                 <SelectValue placeholder="Or choose another language" />
