@@ -1,6 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Rocket, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { Check, Crown, Rocket, Sparkles, X, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useStripeCheckout } from "@/hooks/useStripeCheckout";
+import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Link } from "@tanstack/react-router";
 
 const tiers = [
   {
@@ -76,9 +82,38 @@ const tiers = [
 
 export function PricingTab() {
   const [yearly, setYearly] = useState(false);
+  const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
+  const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
+  const { tier: currentTier, isActive } = useSubscription(user?.id ?? null);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setUser({ id: data.user.id, email: data.user.email ?? undefined });
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUser(session?.user ? { id: session.user.id, email: session.user.email ?? undefined } : null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const handleSubscribe = (tierId: string) => {
+    if (tierId === "go") return;
+    if (!user) {
+      window.location.href = "/login";
+      return;
+    }
+    const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
+    openCheckout({
+      priceId,
+      customerEmail: user.email,
+      userId: user.id,
+      returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+    });
+  };
 
   return (
     <div className="px-5 py-5 space-y-5">
+      <PaymentTestModeBanner />
       <div className="text-center">
         <span className="inline-block rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground">
           Pricing
@@ -194,19 +229,47 @@ export function PricingTab() {
                 ))}
               </ul>
 
-              <Button
-                className={`mt-5 w-full h-11 font-bold ${
-                  t.highlighted
-                    ? "bg-white text-primary hover:bg-white/90"
-                    : "bg-gradient-primary text-primary-foreground"
-                }`}
-              >
-                {t.cta}
-              </Button>
+              {(() => {
+                const isCurrent = isActive && currentTier === t.id;
+                return (
+                  <Button
+                    onClick={() => handleSubscribe(t.id)}
+                    disabled={isCurrent || t.id === "go"}
+                    className={`mt-5 w-full h-11 font-bold ${
+                      t.highlighted
+                        ? "bg-white text-primary hover:bg-white/90"
+                        : "bg-gradient-primary text-primary-foreground"
+                    }`}
+                  >
+                    {isCurrent ? "Current plan" : t.cta}
+                  </Button>
+                );
+              })()}
             </div>
           );
         })}
       </div>
+
+      {isActive && (
+        <p className="text-center text-xs text-muted-foreground">
+          Manage your subscription on your <Link to="/profile" className="underline">Profile</Link>.
+        </p>
+      )}
+
+      <Dialog open={isOpen} onOpenChange={(o) => { if (!o) closeCheckout(); }}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5">
+            <DialogTitle>Complete your subscription</DialogTitle>
+          </DialogHeader>
+          <div className="p-2 min-h-[500px]">
+            {checkoutElement ?? (
+              <div className="flex items-center justify-center h-[500px]">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
