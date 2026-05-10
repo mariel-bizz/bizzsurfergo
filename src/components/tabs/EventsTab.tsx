@@ -76,32 +76,6 @@ export function EventsTab() {
     }
   };
 
-  if (!authed) {
-    return (
-      <div className="px-5 py-8 space-y-4">
-        <div>
-          <h1 className="text-2xl font-bold text-foreground">Executive Events</h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            Live conversations shaping Agentic AI for business transformation.
-          </p>
-        </div>
-        <div className="rounded-3xl border border-border bg-card p-6 text-center shadow-card space-y-3">
-          <Calendar className="w-10 h-10 text-primary mx-auto" />
-          <h2 className="text-lg font-bold">Sign in to see upcoming events</h2>
-          <p className="text-sm text-muted-foreground">
-            Create a free account to RSVP, get calendar reminders, and join executive roundtables.
-          </p>
-          <Button
-            className="w-full"
-            onClick={() => navigate({ to: "/login", search: { redirect: "/events" } })}
-          >
-            Sign in or create account
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="px-5 py-5 space-y-5">
       <div>
