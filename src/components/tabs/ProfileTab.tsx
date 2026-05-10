@@ -63,6 +63,8 @@ type TeamRow = {
   role: "member" | "admin";
   status: "pending" | "active" | "revoked";
   invited_at: string;
+  invite_token: string;
+  accepted_at: string | null;
 };
 
 export function ProfileTab() {
