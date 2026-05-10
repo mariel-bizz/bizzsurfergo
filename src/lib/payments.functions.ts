@@ -155,3 +155,73 @@ export const createPortalSession = createServerFn({ method: "POST" })
     });
     return portal.url;
   });
+
+export type CheckoutReceipt = {
+  sessionId: string;
+  amountTotal: number | null;
+  currency: string | null;
+  status: string | null;
+  paymentStatus: string | null;
+  mode: string | null;
+  customerEmail: string | null;
+  listingId: string | null;
+  listingTitle: string | null;
+  receiptUrl: string | null;
+  createdAt: string | null;
+};
+
+export const getCheckoutReceipt = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { sessionId: string; environment: StripeEnv }) => {
+    if (!/^[a-zA-Z0-9_]+$/.test(data.sessionId)) throw new Error("Invalid sessionId");
+    return data;
+  })
+  .handler(async ({ data, context }): Promise<CheckoutReceipt> => {
+    const { supabase, userId } = context;
+
+    // Try the database first (populated by webhook)
+    const { data: order } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("stripe_session_id", data.sessionId)
+      .maybeSingle();
+
+    if (order) {
+      if (order.user_id && order.user_id !== userId) {
+        throw new Error("Not authorized to view this order");
+      }
+      return {
+        sessionId: order.stripe_session_id,
+        amountTotal: order.amount_total,
+        currency: order.currency,
+        status: order.status,
+        paymentStatus: order.status,
+        mode: order.mode,
+        customerEmail: order.customer_email,
+        listingId: order.listing_id,
+        listingTitle: order.listing_title,
+        receiptUrl: order.receipt_url,
+        createdAt: order.created_at,
+      };
+    }
+
+    // Fallback: fetch directly from Stripe (webhook may not have arrived yet)
+    const stripe = createStripeClient(data.environment);
+    const session = await stripe.checkout.sessions.retrieve(data.sessionId);
+    if (session.metadata?.userId && session.metadata.userId !== userId) {
+      throw new Error("Not authorized to view this order");
+    }
+    return {
+      sessionId: session.id,
+      amountTotal: session.amount_total,
+      currency: session.currency,
+      status: session.status,
+      paymentStatus: session.payment_status,
+      mode: session.mode,
+      customerEmail: session.customer_details?.email ?? session.customer_email ?? null,
+      listingId: (session.metadata?.listingId as string) ?? null,
+      listingTitle: (session.metadata?.listingTitle as string) ?? null,
+      receiptUrl: null,
+      createdAt: new Date(session.created * 1000).toISOString(),
+    };
+  });
