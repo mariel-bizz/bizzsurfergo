@@ -28,6 +28,17 @@ function LoginPage() {
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const isUpgradeFlow = redirect.startsWith("/pricing");
+  const notifySuccess = (mode: "signin" | "signup") => {
+    if (isUpgradeFlow) {
+      toast.success(
+        mode === "signup" ? "Account created — ready to upgrade" : "Welcome back — ready to upgrade",
+      );
+    } else {
+      toast.success(mode === "signup" ? "Account created" : "Welcome back");
+    }
+  };
+
   useEffect(() => {
     // Restore existing session on mount (handles OAuth redirect return).
     supabase.auth.getSession().then(({ data }) => {
@@ -36,7 +47,8 @@ function LoginPage() {
     // Subscribe to auth state changes so a session created by an OAuth
     // redirect (Apple/Google) is picked up immediately on this page.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
+      if (session && event === "SIGNED_IN") {
+        notifySuccess("signin");
         navigate({ to: redirect });
       }
     });
