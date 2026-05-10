@@ -26,11 +26,13 @@ import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
+import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
 
@@ -119,6 +121,11 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   path: '/insights/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
+  id: '/checkout/return',
+  path: '/checkout/return',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminStorageRoute = AdminStorageRouteImport.update({
   id: '/admin/storage',
   path: '/admin/storage',
@@ -144,6 +151,12 @@ const AdminAlertsRoute = AdminAlertsRouteImport.update({
   path: '/admin/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicPaymentsWebhookRoute =
+  ApiPublicPaymentsWebhookRouteImport.update({
+    id: '/api/public/payments/webhook',
+    path: '/api/public/payments/webhook',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksIframeAlertCheckRoute =
   ApiPublicHooksIframeAlertCheckRouteImport.update({
     id: '/api/public/hooks/iframe-alert-check',
@@ -176,12 +189,14 @@ export interface FileRoutesByFullPath {
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -202,12 +217,14 @@ export interface FileRoutesByTo {
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/insights': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -229,12 +246,14 @@ export interface FileRoutesById {
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/checkout/return': typeof CheckoutReturnRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -257,12 +276,14 @@ export interface FileRouteTypes {
     | '/admin/insights-comments'
     | '/admin/seo'
     | '/admin/storage'
+    | '/checkout/return'
     | '/insights/$slug'
     | '/invite/$token'
     | '/marketplace/$listingId'
     | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/payments/webhook'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -283,12 +304,14 @@ export interface FileRouteTypes {
     | '/admin/insights-comments'
     | '/admin/seo'
     | '/admin/storage'
+    | '/checkout/return'
     | '/insights/$slug'
     | '/invite/$token'
     | '/marketplace/$listingId'
     | '/insights'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/payments/webhook'
   id:
     | '__root__'
     | '/'
@@ -309,12 +332,14 @@ export interface FileRouteTypes {
     | '/admin/insights-comments'
     | '/admin/seo'
     | '/admin/storage'
+    | '/checkout/return'
     | '/insights/$slug'
     | '/invite/$token'
     | '/marketplace/$listingId'
     | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/payments/webhook'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -336,11 +361,13 @@ export interface RootRouteChildren {
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
+  CheckoutReturnRoute: typeof CheckoutReturnRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
+  ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -464,6 +491,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout/return': {
+      id: '/checkout/return'
+      path: '/checkout/return'
+      fullPath: '/checkout/return'
+      preLoaderRoute: typeof CheckoutReturnRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/storage': {
       id: '/admin/storage'
       path: '/admin/storage'
@@ -497,6 +531,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/alerts'
       fullPath: '/admin/alerts'
       preLoaderRoute: typeof AdminAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/public/payments/webhook': {
+      id: '/api/public/payments/webhook'
+      path: '/api/public/payments/webhook'
+      fullPath: '/api/public/payments/webhook'
+      preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/hooks/iframe-alert-check': {
@@ -547,22 +588,14 @@ const rootRouteChildren: RootRouteChildren = {
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
+  CheckoutReturnRoute: CheckoutReturnRoute,
   InsightsSlugRoute: InsightsSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
+  ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
