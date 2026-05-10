@@ -417,24 +417,63 @@ function SignedInProfile() {
               {team.map((m) => (
                 <li
                   key={m.id}
-                  className="flex items-center justify-between rounded-xl border border-border bg-card p-3"
+                  className="rounded-xl border border-border bg-card p-3 space-y-2"
                 >
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">{m.name || m.email}</p>
-                    <p className="text-xs text-muted-foreground truncate">{m.email}</p>
-                    <div className="flex gap-1.5 mt-1">
-                      <Badge variant="secondary" className="text-[10px]">{m.role}</Badge>
-                      <Badge
-                        variant={m.status === "active" ? "default" : "outline"}
-                        className="text-[10px]"
-                      >
-                        {m.status}
-                      </Badge>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium truncate">{m.name || m.email}</p>
+                      <p className="text-xs text-muted-foreground truncate">{m.email}</p>
+                      <div className="flex flex-wrap gap-1.5 mt-1">
+                        <Badge
+                          variant={
+                            m.status === "active"
+                              ? "default"
+                              : m.status === "pending"
+                                ? "outline"
+                                : "secondary"
+                          }
+                          className="text-[10px] capitalize"
+                        >
+                          {m.status}
+                        </Badge>
+                        {m.status === "pending" && (
+                          <span className="text-[10px] text-muted-foreground">
+                            Invited {new Date(m.invited_at).toLocaleDateString()}
+                          </span>
+                        )}
+                        {m.status === "active" && m.accepted_at && (
+                          <span className="text-[10px] text-muted-foreground">
+                            Joined {new Date(m.accepted_at).toLocaleDateString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                    <Button variant="ghost" size="icon" onClick={() => onRemove(m.id)} aria-label="Remove">
+                      <Trash2 className="w-4 h-4 text-destructive" />
+                    </Button>
                   </div>
-                  <Button variant="ghost" size="icon" onClick={() => onRemove(m.id)} aria-label="Remove">
-                    <Trash2 className="w-4 h-4 text-destructive" />
-                  </Button>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={m.role}
+                      onValueChange={(v) => onRoleChange(m.id, v as "member" | "admin")}
+                    >
+                      <SelectTrigger className="h-8 text-xs flex-1"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="member">Member</SelectItem>
+                        <SelectItem value="admin">Admin</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    {m.status === "pending" && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-xs h-8"
+                        onClick={() => onCopyInvite(m.id, m.invite_token)}
+                      >
+                        Copy invite link
+                      </Button>
+                    )}
+                  </div>
                 </li>
               ))}
             </ul>
