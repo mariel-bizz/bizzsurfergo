@@ -26,6 +26,7 @@ import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
+import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
@@ -116,6 +117,11 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
   path: '/admin/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
+  id: '/admin/insights-comments',
+  path: '/admin/insights-comments',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/admin/analytics',
   path: '/admin/analytics',
@@ -154,6 +160,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -177,6 +184,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -201,6 +209,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/insights/$slug': typeof InsightsSlugRoute
@@ -226,6 +235,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/insights-comments'
     | '/admin/seo'
     | '/admin/storage'
     | '/insights/$slug'
@@ -249,6 +259,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/insights-comments'
     | '/admin/seo'
     | '/admin/storage'
     | '/insights/$slug'
@@ -272,6 +283,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/insights-comments'
     | '/admin/seo'
     | '/admin/storage'
     | '/insights/$slug'
@@ -296,6 +308,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
@@ -425,6 +438,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/insights-comments': {
+      id: '/admin/insights-comments'
+      path: '/admin/insights-comments'
+      fullPath: '/admin/insights-comments'
+      preLoaderRoute: typeof AdminInsightsCommentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/admin/analytics'
@@ -483,6 +503,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
   InsightsSlugRoute: InsightsSlugRoute,

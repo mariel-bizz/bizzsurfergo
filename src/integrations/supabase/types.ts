@@ -312,6 +312,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_insights_like_count: { Args: { _slug: string }; Returns: number }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
