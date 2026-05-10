@@ -115,6 +115,75 @@ export type Database = {
         }
         Relationships: []
       }
+      insights_comments: {
+        Row: {
+          article_slug: string
+          body: string
+          company: string | null
+          created_at: string
+          id: string
+          moderation_reason: string | null
+          name: string
+          position: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          article_slug: string
+          body: string
+          company?: string | null
+          created_at?: string
+          id?: string
+          moderation_reason?: string | null
+          name: string
+          position?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          article_slug?: string
+          body?: string
+          company?: string | null
+          created_at?: string
+          id?: string
+          moderation_reason?: string | null
+          name?: string
+          position?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      insights_likes: {
+        Row: {
+          article_slug: string
+          company: string | null
+          created_at: string
+          id: string
+          name: string
+          position: string | null
+          user_id: string
+        }
+        Insert: {
+          article_slug: string
+          company?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          position?: string | null
+          user_id: string
+        }
+        Update: {
+          article_slug?: string
+          company?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          position?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       marketplace_inquiries: {
         Row: {
           action_type: string
