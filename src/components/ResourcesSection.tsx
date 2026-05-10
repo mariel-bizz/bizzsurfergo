@@ -169,22 +169,62 @@ export function ResourcesSection() {
         </Button>
       </div>
 
-      {/* Socials */}
-      <div className="rounded-2xl bg-card border border-border p-4 shadow-card">
-        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold mb-3">Follow BizzSurfer</p>
-        <div className="grid grid-cols-3 gap-2">
-          {socials.map((s) => (
-            <a
-              key={s.label}
-              href={s.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex flex-col items-center gap-1.5 rounded-xl border border-border bg-background py-3 active:scale-95 transition-transform"
-            >
-              <s.icon className="w-4 h-4 text-primary" />
-              <span className="text-[11px] font-semibold text-foreground">{s.label}</span>
-            </a>
-          ))}
+    </section>
+  );
+}
+
+const socialStyles: Record<string, { bg: string; label: string; sub: string }> = {
+  "bizzsurfer.com": {
+    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.20_265),oklch(0.65_0.18_220))]",
+    label: "Website",
+    sub: "bizzsurfer.com",
+  },
+  LinkedIn: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.45_0.15_245),oklch(0.55_0.18_240))]",
+    label: "LinkedIn",
+    sub: "@bizzsurfer",
+  },
+  YouTube: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.24_25),oklch(0.62_0.22_15))]",
+    label: "YouTube",
+    sub: "@bizzsurfer",
+  },
+};
+
+export function FollowSection() {
+  return (
+    <section className="px-5">
+      <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Follow BizzSurfer</p>
+            <h2 className="text-lg font-bold text-foreground mt-1">Stay in the loop</h2>
+          </div>
+        </div>
+        <div className="grid grid-cols-3 gap-3">
+          {socials.map((s) => {
+            const style = socialStyles[s.label] ?? socialStyles["bizzsurfer.com"];
+            return (
+              <a
+                key={s.label}
+                href={s.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Follow BizzSurfer on ${style.label}`}
+                className={`relative overflow-hidden rounded-2xl ${style.bg} p-3 text-white shadow-elegant active:scale-95 transition-transform flex flex-col items-start gap-2 min-h-[110px]`}
+              >
+                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-white/15 blur-xl" />
+                <div className="absolute -bottom-8 -left-4 w-16 h-16 rounded-full bg-white/10 blur-lg" />
+                <div className="relative w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                  <s.icon className="w-5 h-5 text-white fill-white/30" />
+                </div>
+                <div className="relative mt-auto">
+                  <p className="text-[13px] font-bold leading-tight">{style.label}</p>
+                  <p className="text-[10px] opacity-90 leading-tight">{style.sub}</p>
+                </div>
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
