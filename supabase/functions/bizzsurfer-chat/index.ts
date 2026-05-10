@@ -62,6 +62,15 @@ Deno.serve(async (req: Request) => {
     }
 
     const messages = (body as { messages?: unknown })?.messages;
+    const rawLang = (body as { language?: unknown })?.language;
+    const language = typeof rawLang === "string" && /^[a-zA-Z-]{2,10}$/.test(rawLang) ? rawLang : "en";
+    const LANG_NAMES: Record<string, string> = {
+      en: "English", es: "Spanish", nl: "Dutch", zh: "Mandarin Chinese", hi: "Hindi",
+      ar: "Arabic", fr: "French", de: "German", pt: "Portuguese", bn: "Bengali",
+      ru: "Russian", ur: "Urdu", id: "Indonesian", ja: "Japanese", sw: "Swahili",
+      tr: "Turkish", it: "Italian", ko: "Korean",
+    };
+    const langName = LANG_NAMES[language] ?? "English";
     if (!Array.isArray(messages) || messages.length === 0) {
       return jsonError("INVALID_PAYLOAD", 400);
     }
