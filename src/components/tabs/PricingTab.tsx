@@ -229,19 +229,47 @@ export function PricingTab() {
                 ))}
               </ul>
 
-              <Button
-                className={`mt-5 w-full h-11 font-bold ${
-                  t.highlighted
-                    ? "bg-white text-primary hover:bg-white/90"
-                    : "bg-gradient-primary text-primary-foreground"
-                }`}
-              >
-                {t.cta}
-              </Button>
+              {(() => {
+                const isCurrent = isActive && currentTier === t.id;
+                return (
+                  <Button
+                    onClick={() => handleSubscribe(t.id)}
+                    disabled={isCurrent || t.id === "go"}
+                    className={`mt-5 w-full h-11 font-bold ${
+                      t.highlighted
+                        ? "bg-white text-primary hover:bg-white/90"
+                        : "bg-gradient-primary text-primary-foreground"
+                    }`}
+                  >
+                    {isCurrent ? "Current plan" : t.cta}
+                  </Button>
+                );
+              })()}
             </div>
           );
         })}
       </div>
+
+      {isActive && (
+        <p className="text-center text-xs text-muted-foreground">
+          Manage your subscription on your <Link to="/profile" className="underline">Profile</Link>.
+        </p>
+      )}
+
+      <Dialog open={isOpen} onOpenChange={(o) => { if (!o) closeCheckout(); }}>
+        <DialogContent className="max-w-lg p-0 overflow-hidden">
+          <DialogHeader className="px-5 pt-5">
+            <DialogTitle>Complete your subscription</DialogTitle>
+          </DialogHeader>
+          <div className="p-2 min-h-[500px]">
+            {checkoutElement ?? (
+              <div className="flex items-center justify-center h-[500px]">
+                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
