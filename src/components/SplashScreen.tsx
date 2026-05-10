@@ -76,6 +76,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                   key={l.code}
                   type="button"
                   onClick={() => handleLanguage(l.code)}
+                  data-no-translate
                   className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-3 backdrop-blur transition shadow-sm ${
                     active
                       ? "bg-primary text-primary-foreground border-primary shadow-soft"
