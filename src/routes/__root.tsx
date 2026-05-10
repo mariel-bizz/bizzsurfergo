@@ -129,7 +129,9 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AppShell />
+      <TranslationProvider>
+        <AppShell />
+      </TranslationProvider>
     </QueryClientProvider>
   );
 }
