@@ -91,7 +91,7 @@ export function AppShell() {
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
           <div className="mx-auto max-w-md flex items-center justify-between gap-2 px-3 sm:px-4 py-2">
             <div className="flex items-center min-w-0 flex-shrink">
-              <img src={headerLogo} alt="BizzSurfer Go!" className="h-7 sm:h-8 w-auto max-w-[160px] sm:max-w-[200px] object-contain shrink-0" />
+              <img src={headerLogo} alt="BizzSurfer Go!" className="h-11 sm:h-12 w-auto max-w-[220px] sm:max-w-[260px] object-contain shrink-0" />
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
