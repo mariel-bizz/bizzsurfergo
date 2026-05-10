@@ -181,6 +181,8 @@ export function HomeTab() {
         </div>
       </section>
 
+      <FollowSection />
+
       <TrustedPartnersSection />
 
 
