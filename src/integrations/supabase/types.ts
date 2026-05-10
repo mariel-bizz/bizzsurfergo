@@ -261,8 +261,10 @@ export type Database = {
       }
       team_members: {
         Row: {
+          accepted_at: string | null
           email: string
           id: string
+          invite_token: string
           invited_at: string
           name: string | null
           owner_id: string
@@ -271,8 +273,10 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          accepted_at?: string | null
           email: string
           id?: string
+          invite_token?: string
           invited_at?: string
           name?: string | null
           owner_id: string
@@ -281,8 +285,10 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          accepted_at?: string | null
           email?: string
           id?: string
+          invite_token?: string
           invited_at?: string
           name?: string | null
           owner_id?: string
@@ -391,6 +397,19 @@ export type Database = {
     }
     Functions: {
       get_insights_like_count: { Args: { _slug: string }; Returns: number }
+      get_team_invite: {
+        Args: { _token: string }
+        Returns: {
+          accepted_at: string
+          email: string
+          id: string
+          invited_at: string
+          name: string
+          owner_id: string
+          role: string
+          status: string
+        }[]
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]

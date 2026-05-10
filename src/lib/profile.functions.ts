@@ -68,16 +68,47 @@ export const inviteTeamMember = createServerFn({ method: "POST" })
   .inputValidator((d) => teamInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase.from("team_members").upsert(
-      {
-        owner_id: userId,
-        email: data.email.toLowerCase(),
-        name: data.name ?? null,
-        role: data.role,
-        status: "pending",
-      },
-      { onConflict: "owner_id,email" },
-    );
+    const { data: row, error } = await supabase
+      .from("team_members")
+      .upsert(
+        {
+          owner_id: userId,
+          email: data.email.toLowerCase(),
+          name: data.name ?? null,
+          role: data.role,
+          status: "pending",
+        },
+        { onConflict: "owner_id,email" },
+      )
+      .select("invite_token")
+      .single();
+    if (error) throw new Error(error.message);
+    return { ok: true, invite_token: row.invite_token as string };
+  });
+
+export const updateTeamMember = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        id: z.string().uuid(),
+        role: z.enum(["member", "admin"]).optional(),
+        status: z.enum(["pending", "active", "revoked"]).optional(),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase, userId } = context;
+    const patch: { updated_at: string; role?: string; status?: string } = {
+      updated_at: new Date().toISOString(),
+    };
+    if (data.role) patch.role = data.role;
+    if (data.status) patch.status = data.status;
+    const { error } = await supabase
+      .from("team_members")
+      .update(patch)
+      .eq("id", data.id)
+      .eq("owner_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -94,4 +125,60 @@ export const removeTeamMember = createServerFn({ method: "POST" })
       .eq("owner_id", userId);
     if (error) throw new Error(error.message);
     return { ok: true };
+  });
+
+// Invite acceptance: caller must be signed in with the email matching the invite.
+export const acceptTeamInvite = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => z.object({ token: z.string().uuid() }).parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase, claims } = context;
+    const myEmail = ((claims as { email?: string }).email ?? "").toLowerCase();
+    if (!myEmail) throw new Error("Your account has no email on file.");
+
+    const { data: invite, error: lookupError } = await supabase.rpc(
+      "get_team_invite",
+      { _token: data.token },
+    );
+    if (lookupError) throw new Error(lookupError.message);
+    const row = Array.isArray(invite) ? invite[0] : invite;
+    if (!row) throw new Error("This invite link is no longer valid.");
+    if (row.email.toLowerCase() !== myEmail) {
+      throw new Error(
+        `This invite was sent to ${row.email}. Sign in with that email to accept.`,
+      );
+    }
+    if (row.status === "revoked") throw new Error("This invite was revoked.");
+
+    const { error: updateError } = await supabase
+      .from("team_members")
+      .update({ status: "active", accepted_at: new Date().toISOString() })
+      .eq("id", row.id);
+    if (updateError) throw new Error(updateError.message);
+    return { ok: true, invite: row };
+  });
+
+// Notification gating helper: returns whether a user opted in to a given kind.
+// Called by reminder/digest dispatchers before sending.
+export const canNotifyUser = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) =>
+    z
+      .object({
+        user_id: z.string().uuid(),
+        kind: z.enum(["event_reminders", "insights_digest", "email_updates"]),
+      })
+      .parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { data: prefs, error } = await supabase
+      .from("user_preferences")
+      .select("event_reminders, insights_digest, email_updates")
+      .eq("user_id", data.user_id)
+      .maybeSingle();
+    if (error) throw new Error(error.message);
+    // Defaults match the table defaults (true) when no preferences row exists yet.
+    const allowed = prefs ? Boolean(prefs[data.kind]) : true;
+    return { allowed };
   });
