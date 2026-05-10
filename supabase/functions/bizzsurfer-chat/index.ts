@@ -104,7 +104,11 @@ Deno.serve(async (req: Request) => {
       },
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...cleanMessages],
+        messages: [
+          { role: "system", content: SYSTEM_PROMPT },
+          { role: "system", content: `Always respond in ${langName} (language code: ${language}), regardless of the language the user writes in. Keep proper nouns and brand names in their original form.` },
+          ...cleanMessages,
+        ],
         stream: true,
       }),
     });
