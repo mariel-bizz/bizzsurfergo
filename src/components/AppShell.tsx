@@ -97,7 +97,7 @@ export function AppShell() {
   return (
     <GameContext.Provider value={game}>
       <div className="min-h-screen bg-background relative">
-        {splash && <SplashScreen onDone={() => setSplash(false)} />}
+        {splash && <SplashScreen onDone={dismissSplash} />}
 
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
