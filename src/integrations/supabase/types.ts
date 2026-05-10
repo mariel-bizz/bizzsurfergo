@@ -259,6 +259,69 @@ export type Database = {
         }
         Relationships: []
       }
+      orders: {
+        Row: {
+          amount_total: number | null
+          created_at: string
+          currency: string | null
+          customer_email: string | null
+          environment: string
+          id: string
+          listing_id: string | null
+          listing_title: string | null
+          metadata: Json
+          mode: string | null
+          receipt_url: string | null
+          status: string
+          stripe_customer_id: string | null
+          stripe_payment_intent_id: string | null
+          stripe_session_id: string
+          stripe_subscription_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          customer_email?: string | null
+          environment?: string
+          id?: string
+          listing_id?: string | null
+          listing_title?: string | null
+          metadata?: Json
+          mode?: string | null
+          receipt_url?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          amount_total?: number | null
+          created_at?: string
+          currency?: string | null
+          customer_email?: string | null
+          environment?: string
+          id?: string
+          listing_id?: string | null
+          listing_title?: string | null
+          metadata?: Json
+          mode?: string | null
+          receipt_url?: string | null
+          status?: string
+          stripe_customer_id?: string | null
+          stripe_payment_intent_id?: string | null
+          stripe_session_id?: string
+          stripe_subscription_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       outbound_clicks: {
         Row: {
           created_at: string
