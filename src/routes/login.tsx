@@ -119,13 +119,13 @@ function LoginPage() {
         redirect_uri: `${window.location.origin}${redirect}`,
       });
       if (result.error) {
-        setError(result.error instanceof Error ? result.error.message : `${provider} sign-in failed`);
+        setError(friendlyOAuthError(provider, result.error));
         return;
       }
       if (result.redirected) return;
       navigate({ to: redirect });
     } catch (err) {
-      setError(err instanceof Error ? err.message : `${provider} sign-in failed`);
+      setError(friendlyOAuthError(provider, err));
     } finally {
       setLoading(false);
     }
