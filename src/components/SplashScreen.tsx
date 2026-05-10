@@ -56,9 +56,9 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="relative animate-float">
           <div className="absolute inset-0 rounded-full bg-white/40 blur-3xl animate-pulse" />
           <div className="absolute inset-0 rounded-full bg-white/20 blur-2xl" />
-          <img src={logo} alt="BizzSurfer Go!" className="relative w-64 h-64 sm:w-80 sm:h-80 object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.6)]" />
+          <img src={logo} alt="BizzSurfer Go!" className="relative w-56 h-40 sm:w-72 sm:h-52 object-contain drop-shadow-[0_0_30px_rgba(255,255,255,0.6)]" />
         </a>
-        <div className="-mt-2 text-center max-w-sm">
+        <div className="-mt-1 text-center max-w-sm">
           <h1 className="text-2xl font-bold text-foreground text-balance leading-tight">
             Agentic AI Intelligence for Business Transformation
           </h1>
