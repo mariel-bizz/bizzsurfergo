@@ -11,7 +11,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, ArrowLeft, Calendar, User } from "lucide-react";
-import { CtaBlock } from "./insights";
+import { CtaBlock } from "./insights.index";
 
 export const Route = createFileRoute("/insights/$slug")({
   head: ({ params }) =>
