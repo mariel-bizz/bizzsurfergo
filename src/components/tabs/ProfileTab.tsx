@@ -29,6 +29,7 @@ import {
   listMyTeam,
   inviteTeamMember,
   removeTeamMember,
+  updateTeamMember,
 } from "@/lib/profile.functions";
 
 const TOPIC_OPTIONS = [
@@ -119,6 +120,7 @@ function SignedInProfile() {
   const fetchTeam = useServerFn(listMyTeam);
   const invite = useServerFn(inviteTeamMember);
   const removeMember = useServerFn(removeTeamMember);
+  const updateMember = useServerFn(updateTeamMember);
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -197,10 +199,16 @@ function SignedInProfile() {
     if (!inviteEmail.trim()) return;
     setInviting(true);
     try {
-      await invite({
+      const res = await invite({
         data: { email: inviteEmail.trim(), name: inviteName.trim() || undefined, role: inviteRole },
       });
-      toast.success(`Invited ${inviteEmail.trim()}`);
+      const link = `${window.location.origin}/invite/${res.invite_token}`;
+      try {
+        await navigator.clipboard.writeText(link);
+        toast.success(`Invite link copied for ${inviteEmail.trim()}`);
+      } catch {
+        toast.success(`Invite created. Share: ${link}`);
+      }
       setInviteEmail("");
       setInviteName("");
       setInviteRole("member");
@@ -210,6 +218,28 @@ function SignedInProfile() {
       toast.error(err instanceof Error ? err.message : "Invite failed");
     } finally {
       setInviting(false);
+    }
+  };
+
+  const onRoleChange = async (id: string, role: "member" | "admin") => {
+    const prev = team;
+    setTeam((p) => p.map((m) => (m.id === id ? { ...m, role } : m)));
+    try {
+      await updateMember({ data: { id, role } });
+      toast.success("Role updated");
+    } catch (err) {
+      setTeam(prev);
+      toast.error(err instanceof Error ? err.message : "Could not update role");
+    }
+  };
+
+  const onCopyInvite = async (id: string, token: string) => {
+    const link = `${window.location.origin}/invite/${token}`;
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Invite link copied");
+    } catch {
+      toast.success(link);
     }
   };
 
