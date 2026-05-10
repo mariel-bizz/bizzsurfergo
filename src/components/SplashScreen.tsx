@@ -3,6 +3,7 @@ import { ArrowRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import logo from "@/assets/bizzsurfer-go-stacked.png";
+import { setAppLanguage } from "@/components/TranslationProvider";
 
 const TILE_LANGUAGES = [
   { code: "en", label: "English", flag: "🇬🇧" },
