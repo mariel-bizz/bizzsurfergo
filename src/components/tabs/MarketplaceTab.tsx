@@ -82,6 +82,9 @@ export function MarketplaceTab() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [freeOnly, setFreeOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
+  const [priceType, setPriceType] = useState<PriceType | "all">("all");
+  const [cartOpen, setCartOpen] = useState(false);
+  const { listings: cartListings } = useCart();
 
   const [customPresets, setCustomPresets] = useState<Preset[]>([]);
   const [activePresetId, setActivePresetId] = useState<string | null>(null);
