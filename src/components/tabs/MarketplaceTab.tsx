@@ -722,6 +722,8 @@ export function MarketplaceTab() {
         onOpenChange={setOnboardingOpen}
         onApply={handleOnboardingApply}
       />
+
+      <MarketplaceCartSheet open={cartOpen} onOpenChange={setCartOpen} />
     </div>
   );
 }
