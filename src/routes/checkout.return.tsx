@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -6,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { getCheckoutReceipt } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
+import { removeFromCart } from "@/lib/marketplace-cart";
 
 export const Route = createFileRoute("/checkout/return")({
   head: () =>
