@@ -189,6 +189,23 @@ export function getListing(id: string): Listing | undefined {
   return listings.find((l) => l.id === id);
 }
 
+export type PriceType = "fixed" | "from" | "quote" | "free";
+
+/**
+ * Classify a listing's price into a coarse type for filtering:
+ *  - "free"  → Free or Included
+ *  - "from"  → "From €X" (quote-anchored but a starting amount exists)
+ *  - "quote" → Custom (no concrete amount)
+ *  - "fixed" → A direct, payable amount (one-time or recurring)
+ */
+export function getPriceType(price: string): PriceType {
+  const lower = price.toLowerCase().trim();
+  if (lower.includes("free") || lower.includes("included")) return "free";
+  if (lower.includes("custom")) return "quote";
+  if (lower.startsWith("from")) return "from";
+  return "fixed";
+}
+
 /**
  * Parse a freeform listing price string into a chargeable amount in cents
  * and an interval. Returns null when the listing isn't directly payable

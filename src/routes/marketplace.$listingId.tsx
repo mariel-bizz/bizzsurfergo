@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, CreditCard, Download, Loader2, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, CreditCard, Download, Loader2, Plus, ShoppingCart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
-import { categoryMeta, getListing, parseListingPrice, type Listing } from "@/lib/marketplace-data";
+import { categoryMeta, getListing, getPriceType, parseListingPrice, type Listing } from "@/lib/marketplace-data";
+import { addToCart, useCart } from "@/lib/marketplace-cart";
 import { ListingActionDialog } from "@/components/marketplace/ListingActionDialog";
 import { MarketplaceCheckout } from "@/components/marketplace/MarketplaceCheckout";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
@@ -12,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/$listingId")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    checkout: s.checkout === 1 || s.checkout === "1" ? 1 : undefined,
+  }),
   loader: ({ params }) => {
     const listing = getListing(params.listingId);
     if (!listing) throw notFound();
@@ -50,11 +54,15 @@ export const Route = createFileRoute("/marketplace/$listingId")({
 
 function ListingDetail() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
+  const search = Route.useSearch();
   const meta = categoryMeta[listing.category];
   const Icon = meta.icon;
   const isDownload = listing.category === "templates";
   const parsedPrice = parseListingPrice(listing.price);
   const isPayable = !!parsedPrice;
+  const cartable = isPayable && (getPriceType(listing.price) === "fixed" || getPriceType(listing.price) === "from");
+  const { listings: cartListings } = useCart();
+  const inCart = cartListings.some((c) => c.id === listing.id);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -79,6 +87,20 @@ function ListingDetail() {
       sub.subscription.unsubscribe();
     };
   }, []);
+
+  // Auto-open checkout when arriving from cart with ?checkout=1
+  useEffect(() => {
+    if (search.checkout === 1 && isPayable && authChecked && isAuthed) {
+      setCheckoutOpen(true);
+    }
+  }, [search.checkout, isPayable, authChecked, isAuthed]);
+
+  const handleAddToCart = () => {
+    if (inCart) return;
+    if (addToCart(listing.id)) {
+      toast.success(`Added “${listing.title}” to cart`);
+    }
+  };
 
   const handlePrimaryAction = () => {
     if (isPayable) {
@@ -179,13 +201,26 @@ function ListingDetail() {
           </p>
           <p className="text-base font-bold text-white truncate">{listing.price}</p>
         </div>
-        <Button
-          onClick={handlePrimaryAction}
-          className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold shrink-0"
-        >
-          <ActionIcon className="w-4 h-4 mr-1.5" />
-          {ctaLabel}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          {cartable && (
+            <Button
+              onClick={handleAddToCart}
+              disabled={inCart}
+              variant="outline"
+              className="h-11 px-3 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white font-bold disabled:opacity-70"
+            >
+              {inCart ? <ShoppingCart className="w-4 h-4 mr-1.5" /> : <Plus className="w-4 h-4 mr-1.5" />}
+              {inCart ? "In cart" : "Add to cart"}
+            </Button>
+          )}
+          <Button
+            onClick={handlePrimaryAction}
+            className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
+          >
+            <ActionIcon className="w-4 h-4 mr-1.5" />
+            {ctaLabel}
+          </Button>
+        </div>
       </div>
 
       <ListingActionDialog
