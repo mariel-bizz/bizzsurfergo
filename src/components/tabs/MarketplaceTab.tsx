@@ -15,8 +15,13 @@ import {
   RotateCcw,
   Trash2,
   Wand2,
+  ShoppingCart,
+  Plus,
+  Check as CheckIcon,
 } from "lucide-react";
-import { listings, categoryMeta, type Category } from "@/lib/marketplace-data";
+import { listings, categoryMeta, getPriceType, type Category, type PriceType } from "@/lib/marketplace-data";
+import { addToCart, useCart } from "@/lib/marketplace-cart";
+import { MarketplaceCartSheet } from "@/components/marketplace/MarketplaceCartSheet";
 import {
   MarketplaceOnboarding,
   hasCompletedMarketplaceOnboarding,
