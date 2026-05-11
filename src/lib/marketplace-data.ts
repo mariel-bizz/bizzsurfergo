@@ -204,12 +204,12 @@ export function parseListingPrice(price: string): {
   if (!lower || lower.includes("free") || lower.includes("included") || lower.includes("custom")) {
     return null;
   }
-  // "From €18,000" → quote-only, not a fixed price the user can self-checkout.
-  if (lower.startsWith("from")) return null;
   const match = price.match(/(\d[\d,.]*)/);
   if (!match) return null;
   const amount = parseFloat(match[1].replace(/,/g, ""));
   if (!Number.isFinite(amount) || amount <= 0) return null;
+  // "From €X" listings are quote-anchored but we still let users pay the
+  // starting amount directly so checkout / cart flows work end-to-end.
   const interval = /\bmo\b|month/.test(lower) ? "month" : null;
   return {
     amountInCents: Math.round(amount * 100),
