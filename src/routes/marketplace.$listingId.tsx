@@ -88,6 +88,20 @@ function ListingDetail() {
     };
   }, []);
 
+  // Auto-open checkout when arriving from cart with ?checkout=1
+  useEffect(() => {
+    if (search.checkout === 1 && isPayable && authChecked && isAuthed) {
+      setCheckoutOpen(true);
+    }
+  }, [search.checkout, isPayable, authChecked, isAuthed]);
+
+  const handleAddToCart = () => {
+    if (inCart) return;
+    if (addToCart(listing.id)) {
+      toast.success(`Added “${listing.title}” to cart`);
+    }
+  };
+
   const handlePrimaryAction = () => {
     if (isPayable) {
       if (!authChecked) return;
