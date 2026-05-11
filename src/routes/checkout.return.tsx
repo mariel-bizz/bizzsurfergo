@@ -44,6 +44,12 @@ function CheckoutReturn() {
     retryDelay: 1500,
   });
 
+  // After a successful purchase, remove the item from the local cart.
+  useEffect(() => {
+    const listingId = (data as { listingId?: string } | undefined)?.listingId;
+    if (listingId) removeFromCart(listingId);
+  }, [data]);
+
   if (!session_id) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-5">
