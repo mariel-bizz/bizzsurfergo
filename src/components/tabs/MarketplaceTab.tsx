@@ -465,7 +465,7 @@ export function MarketplaceTab() {
           No listings match your search.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
+        <div className="grid grid-cols-1 gap-4 items-stretch">
           {filtered.map((l) => {
             const meta = categoryMeta[l.category];
             const Icon = meta.icon;
