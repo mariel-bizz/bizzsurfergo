@@ -201,13 +201,26 @@ function ListingDetail() {
           </p>
           <p className="text-base font-bold text-white truncate">{listing.price}</p>
         </div>
-        <Button
-          onClick={handlePrimaryAction}
-          className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold shrink-0"
-        >
-          <ActionIcon className="w-4 h-4 mr-1.5" />
-          {ctaLabel}
-        </Button>
+        <div className="flex items-center gap-2 shrink-0">
+          {cartable && (
+            <Button
+              onClick={handleAddToCart}
+              disabled={inCart}
+              variant="outline"
+              className="h-11 px-3 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white font-bold disabled:opacity-70"
+            >
+              {inCart ? <ShoppingCart className="w-4 h-4 mr-1.5" /> : <Plus className="w-4 h-4 mr-1.5" />}
+              {inCart ? "In cart" : "Add to cart"}
+            </Button>
+          )}
+          <Button
+            onClick={handlePrimaryAction}
+            className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
+          >
+            <ActionIcon className="w-4 h-4 mr-1.5" />
+            {ctaLabel}
+          </Button>
+        </div>
       </div>
 
       <ListingActionDialog
