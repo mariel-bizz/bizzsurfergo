@@ -245,8 +245,11 @@ export function MarketplaceTab() {
   return (
     <div className="px-5 py-5 space-y-5">
       <header className="text-center">
-        <span className="inline-block rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground">
-          Marketplace
+        <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-primary flex items-center justify-center shadow-elegant">
+          <Bot className="w-10 h-10 text-primary-foreground" strokeWidth={2.25} />
+        </div>
+        <span className="mt-4 inline-block rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground">
+          Agentic AI
         </span>
         <h1 className="mt-3 text-2xl font-bold text-foreground">
           Curated agents, services & playbooks
@@ -462,7 +465,7 @@ export function MarketplaceTab() {
           No listings match your search.
         </p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
+        <div className="grid grid-cols-1 gap-4 items-stretch">
           {filtered.map((l) => {
             const meta = categoryMeta[l.category];
             const Icon = meta.icon;
