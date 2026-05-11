@@ -235,7 +235,7 @@ export function MarketplaceTab() {
         break;
     }
     return sorted;
-  }, [active, query, selectedTags, freeOnly, minRating, sort]);
+  }, [active, query, selectedTags, freeOnly, priceType, minRating, sort]);
 
   const toggleTag = (tag: string) =>
     setSelectedTags((prev) =>
