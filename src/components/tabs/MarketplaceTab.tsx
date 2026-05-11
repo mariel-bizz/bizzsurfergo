@@ -253,7 +253,20 @@ export function MarketplaceTab() {
 
   return (
     <div className="px-5 py-5 space-y-5">
-      <header className="text-center">
+      <header className="relative text-center">
+        <button
+          onClick={() => setCartOpen(true)}
+          className="absolute right-0 top-0 inline-flex items-center gap-1.5 rounded-full bg-card border border-border h-10 px-3 text-xs font-bold text-foreground hover:border-primary/40 shadow-soft"
+          aria-label={`Open cart (${cartListings.length} item${cartListings.length === 1 ? "" : "s"})`}
+        >
+          <ShoppingCart className="w-4 h-4 text-primary" />
+          Cart
+          {cartListings.length > 0 && (
+            <span className="ml-0.5 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+              {cartListings.length}
+            </span>
+          )}
+        </button>
         <div className="mx-auto w-20 h-20 rounded-3xl bg-gradient-primary flex items-center justify-center shadow-elegant">
           <Bot className="w-10 h-10 text-primary-foreground" strokeWidth={2.25} />
         </div>
