@@ -54,11 +54,15 @@ export const Route = createFileRoute("/marketplace/$listingId")({
 
 function ListingDetail() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
+  const search = Route.useSearch();
   const meta = categoryMeta[listing.category];
   const Icon = meta.icon;
   const isDownload = listing.category === "templates";
   const parsedPrice = parseListingPrice(listing.price);
   const isPayable = !!parsedPrice;
+  const cartable = isPayable && (getPriceType(listing.price) === "fixed" || getPriceType(listing.price) === "from");
+  const { listings: cartListings } = useCart();
+  const inCart = cartListings.some((c) => c.id === listing.id);
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
