@@ -458,6 +458,35 @@ export function MarketplaceTab() {
         )}
       </div>
 
+      <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Pricing type">
+        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1">
+          Pricing
+        </span>
+        {([
+          { key: "all", label: "All prices" },
+          { key: "fixed", label: "Fixed price" },
+          { key: "from", label: "From €X" },
+          { key: "quote", label: "Custom / quote" },
+          { key: "free", label: "Free / included" },
+        ] as { key: PriceType | "all"; label: string }[]).map((opt) => {
+          const isOn = priceType === opt.key;
+          return (
+            <button
+              key={opt.key}
+              onClick={() => setPriceType(opt.key)}
+              className={`rounded-full px-3 h-8 text-[11px] font-bold border transition ${
+                isOn
+                  ? "bg-primary text-primary-foreground border-transparent shadow-soft"
+                  : "bg-card text-foreground border-border hover:border-primary/40"
+              }`}
+              aria-pressed={isOn}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+
       <div className="flex flex-wrap gap-1.5">
         {allTags.map((t) => {
           const isOn = selectedTags.includes(t);
