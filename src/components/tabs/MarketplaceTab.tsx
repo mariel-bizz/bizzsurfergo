@@ -212,6 +212,7 @@ export function MarketplaceTab() {
       if (selectedTags.length && !selectedTags.every((t) => l.tags.includes(t)))
         return false;
       if (freeOnly && priceValue(l.price) > 0) return false;
+      if (priceType !== "all" && getPriceType(l.price) !== priceType) return false;
       if (l.rating < minRating) return false;
       return true;
     });
