@@ -13,6 +13,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace/$listingId")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    checkout: s.checkout === 1 || s.checkout === "1" ? 1 : undefined,
+  }),
   loader: ({ params }) => {
     const listing = getListing(params.listingId);
     if (!listing) throw notFound();
