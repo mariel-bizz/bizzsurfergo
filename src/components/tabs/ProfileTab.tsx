@@ -449,33 +449,86 @@ function SignedInProfile() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-xs text-muted-foreground">
-            Invite teammates so your organization can explore Agentic AI together. Invitations are recorded here; they'll appear with status <em>pending</em> until they sign in with the same email.
+            Add teammate emails as chips, then save them all at once. They'll appear here with status <em>pending</em> until they sign in with the same email — or use the share link below to join in one click.
           </p>
-          <form onSubmit={onInvite} className="space-y-2">
-            <div className="grid grid-cols-1 gap-2">
-              <Input
-                type="email"
-                placeholder="teammate@company.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                required
-              />
-              <Input
-                placeholder="Name (optional)"
-                value={inviteName}
-                onChange={(e) => setInviteName(e.target.value)}
-              />
-              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "member" | "admin")}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
+
+          {/* Unique team share link */}
+          <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <LinkIcon className="w-4 h-4 text-primary" aria-hidden /> Your team invite link
             </div>
+            <div className="flex items-center gap-2">
+              <Input
+                readOnly
+                value={teamShareLink}
+                onFocus={(e) => e.currentTarget.select()}
+                aria-label="Team invite link"
+                className="text-xs"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={onCopyShareLink}
+                disabled={!teamShareLink}
+                aria-label="Copy team invite link"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Anyone with this link can sign in and be added to your team.
+            </p>
+          </div>
+
+          <form onSubmit={onInvite} className="space-y-2">
+            <Label htmlFor="team-emails" className="text-xs">Add by email</Label>
+            <div
+              className="flex flex-wrap items-center gap-1.5 rounded-md border border-input bg-transparent px-2 py-1.5 min-h-9 focus-within:ring-1 focus-within:ring-ring"
+              onClick={() => document.getElementById("team-emails")?.focus()}
+            >
+              {emailChips.map((em) => (
+                <span
+                  key={em}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary text-xs px-2 py-0.5"
+                >
+                  {em}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeEmailChip(em);
+                    }}
+                    aria-label={`Remove ${em}`}
+                    className="hover:text-destructive"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              <input
+                id="team-emails"
+                type="email"
+                value={emailDraft}
+                onChange={(e) => setEmailDraft(e.target.value)}
+                onKeyDown={onEmailKeyDown}
+                onPaste={onEmailPaste}
+                onBlur={() => {
+                  if (emailDraft.trim()) {
+                    addEmailChip(emailDraft);
+                    setEmailDraft("");
+                  }
+                }}
+                placeholder={emailChips.length ? "" : "teammate@company.com, another@company.com"}
+                className="flex-1 min-w-[160px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Press Enter, comma, or space to add an email. Backspace removes the last chip.
+            </p>
             <Button type="submit" className="w-full" disabled={inviting}>
               <Mail className="w-4 h-4 mr-2" />
-              {inviting ? "Sending…" : "Send invite"}
+              {inviting ? "Saving…" : "Save emails to team"}
             </Button>
           </form>
 
