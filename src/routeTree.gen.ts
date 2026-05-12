@@ -25,6 +25,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
+import { Route as JoinTeamOwnerIdRouteImport } from './routes/join-team.$ownerId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
@@ -119,6 +120,11 @@ const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
   id: '/$listingId',
   path: '/$listingId',
   getParentRoute: () => MarketplaceRoute,
+} as any)
+const JoinTeamOwnerIdRoute = JoinTeamOwnerIdRouteImport.update({
+  id: '/join-team/$ownerId',
+  path: '/join-team/$ownerId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
@@ -217,6 +223,7 @@ export interface FileRoutesByFullPath {
   '/checkout/return': typeof CheckoutReturnRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
@@ -249,6 +256,7 @@ export interface FileRoutesByTo {
   '/checkout/return': typeof CheckoutReturnRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights': typeof InsightsIndexRoute
@@ -282,6 +290,7 @@ export interface FileRoutesById {
   '/checkout/return': typeof CheckoutReturnRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
@@ -316,6 +325,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/insights/$slug'
     | '/invite/$token'
+    | '/join-team/$ownerId'
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
     | '/insights/'
@@ -348,6 +358,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/insights/$slug'
     | '/invite/$token'
+    | '/join-team/$ownerId'
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
     | '/insights'
@@ -380,6 +391,7 @@ export interface FileRouteTypes {
     | '/checkout/return'
     | '/insights/$slug'
     | '/invite/$token'
+    | '/join-team/$ownerId'
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
     | '/insights/'
@@ -413,6 +425,7 @@ export interface RootRouteChildren {
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
+  JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
@@ -535,6 +548,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/marketplace/$listingId'
       preLoaderRoute: typeof MarketplaceListingIdRouteImport
       parentRoute: typeof MarketplaceRoute
+    }
+    '/join-team/$ownerId': {
+      id: '/join-team/$ownerId'
+      path: '/join-team/$ownerId'
+      fullPath: '/join-team/$ownerId'
+      preLoaderRoute: typeof JoinTeamOwnerIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/invite/$token': {
       id: '/invite/$token'
@@ -673,6 +693,7 @@ const rootRouteChildren: RootRouteChildren = {
   CheckoutReturnRoute: CheckoutReturnRoute,
   InsightsSlugRoute: InsightsSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
+  JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,

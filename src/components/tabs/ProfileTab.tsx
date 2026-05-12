@@ -18,6 +18,9 @@ import {
   Trash2,
   Mail,
   Sparkles,
+  X,
+  Link as LinkIcon,
+  Copy,
 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
@@ -137,9 +140,9 @@ function SignedInProfile() {
   const [insightsDigest, setInsightsDigest] = useState(true);
 
   const [team, setTeam] = useState<TeamRow[]>([]);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteName, setInviteName] = useState("");
-  const [inviteRole, setInviteRole] = useState<"member" | "admin">("member");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [emailChips, setEmailChips] = useState<string[]>([]);
+  const [emailDraft, setEmailDraft] = useState("");
   const [inviting, setInviting] = useState(false);
 
   useEffect(() => {
@@ -148,6 +151,7 @@ function SignedInProfile() {
       .then(([prefs, t]) => {
         if (cancelled) return;
         setEmail(prefs.account.email);
+        setOwnerId(prefs.account.id);
         const p = prefs.preferences;
         if (p) {
           setDisplayName(p.display_name ?? "");
@@ -196,30 +200,95 @@ function SignedInProfile() {
     }
   };
 
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const addEmailChip = (raw: string) => {
+    const candidates = raw
+      .split(/[,;\s]+/)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (!candidates.length) return;
+    setEmailChips((prev) => {
+      const next = [...prev];
+      for (const c of candidates) {
+        if (!EMAIL_RE.test(c)) {
+          toast.error(`"${c}" is not a valid email`);
+          continue;
+        }
+        if (next.includes(c)) continue;
+        next.push(c);
+      }
+      return next;
+    });
+  };
+
+  const removeEmailChip = (value: string) =>
+    setEmailChips((prev) => prev.filter((e) => e !== value));
+
+  const onEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === "," || e.key === ";" || e.key === " " || e.key === "Tab") {
+      if (emailDraft.trim()) {
+        e.preventDefault();
+        addEmailChip(emailDraft);
+        setEmailDraft("");
+      }
+    } else if (e.key === "Backspace" && !emailDraft && emailChips.length) {
+      removeEmailChip(emailChips[emailChips.length - 1]);
+    }
+  };
+
+  const onEmailPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData("text");
+    if (/[,;\s]/.test(text)) {
+      e.preventDefault();
+      addEmailChip(text);
+      setEmailDraft("");
+    }
+  };
+
   const onInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteEmail.trim()) return;
+    let pending = [...emailChips];
+    if (emailDraft.trim()) {
+      const draft = emailDraft.trim().toLowerCase();
+      if (EMAIL_RE.test(draft) && !pending.includes(draft)) pending.push(draft);
+    }
+    if (!pending.length) {
+      toast.error("Add at least one email");
+      return;
+    }
     setInviting(true);
-    try {
-      const res = await invite({
-        data: { email: inviteEmail.trim(), name: inviteName.trim() || undefined, role: inviteRole },
-      });
-      const link = `${window.location.origin}/invite/${res.invite_token}`;
+    let ok = 0;
+    const failed: string[] = [];
+    for (const em of pending) {
       try {
-        await navigator.clipboard.writeText(link);
-        toast.success(`Invite link copied for ${inviteEmail.trim()}`);
+        await invite({ data: { email: em, role: "member" } });
+        ok += 1;
       } catch {
-        toast.success(`Invite created. Share: ${link}`);
+        failed.push(em);
       }
-      setInviteEmail("");
-      setInviteName("");
-      setInviteRole("member");
-      const t = await fetchTeam();
-      setTeam((t.team ?? []) as TeamRow[]);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Invite failed");
-    } finally {
-      setInviting(false);
+    }
+    setInviting(false);
+    setEmailChips([]);
+    setEmailDraft("");
+    if (ok) toast.success(`Saved ${ok} ${ok === 1 ? "email" : "emails"} to your team`);
+    if (failed.length) toast.error(`Failed: ${failed.join(", ")}`);
+    const t = await fetchTeam();
+    setTeam((t.team ?? []) as TeamRow[]);
+  };
+
+  const teamShareLink =
+    typeof window !== "undefined" && ownerId
+      ? `${window.location.origin}/join-team/${ownerId}`
+      : "";
+
+  const onCopyShareLink = async () => {
+    if (!teamShareLink) return;
+    try {
+      await navigator.clipboard.writeText(teamShareLink);
+      toast.success("Team invite link copied");
+    } catch {
+      toast.success(teamShareLink);
     }
   };
 
@@ -380,33 +449,86 @@ function SignedInProfile() {
         </CardHeader>
         <CardContent className="space-y-4">
           <p className="text-xs text-muted-foreground">
-            Invite teammates so your organization can explore Agentic AI together. Invitations are recorded here; they'll appear with status <em>pending</em> until they sign in with the same email.
+            Add teammate emails as chips, then save them all at once. They'll appear here with status <em>pending</em> until they sign in with the same email — or use the share link below to join in one click.
           </p>
-          <form onSubmit={onInvite} className="space-y-2">
-            <div className="grid grid-cols-1 gap-2">
-              <Input
-                type="email"
-                placeholder="teammate@company.com"
-                value={inviteEmail}
-                onChange={(e) => setInviteEmail(e.target.value)}
-                required
-              />
-              <Input
-                placeholder="Name (optional)"
-                value={inviteName}
-                onChange={(e) => setInviteName(e.target.value)}
-              />
-              <Select value={inviteRole} onValueChange={(v) => setInviteRole(v as "member" | "admin")}>
-                <SelectTrigger><SelectValue /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="member">Member</SelectItem>
-                  <SelectItem value="admin">Admin</SelectItem>
-                </SelectContent>
-              </Select>
+
+          {/* Unique team share link */}
+          <div className="rounded-xl border border-border bg-muted/30 p-3 space-y-2">
+            <div className="flex items-center gap-2 text-xs font-medium">
+              <LinkIcon className="w-4 h-4 text-primary" aria-hidden /> Your team invite link
             </div>
+            <div className="flex items-center gap-2">
+              <Input
+                readOnly
+                value={teamShareLink}
+                onFocus={(e) => e.currentTarget.select()}
+                aria-label="Team invite link"
+                className="text-xs"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={onCopyShareLink}
+                disabled={!teamShareLink}
+                aria-label="Copy team invite link"
+              >
+                <Copy className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Anyone with this link can sign in and be added to your team.
+            </p>
+          </div>
+
+          <form onSubmit={onInvite} className="space-y-2">
+            <Label htmlFor="team-emails" className="text-xs">Add by email</Label>
+            <div
+              className="flex flex-wrap items-center gap-1.5 rounded-md border border-input bg-transparent px-2 py-1.5 min-h-9 focus-within:ring-1 focus-within:ring-ring"
+              onClick={() => document.getElementById("team-emails")?.focus()}
+            >
+              {emailChips.map((em) => (
+                <span
+                  key={em}
+                  className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary text-xs px-2 py-0.5"
+                >
+                  {em}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeEmailChip(em);
+                    }}
+                    aria-label={`Remove ${em}`}
+                    className="hover:text-destructive"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+              <input
+                id="team-emails"
+                type="email"
+                value={emailDraft}
+                onChange={(e) => setEmailDraft(e.target.value)}
+                onKeyDown={onEmailKeyDown}
+                onPaste={onEmailPaste}
+                onBlur={() => {
+                  if (emailDraft.trim()) {
+                    addEmailChip(emailDraft);
+                    setEmailDraft("");
+                  }
+                }}
+                placeholder={emailChips.length ? "" : "teammate@company.com, another@company.com"}
+                className="flex-1 min-w-[160px] bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              />
+            </div>
+            <p className="text-[11px] text-muted-foreground">
+              Press Enter, comma, or space to add an email. Backspace removes the last chip.
+            </p>
             <Button type="submit" className="w-full" disabled={inviting}>
               <Mail className="w-4 h-4 mr-2" />
-              {inviting ? "Sending…" : "Send invite"}
+              {inviting ? "Saving…" : "Save emails to team"}
             </Button>
           </form>
 
