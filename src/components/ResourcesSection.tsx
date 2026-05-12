@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
-  BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Plug, Youtube,
+  BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, MessageCircle, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
 
 function PartnerLogo({ name, slug }: { name: string; slug?: string }) {
