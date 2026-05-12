@@ -192,6 +192,21 @@ const socialStyles: Record<string, { bg: string; label: string; sub: string }> =
     label: "YouTube",
     sub: "@bizzsurfer",
   },
+  Twitter: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.18_230),oklch(0.65_0.16_220))]",
+    label: "Twitter",
+    sub: "@bizzsurfer",
+  },
+  Spotify: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.65_0.20_145),oklch(0.55_0.22_150))]",
+    label: "Spotify",
+    sub: "BizzSurfer",
+  },
+  WhatsApp: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.65_0.18_150),oklch(0.55_0.20_155))]",
+    label: "WhatsApp",
+    sub: "+31 6 14630463",
+  },
 };
 
 export function FollowSection() {
