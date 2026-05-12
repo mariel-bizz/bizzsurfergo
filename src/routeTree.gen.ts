@@ -23,6 +23,7 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
+import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
@@ -105,6 +106,11 @@ const InsightsIndexRoute = InsightsIndexRouteImport.update({
   id: '/insights/',
   path: '/insights/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceCheckoutRoute = MarketplaceCheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => MarketplaceRoute,
 } as any)
 const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
   id: '/$listingId',
@@ -193,6 +199,7 @@ export interface FileRoutesByFullPath {
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -221,6 +228,7 @@ export interface FileRoutesByTo {
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -250,6 +258,7 @@ export interface FileRoutesById {
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
+  '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -280,6 +289,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/invite/$token'
     | '/marketplace/$listingId'
+    | '/marketplace/checkout'
     | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -308,6 +318,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/invite/$token'
     | '/marketplace/$listingId'
+    | '/marketplace/checkout'
     | '/insights'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -336,6 +347,7 @@ export interface FileRouteTypes {
     | '/insights/$slug'
     | '/invite/$token'
     | '/marketplace/$listingId'
+    | '/marketplace/checkout'
     | '/insights/'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -470,6 +482,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketplace/checkout': {
+      id: '/marketplace/checkout'
+      path: '/checkout'
+      fullPath: '/marketplace/checkout'
+      preLoaderRoute: typeof MarketplaceCheckoutRouteImport
+      parentRoute: typeof MarketplaceRoute
+    }
     '/marketplace/$listingId': {
       id: '/marketplace/$listingId'
       path: '/$listingId'
@@ -559,10 +578,12 @@ declare module '@tanstack/react-router' {
 
 interface MarketplaceRouteChildren {
   MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
+  MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
 }
 
 const MarketplaceRouteChildren: MarketplaceRouteChildren = {
   MarketplaceListingIdRoute: MarketplaceListingIdRoute,
+  MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
 }
 
 const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
