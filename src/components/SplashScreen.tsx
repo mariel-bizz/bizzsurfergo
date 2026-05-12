@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import logo from "@/assets/bizzsurfer-go-stacked.png";
+import logo from "@/assets/bizzsurfer-go-stacked.webp";
 import { setAppLanguage } from "@/components/TranslationProvider";
 
 const TILE_LANGUAGES = [
