@@ -200,30 +200,95 @@ function SignedInProfile() {
     }
   };
 
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const addEmailChip = (raw: string) => {
+    const candidates = raw
+      .split(/[,;\s]+/)
+      .map((s) => s.trim().toLowerCase())
+      .filter(Boolean);
+    if (!candidates.length) return;
+    setEmailChips((prev) => {
+      const next = [...prev];
+      for (const c of candidates) {
+        if (!EMAIL_RE.test(c)) {
+          toast.error(`"${c}" is not a valid email`);
+          continue;
+        }
+        if (next.includes(c)) continue;
+        next.push(c);
+      }
+      return next;
+    });
+  };
+
+  const removeEmailChip = (value: string) =>
+    setEmailChips((prev) => prev.filter((e) => e !== value));
+
+  const onEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" || e.key === "," || e.key === ";" || e.key === " " || e.key === "Tab") {
+      if (emailDraft.trim()) {
+        e.preventDefault();
+        addEmailChip(emailDraft);
+        setEmailDraft("");
+      }
+    } else if (e.key === "Backspace" && !emailDraft && emailChips.length) {
+      removeEmailChip(emailChips[emailChips.length - 1]);
+    }
+  };
+
+  const onEmailPaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const text = e.clipboardData.getData("text");
+    if (/[,;\s]/.test(text)) {
+      e.preventDefault();
+      addEmailChip(text);
+      setEmailDraft("");
+    }
+  };
+
   const onInvite = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteEmail.trim()) return;
+    let pending = [...emailChips];
+    if (emailDraft.trim()) {
+      const draft = emailDraft.trim().toLowerCase();
+      if (EMAIL_RE.test(draft) && !pending.includes(draft)) pending.push(draft);
+    }
+    if (!pending.length) {
+      toast.error("Add at least one email");
+      return;
+    }
     setInviting(true);
-    try {
-      const res = await invite({
-        data: { email: inviteEmail.trim(), name: inviteName.trim() || undefined, role: inviteRole },
-      });
-      const link = `${window.location.origin}/invite/${res.invite_token}`;
+    let ok = 0;
+    const failed: string[] = [];
+    for (const em of pending) {
       try {
-        await navigator.clipboard.writeText(link);
-        toast.success(`Invite link copied for ${inviteEmail.trim()}`);
+        await invite({ data: { email: em, role: "member" } });
+        ok += 1;
       } catch {
-        toast.success(`Invite created. Share: ${link}`);
+        failed.push(em);
       }
-      setInviteEmail("");
-      setInviteName("");
-      setInviteRole("member");
-      const t = await fetchTeam();
-      setTeam((t.team ?? []) as TeamRow[]);
-    } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Invite failed");
-    } finally {
-      setInviting(false);
+    }
+    setInviting(false);
+    setEmailChips([]);
+    setEmailDraft("");
+    if (ok) toast.success(`Saved ${ok} ${ok === 1 ? "email" : "emails"} to your team`);
+    if (failed.length) toast.error(`Failed: ${failed.join(", ")}`);
+    const t = await fetchTeam();
+    setTeam((t.team ?? []) as TeamRow[]);
+  };
+
+  const teamShareLink =
+    typeof window !== "undefined" && ownerId
+      ? `${window.location.origin}/join-team/${ownerId}`
+      : "";
+
+  const onCopyShareLink = async () => {
+    if (!teamShareLink) return;
+    try {
+      await navigator.clipboard.writeText(teamShareLink);
+      toast.success("Team invite link copied");
+    } catch {
+      toast.success(teamShareLink);
     }
   };
 
