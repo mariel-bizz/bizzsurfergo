@@ -481,6 +481,27 @@ function SignedInProfile() {
         </CardContent>
       </Card>
 
+      {/* App preferences */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">App</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <Button
+            variant="outline"
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                window.dispatchEvent(new CustomEvent("bizzsurfer:open-welcome"));
+              }
+            }}
+            aria-label="Reopen the welcome screen"
+            className="w-full"
+          >
+            <Sparkles className="w-4 h-4 mr-2" aria-hidden /> Show welcome screen
+          </Button>
+        </CardContent>
+      </Card>
+
       {/* Gamification summary */}
       <GameSummary />
     </div>
