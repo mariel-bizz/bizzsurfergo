@@ -133,6 +133,68 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
     return session.client_secret;
   });
 
+type CartItemInput = {
+  listingId: string;
+  listingTitle: string;
+  amountInCents: number;
+  currency: "eur";
+};
+
+export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: {
+    items: CartItemInput[];
+    returnUrl: string;
+    environment: StripeEnv;
+  }) => {
+    if (!Array.isArray(data.items) || data.items.length === 0) {
+      throw new Error("Cart is empty");
+    }
+    if (data.items.length > 20) throw new Error("Too many items");
+    for (const it of data.items) {
+      if (!/^[a-zA-Z0-9_-]+$/.test(it.listingId)) throw new Error("Invalid listingId");
+      if (!Number.isInteger(it.amountInCents) || it.amountInCents < 50) {
+        throw new Error("Amount must be at least 50 cents");
+      }
+      if (it.listingTitle.length > 250) throw new Error("Title too long");
+    }
+    return data;
+  })
+  .handler(async ({ data, context }) => {
+    const { userId, claims } = context;
+    const customerEmail = (claims?.email as string | undefined) ?? undefined;
+    const stripe = createStripeClient(data.environment);
+
+    const customerId = await resolveOrCreateCustomer(stripe, {
+      email: customerEmail,
+      userId,
+    });
+
+    const listingIds = data.items.map((i) => i.listingId).join(",");
+    const session = await stripe.checkout.sessions.create({
+      line_items: data.items.map((it) => ({
+        price_data: {
+          currency: it.currency,
+          product_data: {
+            name: it.listingTitle,
+            metadata: { listingId: it.listingId },
+          },
+          unit_amount: it.amountInCents,
+        },
+        quantity: 1,
+      })),
+      mode: "payment",
+      ui_mode: "embedded_page",
+      return_url: data.returnUrl,
+      automatic_tax: { enabled: true },
+      customer: customerId,
+      customer_update: { address: "auto", name: "auto" },
+      metadata: { userId, listingIds, cartCheckout: "1" },
+    });
+
+    return session.client_secret;
+  });
+
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => data)

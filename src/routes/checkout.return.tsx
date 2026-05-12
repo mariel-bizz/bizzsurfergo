@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { getCheckoutReceipt } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
-import { removeFromCart } from "@/lib/marketplace-cart";
+import { removeFromCart, clearCart } from "@/lib/marketplace-cart";
 
 export const Route = createFileRoute("/checkout/return")({
   head: () =>
@@ -17,8 +17,9 @@ export const Route = createFileRoute("/checkout/return")({
       description: "Your order receipt and payment confirmation.",
       breadcrumbName: "Checkout",
     }),
-  validateSearch: (search: Record<string, unknown>): { session_id?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { session_id?: string; clear_cart?: number } => ({
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
+    clear_cart: search.clear_cart === 1 || search.clear_cart === "1" ? 1 : undefined,
   }),
   component: CheckoutReturn,
 });
@@ -32,7 +33,7 @@ function formatAmount(cents: number | null, currency: string | null): string {
 }
 
 function CheckoutReturn() {
-  const { session_id } = Route.useSearch();
+  const { session_id, clear_cart } = Route.useSearch();
   const fetchReceipt = useServerFn(getCheckoutReceipt);
 
   const { data, isLoading, error } = useQuery({
@@ -44,11 +45,15 @@ function CheckoutReturn() {
     retryDelay: 1500,
   });
 
-  // After a successful purchase, remove the item from the local cart.
+  // After a successful purchase, remove the item(s) from the local cart.
   useEffect(() => {
+    if (clear_cart) {
+      clearCart();
+      return;
+    }
     const listingId = (data as { listingId?: string } | undefined)?.listingId;
     if (listingId) removeFromCart(listingId);
-  }, [data]);
+  }, [data, clear_cart]);
 
   if (!session_id) {
     return (

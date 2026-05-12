@@ -95,19 +95,14 @@ export function MarketplaceCartSheet({ open, onOpenChange }: Props) {
               their detail page.
             </p>
             <div className="space-y-2">
-              {listings.map((l) => (
-                <Link
-                  key={l.id}
-                  to="/marketplace/$listingId"
-                  params={{ listingId: l.id }}
-                  search={{ checkout: 1 } as never}
-                  onClick={() => onOpenChange(false)}
-                  className="flex items-center justify-between gap-2 rounded-xl bg-gradient-primary text-primary-foreground px-3 py-2.5 text-xs font-bold shadow-soft hover:shadow-elegant transition"
-                >
-                  <span className="truncate">Checkout: {l.title}</span>
-                  <ArrowRight className="w-4 h-4 shrink-0" />
-                </Link>
-              ))}
+              <Link
+                to="/marketplace/checkout"
+                onClick={() => onOpenChange(false)}
+                className="flex items-center justify-between gap-2 rounded-xl bg-gradient-primary text-primary-foreground px-4 py-3 text-sm font-bold shadow-soft hover:shadow-elegant transition"
+              >
+                <span>Checkout all items</span>
+                <ArrowRight className="w-4 h-4 shrink-0" />
+              </Link>
               <Button
                 variant="ghost"
                 className="w-full"
