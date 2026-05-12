@@ -76,11 +76,14 @@ const PATH_TO_TAB: Record<string, TabKey> = {
   "/profile": "profile",
 };
 
+const ROOT_PATHS = new Set(["/", "/index", "/index.html", "/home"]);
+
 export function AppShell() {
   const [splash, setSplash] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    if (window.location.pathname === "/") setSplash(true);
+    const p = window.location.pathname.replace(/\/+$/, "") || "/";
+    if (ROOT_PATHS.has(p)) setSplash(true);
   }, []);
   const dismissSplash = () => {
     setSplash(false);

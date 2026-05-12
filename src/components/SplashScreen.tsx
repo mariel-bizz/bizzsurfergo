@@ -121,6 +121,13 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         >
           Continue to BizzSurfer Go <ArrowRight className="ml-1 w-4 h-4" />
         </Button>
+        <button
+          type="button"
+          onClick={handleContinue}
+          className="mt-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition"
+        >
+          Skip Welcome
+        </button>
       </div>
     </div>
   );
