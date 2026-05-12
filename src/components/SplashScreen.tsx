@@ -50,7 +50,13 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
   };
 
   return (
-    <div className={`fixed inset-0 z-50 overflow-y-auto bg-gradient-wave transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"}`}>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="welcome-heading"
+      className={`fixed inset-0 z-50 overflow-y-auto bg-gradient-wave transition-opacity duration-500 ${fade ? "opacity-0" : "opacity-100"}`}
+      onKeyDown={(e) => { if (e.key === "Escape") handleContinue(); }}
+    >
       <div className="min-h-full flex flex-col items-center justify-start px-6 py-8">
         <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" aria-label="Open bizzsurfer.com" className="relative animate-float">
           <div className="absolute inset-0 rounded-full bg-white/40 blur-3xl animate-pulse" />
