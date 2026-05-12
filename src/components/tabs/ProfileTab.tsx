@@ -151,6 +151,7 @@ function SignedInProfile() {
       .then(([prefs, t]) => {
         if (cancelled) return;
         setEmail(prefs.account.email);
+        setOwnerId(prefs.account.id);
         const p = prefs.preferences;
         if (p) {
           setDisplayName(p.display_name ?? "");
