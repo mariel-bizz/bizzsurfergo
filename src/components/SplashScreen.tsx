@@ -72,7 +72,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           />
         </a>
         <div className="-mt-1 text-center max-w-sm">
-          <h1 className="text-2xl font-bold text-foreground text-balance leading-tight">
+          <h1 id="welcome-heading" className="text-2xl font-bold text-foreground text-balance leading-tight">
             Agentic AI Intelligence for Business Transformation
           </h1>
         </div>
