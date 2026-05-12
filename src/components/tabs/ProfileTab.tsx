@@ -140,9 +140,9 @@ function SignedInProfile() {
   const [insightsDigest, setInsightsDigest] = useState(true);
 
   const [team, setTeam] = useState<TeamRow[]>([]);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteName, setInviteName] = useState("");
-  const [inviteRole, setInviteRole] = useState<"member" | "admin">("member");
+  const [ownerId, setOwnerId] = useState<string | null>(null);
+  const [emailChips, setEmailChips] = useState<string[]>([]);
+  const [emailDraft, setEmailDraft] = useState("");
   const [inviting, setInviting] = useState(false);
 
   useEffect(() => {
