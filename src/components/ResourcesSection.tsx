@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
-  BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Plug, Youtube,
+  BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, MessageCircle, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
 
 function PartnerLogo({ name, slug }: { name: string; slug?: string }) {
@@ -100,9 +100,12 @@ const resources = [
 ];
 
 const socials = [
-  { icon: Globe, label: "bizzsurfer.com", href: "https://www.bizzsurfer.com" },
+  { icon: Globe, label: "bizzsurfer.com", href: "https://bizzsurfer.com" },
   { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer" },
-  { icon: Youtube, label: "YouTube", href: "https://www.youtube.com/@bizzsurfer" },
+  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@bizzsurfer" },
+  { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer" },
+  { icon: Music, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly" },
+  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/31614630463" },
 ];
 
 export function ResourcesSection() {
@@ -188,6 +191,21 @@ const socialStyles: Record<string, { bg: string; label: string; sub: string }> =
     bg: "bg-[linear-gradient(135deg,oklch(0.55_0.24_25),oklch(0.62_0.22_15))]",
     label: "YouTube",
     sub: "@bizzsurfer",
+  },
+  Twitter: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.18_230),oklch(0.65_0.16_220))]",
+    label: "Twitter",
+    sub: "@bizzsurfer",
+  },
+  Spotify: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.65_0.20_145),oklch(0.55_0.22_150))]",
+    label: "Spotify",
+    sub: "BizzSurfer",
+  },
+  WhatsApp: {
+    bg: "bg-[linear-gradient(135deg,oklch(0.65_0.18_150),oklch(0.55_0.20_155))]",
+    label: "WhatsApp",
+    sub: "+31 6 14630463",
   },
 };
 
