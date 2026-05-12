@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import splashLogoUrl from "@/assets/bizzsurfer-go-stacked.webp?url";
 import "@/integrations/supabase/server-fn-fetch.client";
 import { AppShell } from "@/components/AppShell";
 import { TranslationProvider } from "@/components/TranslationProvider";
