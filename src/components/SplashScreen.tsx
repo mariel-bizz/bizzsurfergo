@@ -123,14 +123,17 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         <Button
           size="lg"
           onClick={handleContinue}
-          className="mt-6 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 px-6 text-sm font-bold"
+          autoFocus
+          aria-label="Continue to BizzSurfer Go app"
+          className="mt-6 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Continue to BizzSurfer Go <ArrowRight className="ml-1 w-4 h-4" />
         </Button>
         <button
           type="button"
           onClick={handleContinue}
-          className="mt-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition"
+          aria-label="Skip the welcome screen and enter the app"
+          className="mt-3 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
         >
           Skip Welcome
         </button>
