@@ -100,9 +100,12 @@ const resources = [
 ];
 
 const socials = [
-  { icon: Globe, label: "bizzsurfer.com", href: "https://www.bizzsurfer.com" },
+  { icon: Globe, label: "bizzsurfer.com", href: "https://bizzsurfer.com" },
   { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer" },
-  { icon: Youtube, label: "YouTube", href: "https://www.youtube.com/@bizzsurfer" },
+  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@bizzsurfer" },
+  { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer" },
+  { icon: Music, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly" },
+  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/31614630463" },
 ];
 
 export function ResourcesSection() {
