@@ -99,6 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "apple-touch-icon", href: "/favicon.png" },
       { rel: "preconnect", href: "https://cdn.gpteng.co", crossOrigin: "anonymous" },
       { rel: "dns-prefetch", href: "https://cdn.gpteng.co" },
+      { rel: "preload", as: "image", href: splashLogoUrl, fetchPriority: "high" },
       {
         rel: "stylesheet",
         href: appCss,
