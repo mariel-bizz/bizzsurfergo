@@ -1,14 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
-import { Send, Sparkles, ExternalLink, Settings2 } from "lucide-react";
+import { Send, Sparkles, ExternalLink, Settings2, Paperclip, X, Mail, Download } from "lucide-react";
 import { toast } from "sonner";
-import { GoChatSetup, PROVIDER_META, type GoChatConfig } from "@/components/chat/GoChatSetup";
+import { GoChatSetup, PROVIDER_META, type GoChatConfig, type Provider } from "@/components/chat/GoChatSetup";
+import jsPDF from "jspdf";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+} from "@/components/ui/dialog";
+import { supabase } from "@/integrations/supabase/client";
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Attachment = { name: string; type: string; dataUrl: string };
+type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
 
 const CONFIG_KEY = "bizzsurfer.gochat.config";
-
+const QUESTION_LIMIT = 2;
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
@@ -21,6 +27,15 @@ const PRESETS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-chat`;
 
+// Strip markdown markers (### headings, **bold**, * bullets) from streamed answers.
+function cleanAnswer(text: string): string {
+  return text
+    .replace(/^#{1,6}\s+/gm, "")          // ### headings
+    .replace(/\*\*(.+?)\*\*/g, "$1")       // **bold**
+    .replace(/(^|\s)\*(?!\s)/g, "$1")      // stray *
+    .replace(/^\s*[-•*]\s+/gm, "• ");      // normalise bullets
+}
+
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const game = useGame();
   const [config, setConfig] = useState<GoChatConfig | null>(() => {
@@ -28,28 +43,36 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     try {
       const raw = window.localStorage.getItem(CONFIG_KEY);
       return raw ? (JSON.parse(raw) as GoChatConfig) : null;
-    } catch {
-      return null;
-    }
+    } catch { return null; }
   });
   const gemPersona = config?.provider === "gemini"
     ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
     : "";
   const contextPreamble = config
-    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope.`
+    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in plain prose with short paragraphs and simple bullets — do not use markdown headings (no ###) or bold (**) syntax.`
     : "";
   const initialAssistant = config
-    ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**. Ask me anything, or pick a starter below.`
-    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started.";
+    ? `I'm BizzSurfer Go! — focused on ${config.departments.join(", ")} in ${config.industries.join(", ")}. Ask me anything, or pick a starter below.`
+    : "I'm BizzSurfer Go! — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started.";
   const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: initialAssistant }]);
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
+  const [attachments, setAttachments] = useState<Attachment[]>([]);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [emailValue, setEmailValue] = useState("");
+  const [sending, setSending] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Load any prior session email to pre-fill the popup.
   useEffect(() => {
-    if (seedPrompt) setInput(seedPrompt);
-  }, [seedPrompt]);
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user?.email) setEmailValue(data.user.email);
+    });
+  }, []);
 
+  useEffect(() => { if (seedPrompt) setInput(seedPrompt); }, [seedPrompt]);
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
@@ -59,22 +82,51 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setConfig(cfg);
     setMessages([{
       role: "assistant",
-      content: `Locked in: **${PROVIDER_META.find(p => p.id === cfg.provider)?.name}** for **${cfg.departments.join(", ")}** in **${cfg.industries.join(", ")}**. What's the first question on your board agenda?`,
+      content: `Locked in: ${PROVIDER_META.find(p => p.id === cfg.provider)?.name} for ${cfg.departments.join(", ")} in ${cfg.industries.join(", ")}. What's the first question on your board agenda?`,
     }]);
+    setQuestionCount(0);
+  };
+
+  const switchProvider = (provider: Provider) => {
+    if (!config) return;
+    const next = { ...config, provider };
+    try { window.localStorage.setItem(CONFIG_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    setConfig(next);
+    toast.success(`Switched to ${PROVIDER_META.find(p => p.id === provider)?.name}`);
   };
 
   const resetConfig = () => {
     try { window.localStorage.removeItem(CONFIG_KEY); } catch { /* ignore */ }
     setConfig(null);
     setMessages([{ role: "assistant", content: "Let's reconfigure your BizzSurfer GO! chat." }]);
+    setQuestionCount(0);
+  };
+
+  const onPickFiles = async (files: FileList | null) => {
+    if (!files) return;
+    const items: Attachment[] = [];
+    for (const f of Array.from(files).slice(0, 4)) {
+      if (f.size > 5 * 1024 * 1024) { toast.error(`${f.name} is over 5MB`); continue; }
+      const dataUrl: string = await new Promise((resolve, reject) => {
+        const r = new FileReader();
+        r.onload = () => resolve(r.result as string);
+        r.onerror = reject;
+        r.readAsDataURL(f);
+      });
+      items.push({ name: f.name, type: f.type, dataUrl });
+    }
+    setAttachments((prev) => [...prev, ...items].slice(0, 4));
   };
 
   const send = async (text: string) => {
-    if (!text.trim() || streaming) return;
-    const userMsg: Msg = { role: "user", content: text };
+    if ((!text.trim() && attachments.length === 0) || streaming) return;
+    if (questionCount >= QUESTION_LIMIT) { setEmailOpen(true); return; }
+
+    const userMsg: Msg = { role: "user", content: text, attachments: attachments.length ? attachments : undefined };
     const next = [...messages, userMsg];
     setMessages(next);
     setInput("");
+    setAttachments([]);
     setStreaming(true);
 
     game.update((s) => {
@@ -93,13 +145,21 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       setMessages((prev) => {
         if (!assistantStarted) {
           assistantStarted = true;
-          return [...prev, { role: "assistant" as const, content: acc }];
+          return [...prev, { role: "assistant" as const, content: cleanAnswer(acc) }];
         }
-        return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: acc } : m);
+        return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: cleanAnswer(acc) } : m);
       });
     };
 
     try {
+      // Build payload: attachments are inlined as a brief text reference (vision multi-modal isn't wired in the edge fn).
+      const apiMessages = next.map((m) => ({
+        role: m.role,
+        content: m.attachments?.length
+          ? `${m.content}\n\n[Attached files: ${m.attachments.map(a => a.name).join(", ")}]`
+          : m.content,
+      }));
+
       const resp = await fetch(CHAT_URL, {
         method: "POST",
         headers: {
@@ -107,7 +167,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          messages: contextPreamble ? [{ role: "system", content: contextPreamble }, ...next] : next,
+          messages: contextPreamble ? [{ role: "system", content: contextPreamble }, ...apiMessages] : apiMessages,
           provider: config?.provider ?? null,
           language: typeof window !== "undefined" ? window.localStorage.getItem("bizzsurfer.lang") || "en" : "en",
         }),
@@ -143,6 +203,12 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           }
         }
       }
+
+      setQuestionCount((c) => {
+        const nc = c + 1;
+        if (nc >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
+        return nc;
+      });
     } catch (e) {
       console.error(e);
       toast.error("Couldn't reach BizzSurfer. Try again.");
@@ -152,7 +218,124 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   };
 
   const providerMeta = config ? PROVIDER_META.find((p) => p.id === config.provider) : null;
-  
+
+  // ---- PDF + email summary ----
+  const buildSummaryText = () => {
+    const lines: string[] = [];
+    lines.push("BizzSurfer Go! — Conversation summary");
+    if (config) {
+      lines.push(`Model: ${PROVIDER_META.find(p => p.id === config.provider)?.name}`);
+      lines.push(`Departments: ${config.departments.join(", ")}`);
+      lines.push(`Industries: ${config.industries.join(", ")}`);
+    }
+    lines.push("");
+    messages.slice(1).forEach((m) => {
+      lines.push(`${m.role === "user" ? "You" : "BizzSurfer"}: ${m.content}`);
+      lines.push("");
+    });
+    return lines.join("\n");
+  };
+
+  const downloadPdf = () => {
+    const doc = new jsPDF({ unit: "pt", format: "a4" });
+    const margin = 48;
+    const width = doc.internal.pageSize.getWidth() - margin * 2;
+    const pageH = doc.internal.pageSize.getHeight() - margin;
+    let y = margin;
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(16);
+    doc.text("BizzSurfer Go! — Your conversation", margin, y); y += 22;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    if (config) {
+      doc.text(`Model: ${PROVIDER_META.find(p => p.id === config.provider)?.name}`, margin, y); y += 14;
+      doc.text(`Departments: ${config.departments.join(", ")}`, margin, y); y += 14;
+      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y); y += 20;
+    }
+    doc.setTextColor(0);
+    doc.setFontSize(11);
+
+    messages.slice(1).forEach((m) => {
+      doc.setFont("helvetica", "bold");
+      const who = m.role === "user" ? "You" : "BizzSurfer";
+      const lines = doc.splitTextToSize(`${who}:`, width);
+      lines.forEach((l: string) => { if (y > pageH) { doc.addPage(); y = margin; } doc.text(l, margin, y); y += 14; });
+      doc.setFont("helvetica", "normal");
+      const body = doc.splitTextToSize(m.content, width);
+      body.forEach((l: string) => { if (y > pageH) { doc.addPage(); y = margin; } doc.text(l, margin, y); y += 14; });
+      y += 8;
+    });
+
+    if (y > pageH - 80) { doc.addPage(); y = margin; }
+    doc.setDrawColor(200); doc.line(margin, y, margin + width, y); y += 18;
+    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
+    doc.text("Want the full picture?", margin, y); y += 16;
+    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
+    doc.text("Upgrade to BizzSurfer Pro for unlimited questions, full reports,", margin, y); y += 12;
+    doc.text("upcoming events and a 1:1 demo call with our team.", margin, y); y += 18;
+    doc.setTextColor(0, 80, 200);
+    doc.textWithLink("→ Book a demo call", margin, y, { url: "https://bizzsurfergo.lovable.app/pricing" });
+
+    doc.save("bizzsurfer-go-summary.pdf");
+  };
+
+  const sendShortSummaryEmail = async () => {
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) { toast.error("Please enter a valid email."); return; }
+    setSending(true);
+
+    // Generate PDF download for the user.
+    try { downloadPdf(); } catch (e) { console.error(e); }
+
+    // Compose a short-version email that opens in the user's mail client (mailto).
+    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
+    const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
+    const subject = `Your BizzSurfer Go! summary`;
+    const body = [
+      `Hi,`,
+      ``,
+      `Here's a short version of your BizzSurfer Go! conversation:`,
+      ``,
+      config ? `Focus: ${config.departments.join(", ")} in ${config.industries.join(", ")}` : "",
+      `Model used: ${providerMeta?.name ?? "BizzSurfer Go!"}`,
+      ``,
+      `— Your question:`,
+      lastUser,
+      ``,
+      `— BizzSurfer's take (excerpt):`,
+      (lastAi.length > 600 ? lastAi.slice(0, 600) + "…" : lastAi),
+      ``,
+      `Upgrade to BizzSurfer Pro to get:`,
+      `• Unlimited questions across all language models`,
+      `• Full PDF reports per conversation`,
+      `• Access to our upcoming events for transformation leaders`,
+      `• A 1:1 demo call with our team`,
+      ``,
+      `→ Upgrade & book a demo: https://bizzsurfergo.lovable.app/pricing`,
+      ``,
+      `The full PDF has been downloaded to your device.`,
+    ].filter(Boolean).join("\n");
+
+    const mailto = `mailto:${encodeURIComponent(emailValue)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    window.location.href = mailto;
+
+    // Capture the lead in waitlist for follow-up.
+    try {
+      await supabase.from("waitlist" as any).insert({
+        email: emailValue,
+        source: "go_chat_summary",
+        metadata: { provider: config?.provider, departments: config?.departments, industries: config?.industries },
+      } as any);
+    } catch (e) { /* non-blocking */ }
+
+    setSending(false);
+    setEmailOpen(false);
+    toast.success("PDF downloaded and email drafted.");
+  };
+
+  const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
 
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)]">
@@ -160,7 +343,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         <div className="rounded-2xl bg-gradient-primary text-primary-foreground p-4 shadow-soft flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
             {providerMeta ? (
-              <img src={providerMeta.logo} alt={providerMeta.name} className="w-6 h-6" />
+              <img src={providerMeta.logo} alt={providerMeta.name} className="w-6 h-6 object-contain" />
             ) : (
               <Sparkles className="w-5 h-5" />
             )}
@@ -195,6 +378,31 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
       {config && (
         <>
+          {/* Quick model switcher */}
+          <div className="px-4 pb-2">
+            <div className="flex gap-1.5 overflow-x-auto -mx-4 px-4">
+              {PROVIDER_META.map((p) => {
+                const isActive = p.id === config.provider;
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => !isActive && switchProvider(p.id)}
+                    className={`shrink-0 inline-flex items-center gap-1.5 rounded-full border px-3 h-8 text-[11px] font-bold transition ${
+                      isActive
+                        ? "bg-primary text-primary-foreground border-primary shadow-soft"
+                        : "bg-card text-foreground border-border hover:border-primary/40"
+                    }`}
+                    aria-pressed={isActive}
+                    title={`Use ${p.name}`}
+                  >
+                    <img src={p.logo} alt="" className="w-3.5 h-3.5 object-contain" />
+                    {p.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
@@ -203,6 +411,13 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                     ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
                     : "bg-card text-card-foreground border border-border rounded-bl-sm"
                 }`}>
+                  {m.attachments?.length ? (
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {m.attachments.map((a, j) => a.type.startsWith("image/")
+                        ? <img key={j} src={a.dataUrl} alt={a.name} className="w-16 h-16 rounded-lg object-cover" />
+                        : <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">{a.name}</span>)}
+                    </div>
+                  ) : null}
                   <FormattedText text={m.content} />
                 </div>
               </div>
@@ -229,41 +444,117 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             </div>
           )}
 
+          {questionCount >= QUESTION_LIMIT && (
+            <div className="mx-4 mb-2 rounded-xl bg-accent/60 border border-primary/30 px-3 py-2 text-[11px] text-foreground flex items-center justify-between gap-2">
+              <span>You've used your 2 free questions. Get the full report by email.</span>
+              <button
+                onClick={() => setEmailOpen(true)}
+                className="shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-primary text-primary-foreground px-2.5 py-1 text-[11px] font-bold"
+              >
+                <Mail className="w-3 h-3" /> Get PDF
+              </button>
+            </div>
+          )}
+
+          {attachments.length > 0 && (
+            <div className="px-4 pb-1 flex gap-1.5 flex-wrap">
+              {attachments.map((a, i) => (
+                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-[11px]">
+                  {a.type.startsWith("image/")
+                    ? <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
+                    : <Paperclip className="w-3 h-3" />}
+                  {a.name}
+                  <button onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))} aria-label="Remove">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          )}
+
           <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="px-4 pt-2 pb-3 bg-background border-t border-border">
             <div className="flex items-center gap-2">
               <input
+                ref={fileRef}
+                type="file"
+                accept="image/*,.pdf,.txt,.csv,.doc,.docx"
+                multiple
+                hidden
+                onChange={(e) => { onPickFiles(e.target.files); e.target.value = ""; }}
+              />
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={streaming}
+                className="rounded-2xl w-11 h-11 bg-muted text-foreground flex items-center justify-center hover:bg-accent transition shrink-0"
+                aria-label="Attach file"
+                title="Attach image or file"
+              >
+                <Paperclip className="w-4 h-4" />
+              </button>
+              <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={`Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`}
-                disabled={streaming}
-                className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                placeholder={questionCount >= QUESTION_LIMIT ? "Get the PDF to continue…" : `Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`}
+                disabled={streaming || questionCount >= QUESTION_LIMIT}
+                className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
               />
-              <Button type="submit" size="icon" disabled={streaming || !input.trim()} className="rounded-2xl w-12 h-12 bg-gradient-primary shadow-soft">
+              <Button type="submit" size="icon" disabled={streaming || (!input.trim() && attachments.length === 0)} className="rounded-2xl w-12 h-12 bg-gradient-primary shadow-soft">
                 <Send className="w-5 h-5" />
               </Button>
             </div>
           </form>
         </>
       )}
+
+      {/* Email capture popup after 2 questions */}
+      <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2"><Mail className="w-5 h-5 text-primary" /> Get your full report</DialogTitle>
+            <DialogDescription>
+              We'll email you a short summary with an upgrade offer, and download the full PDF to your device.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <label className="text-xs font-bold text-foreground">Confirm your email</label>
+            <input
+              value={emailValue}
+              onChange={(e) => setEmailValue(e.target.value)}
+              type="email"
+              placeholder="you@company.com"
+              className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              autoFocus
+            />
+            <p className="text-[11px] text-muted-foreground">
+              The email includes a short version of the PDF, an invite to upcoming events,
+              full reports, and a 1:1 demo call when you upgrade.
+            </p>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={downloadPdf} className="rounded-xl">
+              <Download className="w-4 h-4 mr-1" /> PDF only
+            </Button>
+            <Button onClick={sendShortSummaryEmail} disabled={sending} className="rounded-xl bg-gradient-primary">
+              <Mail className="w-4 h-4 mr-1" /> {sending ? "Preparing…" : "Email me"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
 
 function FormattedText({ text }: { text: string }) {
-  // Lightweight markdown: **bold**, line breaks, bullets
   const lines = text.split("\n");
   return (
     <div className="space-y-1">
       {lines.map((line, i) => {
-        const isBullet = /^\s*[-•*]\s+/.test(line);
-        const clean = line.replace(/^\s*[-•*]\s+/, "");
-        const parts = clean.split(/(\*\*[^*]+\*\*)/g);
+        const isBullet = /^\s*[•]\s+/.test(line);
+        const clean = line.replace(/^\s*[•]\s+/, "");
         return (
           <p key={i} className={isBullet ? "pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-primary before:font-bold" : ""}>
-            {parts.map((p, j) => p.startsWith("**") && p.endsWith("**")
-              ? <strong key={j} className="font-bold">{p.slice(2, -2)}</strong>
-              : <span key={j}>{p}</span>
-            )}
+            {clean}
           </p>
         );
       })}
