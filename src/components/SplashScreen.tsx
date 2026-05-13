@@ -82,7 +82,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
             <Globe className="w-3.5 h-3.5" /> Language
           </div>
 
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-3 gap-1.5">
             {TILE_LANGUAGES.map((l) => {
               const active = language === l.code;
               return (
@@ -91,14 +91,14 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                   type="button"
                   onClick={() => handleLanguage(l.code)}
                   data-no-translate
-                  className={`flex flex-col items-center justify-center gap-1 rounded-xl border p-3 backdrop-blur transition shadow-sm ${
+                  className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border p-1.5 backdrop-blur transition shadow-sm ${
                     active
                       ? "bg-primary text-primary-foreground border-primary shadow-soft"
                       : "bg-card/80 border-border hover:bg-card"
                   }`}
                 >
-                  <span className="text-2xl leading-none" aria-hidden>{l.flag}</span>
-                  <span className="text-xs font-semibold">{l.label}</span>
+                  <span className="text-base leading-none" aria-hidden>{l.flag}</span>
+                  <span className="text-[10px] font-semibold">{l.label}</span>
                 </button>
               );
             })}

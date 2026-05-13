@@ -34,6 +34,10 @@
   --color-input: var(--input);
   --color-ring: var(--ring);
   --color-ring-offset-background: var(--background);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-amber: var(--brand-amber);
+  --color-brand-gray: var(--brand-gray);
   --font-display: 'Plus Jakarta Sans', system-ui, sans-serif;
   --font-sans: 'Inter', system-ui, sans-serif;
 }
@@ -49,10 +53,16 @@
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.22 0.04 250);
 
-  /* BizzSurfer orange */
-  --primary: oklch(0.71 0.19 45);
+  /* BizzSurfer brand palette: #02449A #FF6F00 #FFAB1D #D9D9D9 */
+  --brand-blue: oklch(0.39 0.17 263);   /* #02449A */
+  --brand-orange: oklch(0.677 0.194 46); /* #FF6F00 */
+  --brand-amber: oklch(0.798 0.155 75);  /* #FFAB1D */
+  --brand-gray: oklch(0.87 0 0);         /* #D9D9D9 */
+
+  /* BizzSurfer orange (mapped to brand) */
+  --primary: var(--brand-orange);
   --primary-foreground: oklch(1 0 0);
-  --primary-glow: oklch(0.82 0.16 55);
+  --primary-glow: var(--brand-amber);
 
   --secondary: oklch(0.96 0.02 60);
   --secondary-foreground: oklch(0.25 0.04 250);
@@ -73,9 +83,10 @@
   --input: oklch(0.93 0.012 60);
   --ring: oklch(0.71 0.19 45);
 
-  --gradient-primary: linear-gradient(135deg, oklch(0.71 0.19 45), oklch(0.82 0.16 55));
+  --gradient-primary: linear-gradient(135deg, var(--brand-orange), var(--brand-amber));
   --gradient-wave: linear-gradient(180deg, oklch(0.985 0.008 80) 0%, oklch(0.95 0.04 55) 100%);
-  --gradient-deep: linear-gradient(135deg, oklch(0.65 0.21 40), oklch(0.78 0.17 60));
+  --gradient-deep: linear-gradient(135deg, var(--brand-blue), var(--brand-orange));
+  --gradient-brand: linear-gradient(135deg, var(--brand-blue), var(--brand-amber));
   --shadow-soft: 0 4px 20px -4px oklch(0.71 0.19 45 / 0.18);
   --shadow-elegant: 0 20px 50px -20px oklch(0.71 0.19 45 / 0.3);
   --shadow-card: 0 2px 12px -2px oklch(0.5 0.05 250 / 0.08);
@@ -113,6 +124,7 @@
   .bg-gradient-primary { background-image: var(--gradient-primary); }
   .bg-gradient-wave { background-image: var(--gradient-wave); }
   .bg-gradient-deep { background-image: var(--gradient-deep); }
+  .bg-gradient-brand { background-image: var(--gradient-brand); }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-card { box-shadow: var(--shadow-card); }
