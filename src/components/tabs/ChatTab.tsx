@@ -407,7 +407,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     toast.success("PDF downloaded.");
   };
 
-  // Step 2b: open the user's mail client with a short summary.
+  // Step 2b: send the summary email to the user via the transactional queue.
   const handleEmailMe = async () => {
     trackEvent("go_chat_email_me_clicked", {
       email: submittedEmail,
@@ -417,35 +417,36 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
     const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
     const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
-    const subject = `Your BizzSurfer Go! summary`;
-    const body = [
-      `Hi,`,
-      ``,
-      `Here's a short version of your BizzSurfer Go! conversation:`,
-      ``,
-      config ? `Focus: ${config.departments.join(", ")} in ${config.industries.join(", ")}` : "",
-      `Model used: ${providerMeta?.name ?? "BizzSurfer Go!"}`,
-      ``,
-      `— Your question:`,
-      lastUser,
-      ``,
-      `— BizzSurfer's take (excerpt):`,
-      (lastAi.length > 600 ? lastAi.slice(0, 600) + "…" : lastAi),
-      ``,
-      `Upgrade to BizzSurfer Pro to get:`,
-      `• Unlimited questions across all language models`,
-      `• Full PDF reports per conversation`,
-      `• Access to our upcoming events for transformation leaders`,
-      `• A 1:1 demo call with our team`,
-      ``,
-      `→ Upgrade & book a demo: https://bizzsurfergo.lovable.app/pricing`,
-      ``,
-      `The full PDF has been downloaded to your device.`,
-    ].filter(Boolean).join("\n");
+    const focus = config
+      ? `${config.departments.join(", ")} in ${config.industries.join(", ")}`
+      : "Your transformation focus";
 
-    const mailto = `mailto:${encodeURIComponent(submittedEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    window.location.href = mailto;
-    toast.success("PDF downloaded and email drafted.");
+    try {
+      const res = await fetch("/api/public/chat/email-summary", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          recipientEmail: submittedEmail,
+          focus,
+          modelUsed: providerMeta?.name ?? "BizzSurfer Go!",
+          question: lastUser,
+          excerpt: lastAi.length > 1200 ? lastAi.slice(0, 1200) + "…" : lastAi,
+          upgradeUrl: "https://bizzsurfergo.lovable.app/pricing",
+        }),
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok || json?.error) {
+        throw new Error(json?.error || `Request failed (${res.status})`);
+      }
+      if (json?.reason === "email_suppressed") {
+        toast.error("This email has unsubscribed and can't receive messages.");
+        return;
+      }
+      toast.success(`Email sent to ${submittedEmail}. PDF downloaded too.`);
+    } catch (err) {
+      console.error("email send failed", err);
+      toast.error("Couldn't send the email. Please try again.");
+    }
   };
 
   const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
