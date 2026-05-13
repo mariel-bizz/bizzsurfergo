@@ -3,7 +3,7 @@ import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot } from "lucide-react";
 import { useState } from "react";
-import banner from "@/assets/bizzsurfer-banner.webp";
+
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, FollowSection } from "../ResourcesSection";
@@ -32,13 +32,6 @@ export function HomeTab() {
 
   return (
     <div className="space-y-8 pt-2">
-      {/* Banner */}
-      <section className="px-5 pt-2">
-        <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer" className="block rounded-2xl overflow-hidden shadow-card border border-border">
-          <img src={banner} alt="BizzSurfer Agentic AI" className="w-full" width={1296} height={324} fetchPriority="high" decoding="async" />
-        </a>
-      </section>
-
       {/* Hero */}
       <section className="relative px-5 pt-6 pb-8 wave-bg overflow-hidden">
         <div className="relative">
