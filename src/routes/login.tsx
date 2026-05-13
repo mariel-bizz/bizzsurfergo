@@ -239,6 +239,12 @@ function LoginPage() {
               <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
                 Continue with Apple
               </Button>
+              <Button variant="outline" className="w-full" onClick={() => oauthSupabase("azure")} disabled={loading}>
+                Continue with Microsoft
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => oauthSupabase("linkedin_oidc")} disabled={loading}>
+                Continue with LinkedIn
+              </Button>
             </>
           )}
           <button
