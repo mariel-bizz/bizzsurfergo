@@ -45,6 +45,7 @@ import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/em
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
+import { Route as ApiPublicChatEmailSummaryRouteImport } from './routes/api/public/chat/email-summary'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -232,6 +233,12 @@ const ApiPublicEventsEventIdDoticsRoute =
     path: '/api/public/events/$eventId.ics',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicChatEmailSummaryRoute =
+  ApiPublicChatEmailSummaryRouteImport.update({
+    id: '/api/public/chat/email-summary',
+    path: '/api/public/chat/email-summary',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -262,6 +269,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -300,6 +308,7 @@ export interface FileRoutesByTo {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights': typeof InsightsIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -339,6 +348,7 @@ export interface FileRoutesById {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
@@ -379,6 +389,7 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/insights/'
     | '/lovable/email/suppression'
+    | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
     | '/api/public/payments/webhook'
@@ -417,6 +428,7 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/insights'
     | '/lovable/email/suppression'
+    | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
     | '/api/public/payments/webhook'
@@ -455,6 +467,7 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/insights/'
     | '/lovable/email/suppression'
+    | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
     | '/api/public/payments/webhook'
@@ -492,6 +505,7 @@ export interface RootRouteChildren {
   JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
@@ -756,6 +770,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicEventsEventIdDoticsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/chat/email-summary': {
+      id: '/api/public/chat/email-summary'
+      path: '/api/public/chat/email-summary'
+      fullPath: '/api/public/chat/email-summary'
+      preLoaderRoute: typeof ApiPublicChatEmailSummaryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -800,6 +821,7 @@ const rootRouteChildren: RootRouteChildren = {
   JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
@@ -812,3 +834,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
