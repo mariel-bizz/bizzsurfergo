@@ -191,23 +191,31 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       {!config && <GoChatSetup onComplete={saveConfig} />}
 
       {config && isGemini && (
-        <div className="flex-1 flex flex-col px-4 pb-3 min-h-0">
-          <div className="rounded-2xl border border-border bg-card overflow-hidden flex-1 flex flex-col">
-            <iframe
-              src={GEMINI_GEM_URL}
-              title="BizzSurfer Gemini Gem"
-              className="flex-1 w-full"
-              allow="clipboard-write; microphone"
+        <div className="flex-1 flex flex-col px-4 pb-4 min-h-0">
+          <div className="flex-1 rounded-2xl border border-border bg-card p-6 flex flex-col items-center justify-center text-center gap-4">
+            <img
+              src="https://cdn.simpleicons.org/googlegemini/FFAB1D"
+              alt="Gemini"
+              className="w-12 h-12"
             />
+            <div className="space-y-1">
+              <h3 className="text-base font-bold text-foreground">BizzSurfer Gem on Gemini</h3>
+              <p className="text-xs text-muted-foreground max-w-xs">
+                Google doesn't allow Gems to run inside other apps. Open the Gem in Gemini — it stays linked to your BizzSurfer GO! setup.
+              </p>
+            </div>
+            <a
+              href={GEMINI_GEM_URL}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-2xl bg-gradient-primary px-5 py-2.5 text-sm font-bold text-primary-foreground shadow-soft"
+            >
+              Open Gem in Gemini <ExternalLink className="w-4 h-4" />
+            </a>
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground">
+              Sign in with your Google account
+            </p>
           </div>
-          <a
-            href={GEMINI_GEM_URL}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-2 text-center text-[11px] font-semibold text-primary inline-flex items-center justify-center gap-1"
-          >
-            Open Gem in new tab <ExternalLink className="w-3 h-3" />
-          </a>
         </div>
       )}
 
