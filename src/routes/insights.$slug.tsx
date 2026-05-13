@@ -8,7 +8,6 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
 import type { Block, Inline } from "@contentful/rich-text-types";
 import type { ReactNode } from "react";
-import { pageHead } from "@/lib/page-head";
 import { getBlogPost } from "@/lib/contentful.functions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,14 +15,76 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, ArrowLeft, Calendar, User } from "lucide-react";
 import { CtaBlock } from "./insights.index";
 
+function truncate(s: string, n: number) {
+  if (!s) return s;
+  if (s.length <= n) return s;
+  return s.slice(0, n - 1).trimEnd() + "…";
+}
+
 export const Route = createFileRoute("/insights/$slug")({
-  head: ({ params }) =>
-    pageHead({
-      path: `/insights/${params.slug}`,
-      title: `Insights — BizzSurfer Go!`,
-      description: "Read the latest insights from BizzSurfer.",
-      breadcrumbName: "Article",
-    }),
+  loader: async ({ params }) => {
+    try {
+      const post = await getBlogPost({ data: { slug: params.slug } });
+      return { post };
+    } catch {
+      return { post: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const post = loaderData?.post ?? null;
+    // Canonical points to the marketing site so SEO/views consolidate on www.bizzsurfer.com.
+    const canonical = marketingUrlForSlug(params.slug);
+    const title = post
+      ? truncate(post.metaTitle || `${post.title} — BizzSurfer`, 60)
+      : "Insights — BizzSurfer Go!";
+    const description = post
+      ? truncate(post.metaDescription || post.excerpt || "BizzSurfer insight article.", 160)
+      : "Read the latest insights from BizzSurfer.";
+    const image = post?.featuredImage
+      ? `${post.featuredImage.url}?w=1200&fm=jpg&q=80`
+      : null;
+
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: canonical },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+    }
+
+    const scripts: Array<{ type: string; children: string }> = [];
+    if (post) {
+      const articleLd: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description,
+        mainEntityOfPage: canonical,
+        url: canonical,
+      };
+      if (post.publishedDate) articleLd.datePublished = post.publishedDate;
+      if (post.author) articleLd.author = { "@type": "Person", name: post.author };
+      if (image) articleLd.image = image;
+      scripts.push({
+        type: "application/ld+json",
+        children: JSON.stringify(articleLd),
+      });
+    }
+
+    return {
+      meta,
+      links: [{ rel: "canonical", href: canonical }],
+      scripts,
+    };
+  },
   component: ArticlePage,
   notFoundComponent: () => (
     <div className="px-4 py-12 text-center">
