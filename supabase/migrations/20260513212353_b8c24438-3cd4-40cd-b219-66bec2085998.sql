@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX IF NOT EXISTS waitlist_email_lower_unique ON public.waitlist (lower(email));
