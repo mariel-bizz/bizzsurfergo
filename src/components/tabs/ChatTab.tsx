@@ -148,75 +148,108 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     }
   };
 
+  const providerMeta = config ? PROVIDER_META.find((p) => p.id === config.provider) : null;
+  const isGemini = config?.provider === "gemini";
+
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)]">
       <div className="px-5 pt-3 pb-2">
         <div className="rounded-2xl bg-gradient-primary text-primary-foreground p-4 shadow-soft flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-            <Sparkles className="w-5 h-5" />
+            {providerMeta ? (
+              <img src={providerMeta.logo} alt={providerMeta.name} className="w-6 h-6" />
+            ) : (
+              <Sparkles className="w-5 h-5" />
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-[10px] uppercase tracking-widest opacity-90 font-semibold">Agentic AI Advisor</p>
-            <p className="text-sm font-bold">BizzSurfer Go!</p>
+            <p className="text-sm font-bold truncate">
+              BizzSurfer Go!{providerMeta ? ` · ${providerMeta.name}` : ""}
+            </p>
           </div>
-          <a
-            href="https://chatgpt.com/g/g-69f61861f0308191bdb780fd6adc5085-bizzsurfer"
-            target="_blank" rel="noreferrer"
-            className="rounded-lg bg-white/20 backdrop-blur px-2.5 py-1.5 text-[11px] font-bold flex items-center gap-1"
-          >
-            GPT <ExternalLink className="w-3 h-3" />
-          </a>
+          {config ? (
+            <button
+              onClick={resetConfig}
+              className="rounded-lg bg-white/20 backdrop-blur px-2.5 py-1.5 text-[11px] font-bold flex items-center gap-1"
+              aria-label="Reconfigure"
+            >
+              <Settings2 className="w-3 h-3" /> Setup
+            </button>
+          ) : (
+            <a
+              href="https://chatgpt.com/g/g-69f61861f0308191bdb780fd6adc5085-bizzsurfer"
+              target="_blank" rel="noreferrer"
+              className="rounded-lg bg-white/20 backdrop-blur px-2.5 py-1.5 text-[11px] font-bold flex items-center gap-1"
+            >
+              GPT <ExternalLink className="w-3 h-3" />
+            </a>
+          )}
         </div>
       </div>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-        {messages.map((m, i) => (
-          <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
-              m.role === "user"
-                ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
-                : "bg-card text-card-foreground border border-border rounded-bl-sm"
-            }`}>
-              <FormattedText text={m.content} />
-            </div>
-          </div>
-        ))}
-        {streaming && messages[messages.length - 1]?.role === "user" && (
-          <div className="flex justify-start">
-            <div className="bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
-              {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: `${i*150}ms` }} />)}
-            </div>
-          </div>
-        )}
-      </div>
+      {!config && <GoChatSetup onComplete={saveConfig} />}
 
-      {messages.length <= 2 && (
-        <div className="px-4 pb-2">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">Try a leader question</p>
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 snap-x">
-            {PRESETS.map((p) => (
-              <button key={p} onClick={() => send(p)} className="snap-start shrink-0 max-w-[80%] text-left rounded-xl bg-accent text-accent-foreground px-3 py-2 text-xs font-medium border border-primary/20 hover:bg-accent/80 transition">
-                {p}
-              </button>
-            ))}
+      {config && isGemini && (
+        <div className="flex-1 flex flex-col px-4 pb-3 min-h-0">
+          <div className="rounded-2xl border border-border bg-card overflow-hidden flex-1 flex flex-col">
+            <iframe
+              src={GEMINI_GEM_URL}
+              title="BizzSurfer Gemini Gem"
+              className="flex-1 w-full"
+              allow="clipboard-write; microphone"
+            />
           </div>
+          <a
+            href={GEMINI_GEM_URL}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 text-center text-[11px] font-semibold text-primary inline-flex items-center justify-center gap-1"
+          >
+            Open Gem in new tab <ExternalLink className="w-3 h-3" />
+          </a>
         </div>
       )}
 
-      <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="px-4 pt-2 pb-3 bg-background border-t border-border">
-        <div className="flex items-center gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask BizzSurfer Go!..."
-            disabled={streaming}
-            className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-          />
-          <Button type="submit" size="icon" disabled={streaming || !input.trim()} className="rounded-2xl w-12 h-12 bg-gradient-primary shadow-soft">
-            <Send className="w-5 h-5" />
-          </Button>
-        </div>
-      </form>
+      {config && !isGemini && (
+        <>
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+            {messages.map((m, i) => (
+              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
+                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
+                  m.role === "user"
+                    ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
+                    : "bg-card text-card-foreground border border-border rounded-bl-sm"
+                }`}>
+                  <FormattedText text={m.content} />
+                </div>
+              </div>
+            ))}
+            {streaming && messages[messages.length - 1]?.role === "user" && (
+              <div className="flex justify-start">
+                <div className="bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
+                  {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: `${i*150}ms` }} />)}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="px-4 pt-2 pb-3 bg-background border-t border-border">
+            <div className="flex items-center gap-2">
+              <input
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={`Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`}
+                disabled={streaming}
+                className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              />
+              <Button type="submit" size="icon" disabled={streaming || !input.trim()} className="rounded-2xl w-12 h-12 bg-gradient-primary shadow-soft">
+                <Send className="w-5 h-5" />
+              </Button>
+            </div>
+          </form>
+        </>
+      )}
     </div>
   );
 }
