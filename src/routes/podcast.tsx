@@ -67,6 +67,31 @@ function PodcastPage() {
         />
       </div>
 
+      <div className="space-y-4">
+        <h2 className="text-base font-bold text-foreground">Featured playlist & show</h2>
+        {[
+          { title: "Featured playlist", src: "https://open.spotify.com/embed/playlist/6Jvb9W4LCZ6pNpVDlFzayF?utm_source=generator&theme=0" },
+          { title: "Featured show", src: "https://open.spotify.com/embed/show/3sNWski1Zw9mGauajOdToS?utm_source=generator&theme=0" },
+          { title: "Latest episode", src: "https://open.spotify.com/embed/episode/0HJ2oPYS3w5T6UUiUiIAs9?utm_source=generator&theme=0" },
+          { title: "Recommended episode", src: "https://open.spotify.com/embed/episode/5SmYUmU9twq0jf4VGioVca?utm_source=generator&theme=0" },
+        ].map((e) => (
+          <div key={e.src} className="rounded-3xl overflow-hidden shadow-card border border-border bg-card">
+            <iframe
+              title={e.title}
+              src={e.src}
+              width="100%"
+              height="352"
+              frameBorder={0}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              style={{ borderRadius: 12 }}
+              className="block w-full"
+            />
+          </div>
+        ))}
+      </div>
+
+
       <div className="rounded-3xl bg-gradient-deep p-6 text-white shadow-elegant space-y-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
