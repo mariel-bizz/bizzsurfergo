@@ -21,7 +21,16 @@ import {
   X,
   Link as LinkIcon,
   Copy,
+  Send,
 } from "lucide-react";
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { toast } from "sonner";
@@ -144,6 +153,7 @@ function SignedInProfile() {
   const [emailChips, setEmailChips] = useState<string[]>([]);
   const [emailDraft, setEmailDraft] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -311,6 +321,29 @@ function SignedInProfile() {
       toast.success("Invite link copied");
     } catch {
       toast.success(link);
+    }
+  };
+
+  const onResendInvite = async (m: TeamRow) => {
+    setResendingId(m.id);
+    try {
+      await invite({ data: { email: m.email, role: m.role } });
+      if (teamShareLink) {
+        try {
+          await navigator.clipboard.writeText(teamShareLink);
+          toast.success(`Invite refreshed for ${m.email} — team link copied`);
+        } catch {
+          toast.success(`Invite refreshed for ${m.email}`);
+        }
+      } else {
+        toast.success(`Invite refreshed for ${m.email}`);
+      }
+      const t = await fetchTeam();
+      setTeam((t.team ?? []) as TeamRow[]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not resend invite");
+    } finally {
+      setResendingId(null);
     }
   };
 
@@ -528,7 +561,7 @@ function SignedInProfile() {
             </p>
             <Button type="submit" className="w-full" disabled={inviting}>
               <Mail className="w-4 h-4 mr-2" />
-              {inviting ? "Saving…" : "Save emails to team"}
+              {inviting ? "Sending…" : "Send invitations to my team"}
             </Button>
           </form>
 
@@ -586,19 +619,101 @@ function SignedInProfile() {
                       </SelectContent>
                     </Select>
                     {m.status === "pending" && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-xs h-8"
-                        onClick={() => onCopyInvite(m.id, m.invite_token)}
-                      >
-                        Copy invite link
-                      </Button>
+                      <>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => onCopyInvite(m.id, m.invite_token)}
+                        >
+                          Copy invite link
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          className="text-xs h-8"
+                          onClick={() => onResendInvite(m)}
+                          disabled={resendingId === m.id}
+                          aria-label={`Resend invite to ${m.email}`}
+                        >
+                          <Send className="w-3 h-3 mr-1" />
+                          {resendingId === m.id ? "Resending…" : "Resend invite"}
+                        </Button>
+                      </>
                     )}
                   </div>
                 </li>
               ))}
             </ul>
+          )}
+
+          {/* Team invites table */}
+          {team.length > 0 && (
+            <div className="space-y-2">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Team invites
+              </h3>
+              <div className="rounded-xl border border-border overflow-hidden">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Email</TableHead>
+                      <TableHead className="text-xs">Status</TableHead>
+                      <TableHead className="text-xs">Updated</TableHead>
+                      <TableHead className="text-xs text-right">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {team.map((m) => {
+                      const displayStatus =
+                        m.status === "revoked" ? "failed" : m.status;
+                      const ts = m.accepted_at ?? m.invited_at;
+                      return (
+                        <TableRow key={`row-${m.id}`}>
+                          <TableCell className="text-xs truncate max-w-[180px]">
+                            {m.email}
+                          </TableCell>
+                          <TableCell>
+                            <Badge
+                              variant={
+                                displayStatus === "active"
+                                  ? "default"
+                                  : displayStatus === "pending"
+                                    ? "outline"
+                                    : "destructive"
+                              }
+                              className="text-[10px] capitalize"
+                            >
+                              {displayStatus}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-[11px] text-muted-foreground whitespace-nowrap">
+                            {new Date(ts).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            {m.status !== "active" ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                className="text-xs h-7"
+                                onClick={() => onResendInvite(m)}
+                                disabled={resendingId === m.id}
+                                aria-label={`Resend invite to ${m.email}`}
+                              >
+                                <Send className="w-3 h-3 mr-1" />
+                                {resendingId === m.id ? "…" : "Resend"}
+                              </Button>
+                            ) : (
+                              <span className="text-[11px] text-muted-foreground">—</span>
+                            )}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
