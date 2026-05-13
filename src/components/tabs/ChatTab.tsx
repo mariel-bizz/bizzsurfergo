@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import bizzsurferGoLogo from "@/assets/bizzsurfer-go-logo.png";
+import { trackEvent } from "@/lib/analytics";
 
 // Strict RFC-5322-ish email check + length cap.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
