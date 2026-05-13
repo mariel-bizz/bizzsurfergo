@@ -23,12 +23,42 @@ export const Route = createFileRoute("/marketplace/$listingId")({
   },
   head: ({ loaderData }) => {
     const l = loaderData?.listing;
-    return pageHead({
+    const base = pageHead({
       path: `/marketplace/${l?.id ?? ""}`,
       title: l ? `${l.title} — Marketplace` : "Listing — Marketplace",
       description: l?.tagline ?? "Marketplace listing on BizzSurfer Go!",
       breadcrumbName: l?.title ?? "Listing",
     });
+    if (!l) return base;
+    const parsed = parseListingPrice(l.price);
+    const product: Record<string, unknown> = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: l.title,
+      description: l.tagline,
+      brand: { "@type": "Brand", name: l.provider },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: l.rating,
+        ratingCount: 1,
+        bestRating: 5,
+      },
+    };
+    if (parsed) {
+      product.offers = {
+        "@type": "Offer",
+        price: parsed.amount,
+        priceCurrency: parsed.currency || "USD",
+        availability: "https://schema.org/InStock",
+      };
+    }
+    return {
+      ...base,
+      scripts: [
+        ...(base.scripts ?? []),
+        { type: "application/ld+json", children: JSON.stringify(product) },
+      ],
+    };
   },
   notFoundComponent: () => (
     <div className="px-5 py-10 text-center space-y-3">
