@@ -9,6 +9,38 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
+import bizzsurferGoLogo from "@/assets/bizzsurfer-go-logo.png";
+
+// Strict RFC-5322-ish email check + length cap.
+const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+function validateEmail(value: string): string | null {
+  const v = value.trim();
+  if (!v) return "Please enter your email address.";
+  if (v.length > 254) return "That email is too long.";
+  if (!EMAIL_RE.test(v)) return "Enter a valid email like name@company.com.";
+  const [, domain] = v.split("@");
+  if (!domain.includes(".") || domain.startsWith(".") || domain.endsWith(".")) {
+    return "That email domain looks invalid.";
+  }
+  return null;
+}
+
+// Cache the logo as a data URL so jsPDF can embed it.
+let logoDataUrl: string | null = null;
+async function getLogoDataUrl(): Promise<string | null> {
+  if (logoDataUrl) return logoDataUrl;
+  try {
+    const res = await fetch(bizzsurferGoLogo);
+    const blob = await res.blob();
+    logoDataUrl = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+    return logoDataUrl;
+  } catch { return null; }
+}
 
 type Attachment = { name: string; type: string; dataUrl: string };
 type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
