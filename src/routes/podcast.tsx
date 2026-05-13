@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { trackEvent } from "@/lib/analytics";
+import bizzsurferLogo from "@/assets/bizzsurfer-logo.webp";
 
 const SPOTIFY_USER_ID = "31l6phq64rtvbtqbgeyozhlbpyly";
 const SPOTIFY_URL = `https://open.spotify.com/user/${SPOTIFY_USER_ID}`;
