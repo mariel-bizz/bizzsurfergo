@@ -9,6 +9,38 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
+import bizzsurferGoLogo from "@/assets/bizzsurfer-go-logo.png";
+
+// Strict RFC-5322-ish email check + length cap.
+const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+function validateEmail(value: string): string | null {
+  const v = value.trim();
+  if (!v) return "Please enter your email address.";
+  if (v.length > 254) return "That email is too long.";
+  if (!EMAIL_RE.test(v)) return "Enter a valid email like name@company.com.";
+  const [, domain] = v.split("@");
+  if (!domain.includes(".") || domain.startsWith(".") || domain.endsWith(".")) {
+    return "That email domain looks invalid.";
+  }
+  return null;
+}
+
+// Cache the logo as a data URL so jsPDF can embed it.
+let logoDataUrl: string | null = null;
+async function getLogoDataUrl(): Promise<string | null> {
+  if (logoDataUrl) return logoDataUrl;
+  try {
+    const res = await fetch(bizzsurferGoLogo);
+    const blob = await res.blob();
+    logoDataUrl = await new Promise<string>((resolve, reject) => {
+      const r = new FileReader();
+      r.onload = () => resolve(r.result as string);
+      r.onerror = reject;
+      r.readAsDataURL(blob);
+    });
+    return logoDataUrl;
+  } catch { return null; }
+}
 
 type Attachment = { name: string; type: string; dataUrl: string };
 type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
@@ -61,6 +93,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [questionCount, setQuestionCount] = useState(0);
   const [emailOpen, setEmailOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -236,58 +269,109 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     return lines.join("\n");
   };
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const margin = 48;
-    const width = doc.internal.pageSize.getWidth() - margin * 2;
+    const pageW = doc.internal.pageSize.getWidth();
+    const width = pageW - margin * 2;
     const pageH = doc.internal.pageSize.getHeight() - margin;
-    let y = margin;
 
+    // Theme colors (matching app's primary teal palette)
+    const PRIMARY: [number, number, number] = [56, 124, 137]; // ~oklch primary
+    const MUTED: [number, number, number] = [110, 118, 128];
+    const TEXT: [number, number, number] = [25, 30, 36];
+
+    // Header band
+    doc.setFillColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+    doc.rect(0, 0, pageW, 90, "F");
+
+    // Logo
+    const logo = await getLogoDataUrl();
+    if (logo) {
+      try { doc.addImage(logo, "PNG", margin, 22, 46, 46); } catch { /* ignore */ }
+    }
+
+    // Wordmark
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("BizzSurfer Go! — Your conversation", margin, y); y += 22;
-
+    doc.setFontSize(18);
+    doc.text("BizzSurfer Go!", margin + 58, 48);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(100);
+    doc.text("Agentic AI advisor for business transformation", margin + 58, 64);
+
+    // Title
+    let y = 130;
+    doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("Your conversation report", margin, y); y += 10;
+    doc.setDrawColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+    doc.setLineWidth(2);
+    doc.line(margin, y, margin + 48, y); y += 24;
+
+    // Meta block
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text(new Date().toLocaleString(), margin, y); y += 14;
     if (config) {
       doc.text(`Model: ${PROVIDER_META.find(p => p.id === config.provider)?.name}`, margin, y); y += 14;
       doc.text(`Departments: ${config.departments.join(", ")}`, margin, y); y += 14;
-      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y); y += 20;
+      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y); y += 22;
     }
-    doc.setTextColor(0);
+
+    // Conversation
+    doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
     doc.setFontSize(11);
 
     messages.slice(1).forEach((m) => {
+      if (y > pageH - 40) { doc.addPage(); y = margin; }
       doc.setFont("helvetica", "bold");
-      const who = m.role === "user" ? "You" : "BizzSurfer";
-      const lines = doc.splitTextToSize(`${who}:`, width);
-      lines.forEach((l: string) => { if (y > pageH) { doc.addPage(); y = margin; } doc.text(l, margin, y); y += 14; });
+      doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+      doc.setFontSize(10);
+      doc.text(m.role === "user" ? "YOU" : "BIZZSURFER GO!", margin, y); y += 14;
       doc.setFont("helvetica", "normal");
+      doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+      doc.setFontSize(11);
       const body = doc.splitTextToSize(m.content, width);
-      body.forEach((l: string) => { if (y > pageH) { doc.addPage(); y = margin; } doc.text(l, margin, y); y += 14; });
-      y += 8;
+      body.forEach((l: string) => {
+        if (y > pageH) { doc.addPage(); y = margin; }
+        doc.text(l, margin, y); y += 15;
+      });
+      y += 10;
     });
 
-    if (y > pageH - 80) { doc.addPage(); y = margin; }
-    doc.setDrawColor(200); doc.line(margin, y, margin + width, y); y += 18;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-    doc.text("Want the full picture?", margin, y); y += 16;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    doc.text("Upgrade to BizzSurfer Pro for unlimited questions, full reports,", margin, y); y += 12;
-    doc.text("upcoming events and a 1:1 demo call with our team.", margin, y); y += 18;
-    doc.setTextColor(0, 80, 200);
-    doc.textWithLink("→ Book a demo call", margin, y, { url: "https://bizzsurfergo.lovable.app/pricing" });
+    // CTA card
+    if (y > pageH - 110) { doc.addPage(); y = margin; }
+    y += 10;
+    doc.setFillColor(244, 248, 249);
+    doc.roundedRect(margin, y, width, 90, 8, 8, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+    doc.text("Want the full picture?", margin + 14, y + 22);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text("Upgrade to BizzSurfer Pro for unlimited questions, full reports,", margin + 14, y + 40);
+    doc.text("upcoming events and a 1:1 demo call with our team.", margin + 14, y + 54);
+    doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+    doc.setFont("helvetica", "bold");
+    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://bizzsurfergo.lovable.app/pricing" });
 
     doc.save("bizzsurfer-go-summary.pdf");
   };
 
   const sendShortSummaryEmail = async () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) { toast.error("Please enter a valid email."); return; }
+    const err = validateEmail(emailValue);
+    if (err) { setEmailError(err); return; }
+    setEmailError(null);
     setSending(true);
+    const cleanEmail = emailValue.trim().toLowerCase();
 
     // Generate PDF download for the user.
-    try { downloadPdf(); } catch (e) { console.error(e); }
+    try { await downloadPdf(); } catch (e) { console.error(e); }
 
     // Compose a short-version email that opens in the user's mail client (mailto).
     const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
@@ -318,16 +402,17 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       `The full PDF has been downloaded to your device.`,
     ].filter(Boolean).join("\n");
 
-    const mailto = `mailto:${encodeURIComponent(emailValue)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
 
-    // Capture the lead in waitlist for follow-up.
+    // Capture the lead in waitlist; the case-insensitive unique index dedups silently.
     try {
-      await supabase.from("waitlist").insert({
-        email: emailValue,
-        name: emailValue.split("@")[0],
+      const { error } = await supabase.from("waitlist").insert({
+        email: cleanEmail,
+        name: cleanEmail.split("@")[0],
         role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
       });
+      if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
     } catch (e) { /* non-blocking */ }
 
     setSending(false);
@@ -516,26 +601,54 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               We'll email you a short summary with an upgrade offer, and download the full PDF to your device.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <label className="text-xs font-bold text-foreground">Confirm your email</label>
+          <div className="space-y-2">
+            <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
             <input
+              id="email-confirm"
               value={emailValue}
-              onChange={(e) => setEmailValue(e.target.value)}
+              onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+              onBlur={() => setEmailError(validateEmail(emailValue))}
               type="email"
+              autoComplete="email"
+              inputMode="email"
+              maxLength={254}
               placeholder="you@company.com"
-              className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              aria-invalid={!!emailError}
+              aria-describedby={emailError ? "email-error" : "email-help"}
+              className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                emailError
+                  ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
+                  : "border-border focus:ring-primary/40"
+              }`}
               autoFocus
             />
-            <p className="text-[11px] text-muted-foreground">
-              The email includes a short version of the PDF, an invite to upcoming events,
-              full reports, and a 1:1 demo call when you upgrade.
-            </p>
+            {emailError ? (
+              <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
+            ) : (
+              <p id="email-help" className="text-[11px] text-muted-foreground">
+                The email includes a short version of the PDF, an invite to upcoming events,
+                full reports, and a 1:1 demo call when you upgrade.
+              </p>
+            )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={downloadPdf} className="rounded-xl">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                const err = validateEmail(emailValue);
+                if (err) { setEmailError(err); return; }
+                await downloadPdf();
+              }}
+              disabled={sending || !!validateEmail(emailValue)}
+              className="rounded-xl"
+            >
               <Download className="w-4 h-4 mr-1" /> PDF only
             </Button>
-            <Button onClick={sendShortSummaryEmail} disabled={sending} className="rounded-xl bg-gradient-primary">
+            <Button
+              onClick={sendShortSummaryEmail}
+              disabled={sending || !!validateEmail(emailValue)}
+              className="rounded-xl bg-gradient-primary"
+            >
               <Mail className="w-4 h-4 mr-1" /> {sending ? "Preparing…" : "Email me"}
             </Button>
           </DialogFooter>
