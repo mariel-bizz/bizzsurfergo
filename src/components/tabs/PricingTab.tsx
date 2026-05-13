@@ -258,6 +258,87 @@ export function PricingTab() {
             </div>
           );
         })}
+
+        {/* Team plan — per-seat, no fixed cost */}
+        <div className="relative rounded-3xl p-5 border bg-card border-border shadow-card">
+          <span className="absolute -top-2.5 right-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground shadow-soft">
+            For teams
+          </span>
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-primary">
+              <Users className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <p className="text-base font-bold text-foreground">BizzSurfer Team</p>
+              <p className="text-xs text-muted-foreground">10% off Hero per seat · min 2 seats</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-4xl font-bold text-foreground">€{teamSeatPrice.toFixed(2)}</span>
+            <span className="text-xs text-muted-foreground">
+              per seat / {yearly ? "year" : "month"}
+            </span>
+          </div>
+
+          <p className="mt-3 text-sm text-muted-foreground">
+            Everything in Hero for every seat, plus team management and Premium AI integrations
+            (Claude, Gemini, OpenAI, Mistral, Perplexity).
+          </p>
+
+          <div className="mt-4 space-y-2">
+            <Label htmlFor="team-seats" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Number of seats
+            </Label>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                onClick={() => setSeats((s) => Math.max(2, s - 1))}
+                aria-label="Decrease seats"
+                disabled={seats <= 2}
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+              <Input
+                id="team-seats"
+                type="number"
+                min={2}
+                max={100}
+                value={seats}
+                onChange={(e) => {
+                  const n = parseInt(e.target.value, 10);
+                  if (Number.isFinite(n)) setSeats(Math.min(100, Math.max(2, n)));
+                }}
+                className="text-center h-10"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                onClick={() => setSeats((s) => Math.min(100, s + 1))}
+                aria-label="Increase seats"
+                disabled={seats >= 100}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-sm text-foreground">
+              Total: <span className="font-bold">€{teamTotal}</span>{" "}
+              <span className="text-muted-foreground">/ {yearly ? "year" : "month"}</span>
+            </p>
+          </div>
+
+          <Button
+            onClick={() => handleSubscribe("team")}
+            className="mt-5 w-full h-11 font-bold bg-gradient-primary text-primary-foreground"
+          >
+            Get {seats} seats
+          </Button>
+        </div>
       </div>
 
       {isActive && (
