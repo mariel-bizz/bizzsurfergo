@@ -23,9 +23,22 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-c
 
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const game = useGame();
-  const [messages, setMessages] = useState<Msg[]>([
-    { role: "assistant", content: "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started." },
-  ]);
+  const [config, setConfig] = useState<GoChatConfig | null>(() => {
+    if (typeof window === "undefined") return null;
+    try {
+      const raw = window.localStorage.getItem(CONFIG_KEY);
+      return raw ? (JSON.parse(raw) as GoChatConfig) : null;
+    } catch {
+      return null;
+    }
+  });
+  const contextPreamble = config
+    ? `Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope.`
+    : "";
+  const initialAssistant = config
+    ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**. Ask me anything, or pick a starter below.`
+    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started.";
+  const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: initialAssistant }]);
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -37,6 +50,21 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
+
+  const saveConfig = (cfg: GoChatConfig) => {
+    try { window.localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); } catch { /* ignore */ }
+    setConfig(cfg);
+    setMessages([{
+      role: "assistant",
+      content: `Locked in: **${PROVIDER_META.find(p => p.id === cfg.provider)?.name}** for **${cfg.departments.join(", ")}** in **${cfg.industries.join(", ")}**. What's the first question on your board agenda?`,
+    }]);
+  };
+
+  const resetConfig = () => {
+    try { window.localStorage.removeItem(CONFIG_KEY); } catch { /* ignore */ }
+    setConfig(null);
+    setMessages([{ role: "assistant", content: "Let's reconfigure your BizzSurfer GO! chat." }]);
+  };
 
   const send = async (text: string) => {
     if (!text.trim() || streaming) return;
