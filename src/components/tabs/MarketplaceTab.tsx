@@ -18,6 +18,8 @@ import {
   ShoppingCart,
   Plus,
   Check as CheckIcon,
+  SlidersHorizontal,
+  ChevronDown,
 } from "lucide-react";
 import { listings, categoryMeta, getPriceType, type Category, type PriceType } from "@/lib/marketplace-data";
 import { addToCart, useCart } from "@/lib/marketplace-cart";
@@ -92,6 +94,7 @@ export function MarketplaceTab() {
   const [presetName, setPresetName] = useState("");
   const [manageOpen, setManageOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
   const allTags = useMemo(() => {
     const set = new Set<string>();
@@ -281,6 +284,26 @@ export function MarketplaceTab() {
         </p>
       </header>
 
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          className="inline-flex items-center gap-2 rounded-full bg-card border border-border h-9 px-3 text-xs font-bold text-foreground hover:border-primary/40"
+          aria-expanded={filtersOpen}
+          aria-controls="marketplace-filters"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
+          {filtersOpen ? "Hide filters" : "Show filters"}
+          {activeFilterCount > 0 && (
+            <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+              {activeFilterCount}
+            </span>
+          )}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${filtersOpen ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+
+      {filtersOpen && (
+      <>
       {/* Preset switcher */}
       <section
         aria-label="Filter presets"
@@ -506,6 +529,8 @@ export function MarketplaceTab() {
           );
         })}
       </div>
+      </>
+      )}
 
       <p className="text-xs text-muted-foreground">
         Showing {filtered.length} of {listings.length} listings
