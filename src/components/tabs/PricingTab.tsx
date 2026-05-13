@@ -89,6 +89,7 @@ const tiers = [
 
 export function PricingTab() {
   const [yearly, setYearly] = useState(false);
+  const [seats, setSeats] = useState(2);
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const { tier: currentTier, isActive } = useSubscription(user?.id ?? null);
@@ -112,9 +113,13 @@ export function PricingTab() {
     const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
     openCheckout({
       priceId,
+      quantity: tierId === "team" ? seats : 1,
       returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
     });
   };
+
+  const teamSeatPrice = yearly ? TEAM_SEAT_YEARLY : TEAM_SEAT_MONTHLY;
+  const teamTotal = (teamSeatPrice * seats).toFixed(2);
 
   return (
     <div className="px-5 py-5 space-y-5">
