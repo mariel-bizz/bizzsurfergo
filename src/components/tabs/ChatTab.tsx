@@ -364,19 +364,57 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://bizzsurfergo.lovable.app/pricing" });
 
     doc.save("bizzsurfer-go-summary.pdf");
+    trackEvent("go_chat_pdf_downloaded", {
+      email: submittedEmail || undefined,
+      provider: config?.provider,
+      messages: messages.length - 1,
+    });
   };
 
-  const sendShortSummaryEmail = async () => {
+  // Step 1: validate + persist email to waitlist, then show inline confirmation.
+  const submitEmail = async () => {
     const err = validateEmail(emailValue);
     if (err) { setEmailError(err); return; }
     setEmailError(null);
     setSending(true);
     const cleanEmail = emailValue.trim().toLowerCase();
 
-    // Generate PDF download for the user.
+    try {
+      const { error } = await supabase.from("waitlist").insert({
+        email: cleanEmail,
+        name: cleanEmail.split("@")[0],
+        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+      });
+      if (error && error.code !== "23505") {
+        console.warn("waitlist insert:", error.message);
+      }
+    } catch (e) { /* non-blocking */ }
+
+    trackEvent("go_chat_email_submitted", {
+      email: cleanEmail,
+      provider: config?.provider,
+    });
+
+    setSubmittedEmail(cleanEmail);
+    setEmailSubmitted(true);
+    setSending(false);
+  };
+
+  // Step 2a: trigger the in-browser PDF download.
+  const handleDownloadPdf = async () => {
+    trackEvent("go_chat_pdf_download_clicked", { email: submittedEmail });
+    try { await downloadPdf(); } catch (e) { console.error(e); }
+    toast.success("PDF downloaded.");
+  };
+
+  // Step 2b: open the user's mail client with a short summary.
+  const handleEmailMe = async () => {
+    trackEvent("go_chat_email_me_clicked", {
+      email: submittedEmail,
+      provider: config?.provider,
+    });
     try { await downloadPdf(); } catch (e) { console.error(e); }
 
-    // Compose a short-version email that opens in the user's mail client (mailto).
     const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
     const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
     const subject = `Your BizzSurfer Go! summary`;
@@ -405,21 +443,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       `The full PDF has been downloaded to your device.`,
     ].filter(Boolean).join("\n");
 
-    const mailto = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${encodeURIComponent(submittedEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
-
-    // Capture the lead in waitlist; the case-insensitive unique index dedups silently.
-    try {
-      const { error } = await supabase.from("waitlist").insert({
-        email: cleanEmail,
-        name: cleanEmail.split("@")[0],
-        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
-      });
-      if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
-    } catch (e) { /* non-blocking */ }
-
-    setSending(false);
-    setEmailOpen(false);
     toast.success("PDF downloaded and email drafted.");
   };
 
