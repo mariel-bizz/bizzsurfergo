@@ -55,7 +55,7 @@ function rateLimited(ip: string): boolean {
   return arr.length > RATE_LIMIT_MAX;
 }
 
-function jsonError(code: string, status: number) {
+function jsonError(req: Request, code: string, status: number) {
   return new Response(JSON.stringify({ error: code }), {
     status,
     headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
