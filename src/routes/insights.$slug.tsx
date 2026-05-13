@@ -8,7 +8,6 @@ import { documentToReactComponents } from "@contentful/rich-text-react-renderer"
 import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
 import type { Block, Inline } from "@contentful/rich-text-types";
 import type { ReactNode } from "react";
-import { pageHead } from "@/lib/page-head";
 import { getBlogPost } from "@/lib/contentful.functions";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,14 +15,76 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, ArrowLeft, Calendar, User } from "lucide-react";
 import { CtaBlock } from "./insights.index";
 
+function truncate(s: string, n: number) {
+  if (!s) return s;
+  if (s.length <= n) return s;
+  return s.slice(0, n - 1).trimEnd() + "…";
+}
+
 export const Route = createFileRoute("/insights/$slug")({
-  head: ({ params }) =>
-    pageHead({
-      path: `/insights/${params.slug}`,
-      title: `Insights — BizzSurfer Go!`,
-      description: "Read the latest insights from BizzSurfer.",
-      breadcrumbName: "Article",
-    }),
+  loader: async ({ params }) => {
+    try {
+      const post = await getBlogPost({ data: { slug: params.slug } });
+      return { post };
+    } catch {
+      return { post: null };
+    }
+  },
+  head: ({ params, loaderData }) => {
+    const post = loaderData?.post ?? null;
+    // Canonical points to the marketing site so SEO/views consolidate on www.bizzsurfer.com.
+    const canonical = marketingUrlForSlug(params.slug);
+    const title = post
+      ? truncate(post.metaTitle || `${post.title} — BizzSurfer`, 60)
+      : "Insights — BizzSurfer Go!";
+    const description = post
+      ? truncate(post.metaDescription || post.excerpt || "BizzSurfer insight article.", 160)
+      : "Read the latest insights from BizzSurfer.";
+    const image = post?.featuredImage
+      ? `${post.featuredImage.url}?w=1200&fm=jpg&q=80`
+      : null;
+
+    const meta: Array<Record<string, string>> = [
+      { title },
+      { name: "description", content: description },
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: canonical },
+      { property: "og:type", content: "article" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+    ];
+    if (image) {
+      meta.push({ property: "og:image", content: image });
+      meta.push({ name: "twitter:image", content: image });
+    }
+
+    const scripts: Array<{ type: string; children: string }> = [];
+    if (post) {
+      const articleLd: Record<string, unknown> = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        headline: post.title,
+        description,
+        mainEntityOfPage: canonical,
+        url: canonical,
+      };
+      if (post.publishedDate) articleLd.datePublished = post.publishedDate;
+      if (post.author) articleLd.author = { "@type": "Person", name: post.author };
+      if (image) articleLd.image = image;
+      scripts.push({
+        type: "application/ld+json",
+        children: JSON.stringify(articleLd),
+      });
+    }
+
+    return {
+      meta,
+      links: [{ rel: "canonical", href: canonical }],
+      scripts,
+    };
+  },
   component: ArticlePage,
   notFoundComponent: () => (
     <div className="px-4 py-12 text-center">
@@ -169,85 +230,60 @@ function ArticlePage() {
   if (!data) return null;
 
   return (
-    <>
-      <ArticleHead post={data} />
-      <article className="px-4 py-4">
-        <Link
-          to="/insights"
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
-        >
-          <ArrowLeft className="h-3 w-3" /> All insights
-        </Link>
+    <article className="px-4 py-4">
+      <Link
+        to="/insights"
+        className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
+      >
+        <ArrowLeft className="h-3 w-3" /> All insights
+      </Link>
 
-        <header className="mt-3">
-          {data.category && (
-            <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
-              {prettyCategory(data.category)}
-            </Badge>
-          )}
-          <h1 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{data.title}</h1>
-          {data.excerpt && (
-            <p className="mt-2 text-base text-muted-foreground">{data.excerpt}</p>
-          )}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            {data.author && (
-              <span className="inline-flex items-center gap-1">
-                <User className="h-3 w-3" /> {data.author}
-              </span>
-            )}
-            {data.publishedDate && (
-              <span className="inline-flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> {formatDate(data.publishedDate)}
-              </span>
-            )}
-          </div>
-        </header>
-
-        {data.featuredImage && (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-muted">
-            <img
-              src={`${data.featuredImage.url}?w=1200&fm=webp&q=80`}
-              alt={data.featuredImage.alt}
-              className="h-full w-full object-cover"
-            />
-          </div>
+      <header className="mt-3">
+        {data.category && (
+          <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+            {prettyCategory(data.category)}
+          </Badge>
         )}
-
-        <div className="mt-4 max-w-prose text-[15px]">
-          {data.body ? (
-            documentToReactComponents(data.body, richTextOptions)
-          ) : (
-            <p className="text-muted-foreground">No content available.</p>
+        <h1 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{data.title}</h1>
+        {data.excerpt && (
+          <p className="mt-2 text-base text-muted-foreground">{data.excerpt}</p>
+        )}
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          {data.author && (
+            <span className="inline-flex items-center gap-1">
+              <User className="h-3 w-3" /> {data.author}
+            </span>
+          )}
+          {data.publishedDate && (
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="h-3 w-3" /> {formatDate(data.publishedDate)}
+            </span>
           )}
         </div>
+      </header>
 
-        <ArticleEngagement slug={data.slug} articleTitle={data.title} />
+      {data.featuredImage && (
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-muted">
+          <img
+            src={`${data.featuredImage.url}?w=1200&fm=webp&q=80`}
+            alt={data.featuredImage.alt}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
 
-        <CtaBlock />
-      </article>
-    </>
+      <div className="mt-4 max-w-prose text-[15px]">
+        {data.body ? (
+          documentToReactComponents(data.body, richTextOptions)
+        ) : (
+          <p className="text-muted-foreground">No content available.</p>
+        )}
+      </div>
+
+      <ArticleEngagement slug={data.slug} articleTitle={data.title} />
+
+      <CtaBlock />
+    </article>
   );
 }
 
-function ArticleHead({ post }: { post: { metaTitle: string | null; title: string; metaDescription: string | null; excerpt: string; featuredImage: { url: string } | null; slug: string } }) {
-  const title = post.metaTitle || `${post.title} — BizzSurfer Go!`;
-  const desc = post.metaDescription || post.excerpt;
-  // Canonical points to the marketing site so SEO/views consolidate on www.bizzsurfer.com.
-  const url = marketingUrlForSlug(post.slug);
-  const image = post.featuredImage ? `${post.featuredImage.url}?w=1200&fm=jpg&q=80` : null;
-  return (
-    <>
-      <title>{title}</title>
-      <meta name="description" content={desc} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={desc} />
-      <meta property="og:url" content={url} />
-      <meta property="og:type" content="article" />
-      {image && <meta property="og:image" content={image} />}
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={desc} />
-      {image && <meta name="twitter:image" content={image} />}
-      <link rel="canonical" href={url} />
-    </>
-  );
-}

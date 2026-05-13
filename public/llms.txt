@@ -1,0 +1,22 @@
+# BizzSurfer Go!
+
+> Agentic AI Intelligence for enterprise Business Transformation leaders. Connect business systems, orchestrate change with AI agents, and accelerate ROI.
+
+BizzSurfer Go! is the executive companion app for transformation leaders adopting Agentic AI. It includes an AI chat assistant, curated insights, executive events, a marketplace of AI agents and playbooks, ROI tools, and pricing for individuals and teams.
+
+## Pages
+
+- [Home](/): Overview of Agentic AI for transformation leaders.
+- [Chat](/chat): AI assistant for transformation questions.
+- [Events](/events): Executive events, roundtables, and masterclasses.
+- [Insights](/insights): Articles on Agentic AI and enterprise transformation.
+- [Marketplace](/marketplace): Curated AI agents, services, and playbooks.
+- [Pricing](/pricing): Individual and team plans.
+- [Resources](/resources): Guides and downloadable resources.
+- [Profile](/profile): Account and subscription management.
+
+## Optional
+
+- [Login](/login): Sign in or create an account.
+- [RSS feed](/feed.xml): Events and insights RSS.
+- [Atom feed](/atom.xml): Events and insights Atom.

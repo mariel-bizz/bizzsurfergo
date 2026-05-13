@@ -9,7 +9,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "BizzSurfer Go! brings Agentic AI to enterprise transformation leaders—connect your business systems and orchestrate change with AI agents, ROI tools, and expert resources.",
+          "Agentic AI for enterprise transformation leaders—connect business systems, orchestrate change, and accelerate ROI with AI agents.",
       },
     ],
     links: [{ rel: "canonical", href: `${SITE}/` }],
