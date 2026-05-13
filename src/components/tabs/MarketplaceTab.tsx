@@ -18,6 +18,8 @@ import {
   ShoppingCart,
   Plus,
   Check as CheckIcon,
+  SlidersHorizontal,
+  ChevronDown,
 } from "lucide-react";
 import { listings, categoryMeta, getPriceType, type Category, type PriceType } from "@/lib/marketplace-data";
 import { addToCart, useCart } from "@/lib/marketplace-cart";
