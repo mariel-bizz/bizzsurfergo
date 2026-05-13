@@ -85,7 +85,8 @@ export const Route = createFileRoute("/lovable/email/queue/process")({
         }
 
         const token = authHeader.slice('Bearer '.length).trim()
-        if (token !== supabaseServiceKey) {
+        const { timingSafeEqualStr } = await import('@/lib/timing-safe')
+        if (!timingSafeEqualStr(token, supabaseServiceKey)) {
           return Response.json({ error: 'Forbidden' }, { status: 403 })
         }
 

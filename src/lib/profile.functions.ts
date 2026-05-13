@@ -165,17 +165,17 @@ export const canNotifyUser = createServerFn({ method: "POST" })
   .inputValidator((d) =>
     z
       .object({
-        user_id: z.string().uuid(),
         kind: z.enum(["event_reminders", "insights_digest", "email_updates"]),
       })
       .parse(d),
   )
   .handler(async ({ data, context }) => {
-    const { supabase } = context;
+    const { supabase, userId } = context;
+    // Always enforce caller's own identity — never trust a client-supplied user_id.
     const { data: prefs, error } = await supabase
       .from("user_preferences")
       .select("event_reminders, insights_digest, email_updates")
-      .eq("user_id", data.user_id)
+      .eq("user_id", userId)
       .maybeSingle();
     if (error) throw new Error(error.message);
     // Defaults match the table defaults (true) when no preferences row exists yet.
