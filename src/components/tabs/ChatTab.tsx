@@ -194,8 +194,6 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       {!config && <GoChatSetup onComplete={saveConfig} />}
 
       {config && (
-
-      {config && !isGemini && (
         <>
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
             {messages.map((m, i) => (
