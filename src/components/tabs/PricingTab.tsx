@@ -219,7 +219,7 @@ export function PricingTab() {
                       />
                     ) : (
                       <X
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${t.highlighted ? "text-white/50" : "text-muted-foreground"}`}
+                        className={`w-4 h-4 mt-0.5 shrink-0 ${t.highlighted ? "text-white/85" : "text-muted-foreground"}`}
                       />
                     )}
                     <span
@@ -229,7 +229,7 @@ export function PricingTab() {
                             ? "text-white/95"
                             : "text-foreground"
                           : t.highlighted
-                            ? "text-white/60"
+                            ? "text-white/85"
                             : "text-muted-foreground"
                       }
                     >
