@@ -53,6 +53,7 @@ export function EventsTab() {
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session);
+      setUserEmail(session?.user?.email ?? "");
     });
     return () => sub.subscription.unsubscribe();
   }, [listRsvps]);
