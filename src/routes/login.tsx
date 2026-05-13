@@ -56,10 +56,20 @@ function LoginPage() {
   }, [navigate, redirect]);
 
   // Map raw OAuth/provider errors to actionable, user-friendly messages.
-  const friendlyOAuthError = (provider: "google" | "apple", raw: unknown): string => {
+  const friendlyOAuthError = (
+    provider: "google" | "apple" | "azure" | "linkedin_oidc",
+    raw: unknown,
+  ): string => {
     const msg = raw instanceof Error ? raw.message : String(raw ?? "");
     const lower = msg.toLowerCase();
-    const label = provider === "apple" ? "Apple" : "Google";
+    const label =
+      provider === "apple"
+        ? "Apple"
+        : provider === "google"
+          ? "Google"
+          : provider === "azure"
+            ? "Microsoft"
+            : "LinkedIn";
 
     if (
       lower.includes("popup_closed") ||
@@ -152,6 +162,25 @@ function LoginPage() {
     }
   };
 
+  const oauthSupabase = async (provider: "azure" | "linkedin_oidc") => {
+    setError(null);
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}${redirect}`,
+          ...(provider === "azure" ? { scopes: "email openid profile" } : {}),
+        },
+      });
+      if (error) throw error;
+      // Browser will redirect to provider.
+    } catch (err) {
+      setError(friendlyOAuthError(provider, err));
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
@@ -209,6 +238,12 @@ function LoginPage() {
               </Button>
               <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
                 Continue with Apple
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => oauthSupabase("azure")} disabled={loading}>
+                Continue with Microsoft
+              </Button>
+              <Button variant="outline" className="w-full" onClick={() => oauthSupabase("linkedin_oidc")} disabled={loading}>
+                Continue with LinkedIn
               </Button>
             </>
           )}
