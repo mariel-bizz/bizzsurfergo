@@ -346,6 +346,8 @@ function SignedInProfile() {
       setResendingId(null);
     }
   };
+
+  const onRemove = async (id: string) => {
     try {
       await removeMember({ data: { id } });
       setTeam((prev) => prev.filter((m) => m.id !== id));
