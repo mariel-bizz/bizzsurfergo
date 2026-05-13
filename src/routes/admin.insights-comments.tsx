@@ -67,7 +67,7 @@ function ModerationPage() {
   const approve = async (id: string) => {
     const { error } = await supabase
       .from("insights_comments")
-      .update({ status: "approved", moderation_reason: "admin-approved" })
+      .update({ status: "approved", moderation_reason: null })
       .eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Comment approved");
