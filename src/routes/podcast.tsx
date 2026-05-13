@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ExternalLink, Headphones, Music } from "lucide-react";
+import { ExternalLink, Headphones } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { trackEvent } from "@/lib/analytics";
+import bizzsurferLogo from "@/assets/bizzsurfer-logo.webp";
 
 const SPOTIFY_USER_ID = "31l6phq64rtvbtqbgeyozhlbpyly";
 const SPOTIFY_URL = `https://open.spotify.com/user/${SPOTIFY_USER_ID}`;
@@ -143,18 +144,36 @@ function PodcastPage() {
         </div>
       </div>
 
-      <div className="rounded-3xl overflow-hidden shadow-elegant border border-border bg-card">
-        <iframe
-          title="BizzSurfer on Spotify"
-          src={SPOTIFY_EMBED}
-          width="100%"
-          height="352"
-          frameBorder={0}
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-          className="block w-full"
-          onLoad={() => trackEvent("podcast_embed_loaded", { title: "BizzSurfer on Spotify", kind: "user" })}
-        />
+      <div className="rounded-3xl bg-gradient-deep p-6 text-white shadow-elegant space-y-4">
+        <div className="flex items-center gap-3">
+          <img
+            src={bizzsurferLogo}
+            alt="BizzSurfer logo"
+            className="w-12 h-12 rounded-xl bg-white/95 p-1.5 object-contain shadow-md"
+          />
+          <div>
+            <p className="text-[11px] uppercase tracking-widest opacity-90 font-semibold">Now streaming</p>
+            <p className="text-base font-bold">Listen on Spotify</p>
+          </div>
+        </div>
+        <p className="text-sm opacity-95">
+          Real talk with builders, founders, and transformation leaders shipping Agentic AI in production.
+        </p>
+        <Button
+          asChild
+          size="lg"
+          className="w-full bg-white text-primary hover:bg-white/90 font-bold"
+        >
+          <a
+            href={SPOTIFY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackOutbound("open_in_spotify_cta", SPOTIFY_URL)}
+            onAuxClick={() => trackOutbound("open_in_spotify_cta_aux", SPOTIFY_URL)}
+          >
+            Open in Spotify <ExternalLink className="ml-2 w-4 h-4" />
+          </a>
+        </Button>
       </div>
 
       <div className="space-y-4">
@@ -181,38 +200,6 @@ function PodcastPage() {
           </div>
         ))}
       </div>
-
-
-      <div className="rounded-3xl bg-gradient-deep p-6 text-white shadow-elegant space-y-4">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-            <Music className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-[11px] uppercase tracking-widest opacity-90 font-semibold">Now streaming</p>
-            <p className="text-base font-bold">Listen on Spotify</p>
-          </div>
-        </div>
-        <p className="text-sm opacity-95">
-          Real talk with builders, founders, and transformation leaders shipping Agentic AI in production.
-        </p>
-        <Button
-          asChild
-          size="lg"
-          className="w-full bg-white text-primary hover:bg-white/90 font-bold"
-        >
-          <a
-            href={SPOTIFY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackOutbound("open_in_spotify_cta", SPOTIFY_URL)}
-            onAuxClick={() => trackOutbound("open_in_spotify_cta_aux", SPOTIFY_URL)}
-          >
-            Open in Spotify <ExternalLink className="ml-2 w-4 h-4" />
-          </a>
-        </Button>
-      </div>
-
       <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
         <h2 className="text-base font-bold text-foreground">What you'll hear</h2>
         <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
