@@ -10,12 +10,12 @@ export type GoChatConfig = {
   industries: string[];
 };
 
-const PROVIDERS: { id: Provider; name: string; logo: string; tagline: string }[] = [
-  { id: "openai", name: "OpenAI", logo: "https://cdn.simpleicons.org/openai/02449A", tagline: "GPT-class reasoning" },
-  { id: "claude", name: "Claude", logo: "https://cdn.simpleicons.org/anthropic/02449A", tagline: "Anthropic — long-form analysis" },
-  { id: "mistral", name: "Mistral AI", logo: "https://cdn.simpleicons.org/mistralai/FF6F00", tagline: "European, efficient" },
-  { id: "perplexity", name: "Perplexity", logo: "https://cdn.simpleicons.org/perplexity/02449A", tagline: "Live web-grounded answers" },
-  { id: "gemini", name: "Gemini", logo: "https://cdn.simpleicons.org/googlegemini/FFAB1D", tagline: "Embedded Google Gem" },
+const PROVIDERS: { id: Provider; name: string; logo: string }[] = [
+  { id: "openai", name: "OpenAI", logo: "https://cdn.simpleicons.org/openai/000000" },
+  { id: "claude", name: "Claude", logo: "https://cdn.simpleicons.org/anthropic/D97757" },
+  { id: "mistral", name: "Mistral AI", logo: "https://cdn.simpleicons.org/mistralai/FA520F" },
+  { id: "perplexity", name: "Perplexity", logo: "https://cdn.simpleicons.org/perplexity/20808D" },
+  { id: "gemini", name: "Gemini", logo: "https://cdn.simpleicons.org/googlegemini/4285F4" },
 ];
 
 const DEPARTMENTS = ["HR", "Sales", "Marketing", "IT", "Supply Chain", "Procurement", "Operations", "Finance", "Customer Service", "R&D"];
@@ -68,7 +68,7 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
       {step === 1 && (
         <section className="space-y-3">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Choose your AI</h2>
+            <h2 className="text-lg font-bold text-foreground">Choose your Language Model</h2>
             <p className="text-xs text-muted-foreground">All five are <span className="font-bold text-primary">FREE</span> with BizzSurfer GO!</p>
           </div>
           <div className="grid grid-cols-1 gap-2">
@@ -80,12 +80,11 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
                   provider === p.id ? "border-primary bg-primary/5 shadow-soft" : "border-border bg-card hover:border-primary/40"
                 }`}
               >
-                <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <img src={p.logo} alt={`${p.name} logo`} className="w-7 h-7" loading="lazy" />
+                <div className="w-11 h-11 rounded-xl bg-transparent flex items-center justify-center shrink-0">
+                  <img src={p.logo} alt={`${p.name} logo`} className="w-8 h-8 object-contain" loading="lazy" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-foreground">{p.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{p.tagline}</p>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Free</span>
               </button>
