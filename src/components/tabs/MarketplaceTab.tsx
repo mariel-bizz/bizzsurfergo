@@ -284,6 +284,26 @@ export function MarketplaceTab() {
         </p>
       </header>
 
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => setFiltersOpen((v) => !v)}
+          className="inline-flex items-center gap-2 rounded-full bg-card border border-border h-9 px-3 text-xs font-bold text-foreground hover:border-primary/40"
+          aria-expanded={filtersOpen}
+          aria-controls="marketplace-filters"
+        >
+          <SlidersHorizontal className="w-3.5 h-3.5 text-primary" />
+          {filtersOpen ? "Hide filters" : "Show filters"}
+          {activeFilterCount > 0 && (
+            <span className="ml-1 inline-flex items-center justify-center min-w-5 h-5 px-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+              {activeFilterCount}
+            </span>
+          )}
+          <ChevronDown className={`w-3.5 h-3.5 transition-transform ${filtersOpen ? "rotate-180" : ""}`} />
+        </button>
+      </div>
+
+      {filtersOpen && (
+      <>
       {/* Preset switcher */}
       <section
         aria-label="Filter presets"
