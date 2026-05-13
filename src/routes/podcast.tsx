@@ -3,17 +3,34 @@ import { ExternalLink, Headphones, Music } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 
-const SPOTIFY_URL = "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly";
+const SPOTIFY_USER_ID = "31l6phq64rtvbtqbgeyozhlbpyly";
+const SPOTIFY_URL = `https://open.spotify.com/user/${SPOTIFY_USER_ID}`;
+const SPOTIFY_EMBED = `https://open.spotify.com/embed/user/${SPOTIFY_USER_ID}?utm_source=generator&theme=0`;
 
 export const Route = createFileRoute("/podcast")({
-  head: () =>
-    pageHead({
+  head: () => {
+    const base = pageHead({
       path: "/podcast",
-      title: "Podcast — BizzSurfer Go!",
+      title: "BizzSurfer Podcast — Operators Behind Enterprise Agentic AI",
       description:
-        "Listen to BizzSurfer's podcast on Spotify: conversations with operators behind enterprise Agentic AI.",
+        "Listen on Spotify: candid conversations with founders, CIOs, and operators shipping Agentic AI in production. New episodes every week.",
       breadcrumbName: "Podcast",
-    }),
+    });
+    return {
+      ...base,
+      meta: [
+        ...base.meta.filter(
+          (m) => !("property" in m && m.property === "og:type"),
+        ),
+        { property: "og:type", content: "music.playlist" },
+        { property: "og:audio", content: SPOTIFY_URL },
+        { property: "music:creator", content: "BizzSurfer" },
+        { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:label1", content: "Listen on" },
+        { name: "twitter:data1", content: "Spotify" },
+      ],
+    };
+  },
   component: PodcastPage,
 });
 
@@ -28,6 +45,19 @@ function PodcastPage() {
           <h1 className="text-2xl font-bold text-foreground leading-tight">BizzSurfer Podcast</h1>
           <p className="text-sm text-muted-foreground">Operators behind enterprise Agentic AI.</p>
         </div>
+      </div>
+
+      <div className="rounded-3xl overflow-hidden shadow-elegant border border-border bg-card">
+        <iframe
+          title="BizzSurfer on Spotify"
+          src={SPOTIFY_EMBED}
+          width="100%"
+          height="352"
+          frameBorder={0}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          className="block w-full"
+        />
       </div>
 
       <div className="rounded-3xl bg-gradient-deep p-6 text-white shadow-elegant space-y-4">
