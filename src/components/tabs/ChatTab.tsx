@@ -621,65 +621,93 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       )}
 
       {/* Email capture popup after 2 questions */}
-      <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
+      <Dialog
+        open={emailOpen}
+        onOpenChange={(o) => {
+          setEmailOpen(o);
+          if (!o) { setEmailSubmitted(false); setSubmittedEmail(""); }
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Mail className="w-5 h-5 text-primary" /> Get your full report</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-primary" />
+              {emailSubmitted ? "You're all set" : "Get your full report"}
+            </DialogTitle>
             <DialogDescription>
-              We'll email you a short summary with an upgrade offer, and download the full PDF to your device.
+              {emailSubmitted
+                ? "Choose how you'd like to receive your summary."
+                : "Confirm your email so we can send a short summary and download your full PDF."}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
-            <input
-              id="email-confirm"
-              value={emailValue}
-              onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
-              onBlur={() => setEmailError(validateEmail(emailValue))}
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              maxLength={254}
-              placeholder="you@company.com"
-              aria-invalid={!!emailError}
-              aria-describedby={emailError ? "email-error" : "email-help"}
-              className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                emailError
-                  ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
-                  : "border-border focus:ring-primary/40"
-              }`}
-              autoFocus
-            />
-            {emailError ? (
-              <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
-            ) : (
-              <p id="email-help" className="text-[11px] text-muted-foreground">
-                The email includes a short version of the PDF, an invite to upcoming events,
-                full reports, and a 1:1 demo call when you upgrade.
-              </p>
-            )}
-          </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={async () => {
-                const err = validateEmail(emailValue);
-                if (err) { setEmailError(err); return; }
-                await downloadPdf();
-              }}
-              disabled={sending || !!validateEmail(emailValue)}
-              className="rounded-xl"
-            >
-              <Download className="w-4 h-4 mr-1" /> PDF only
-            </Button>
-            <Button
-              onClick={sendShortSummaryEmail}
-              disabled={sending || !!validateEmail(emailValue)}
-              className="rounded-xl bg-gradient-primary"
-            >
-              <Mail className="w-4 h-4 mr-1" /> {sending ? "Preparing…" : "Email me"}
-            </Button>
-          </DialogFooter>
+
+          {!emailSubmitted ? (
+            <>
+              <div className="space-y-2">
+                <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
+                <input
+                  id="email-confirm"
+                  value={emailValue}
+                  onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+                  onBlur={() => setEmailError(validateEmail(emailValue))}
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  maxLength={254}
+                  placeholder="you@company.com"
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : "email-help"}
+                  className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                    emailError
+                      ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
+                      : "border-border focus:ring-primary/40"
+                  }`}
+                  autoFocus
+                />
+                {emailError ? (
+                  <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
+                ) : (
+                  <p id="email-help" className="text-[11px] text-muted-foreground">
+                    The email includes a short version of the PDF, an invite to upcoming events,
+                    full reports, and a 1:1 demo call when you upgrade.
+                  </p>
+                )}
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={submitEmail}
+                  disabled={sending || !!validateEmail(emailValue)}
+                  className="rounded-xl bg-gradient-primary w-full"
+                >
+                  {sending ? "Saving…" : "Confirm email"}
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm">
+                <p className="font-semibold text-foreground">✓ Email confirmed</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5 break-all">
+                  Saved <span className="font-medium text-foreground">{submittedEmail}</span> to your BizzSurfer list.
+                </p>
+              </div>
+              <DialogFooter className="gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handleDownloadPdf}
+                  className="rounded-xl"
+                >
+                  <Download className="w-4 h-4 mr-1" /> Download PDF
+                </Button>
+                <Button
+                  onClick={handleEmailMe}
+                  className="rounded-xl bg-gradient-primary"
+                >
+                  <Mail className="w-4 h-4 mr-1" /> Email me
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
