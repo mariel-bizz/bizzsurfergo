@@ -10,12 +10,12 @@ export type GoChatConfig = {
   industries: string[];
 };
 
-const PROVIDERS: { id: Provider; name: string; logo: string; tagline: string }[] = [
-  { id: "openai", name: "OpenAI", logo: "https://cdn.simpleicons.org/openai/02449A", tagline: "GPT-class reasoning" },
-  { id: "claude", name: "Claude", logo: "https://cdn.simpleicons.org/anthropic/02449A", tagline: "Anthropic — long-form analysis" },
-  { id: "mistral", name: "Mistral AI", logo: "https://cdn.simpleicons.org/mistralai/FF6F00", tagline: "European, efficient" },
-  { id: "perplexity", name: "Perplexity", logo: "https://cdn.simpleicons.org/perplexity/02449A", tagline: "Live web-grounded answers" },
-  { id: "gemini", name: "Gemini", logo: "https://cdn.simpleicons.org/googlegemini/FFAB1D", tagline: "Embedded Google Gem" },
+const PROVIDERS: { id: Provider; name: string; logo: string }[] = [
+  { id: "openai", name: "OpenAI", logo: "https://cdn.simpleicons.org/openai/000000" },
+  { id: "claude", name: "Claude", logo: "https://cdn.simpleicons.org/anthropic/D97757" },
+  { id: "mistral", name: "Mistral AI", logo: "https://cdn.simpleicons.org/mistralai/FA520F" },
+  { id: "perplexity", name: "Perplexity", logo: "https://cdn.simpleicons.org/perplexity/20808D" },
+  { id: "gemini", name: "Gemini", logo: "https://cdn.simpleicons.org/googlegemini/4285F4" },
 ];
 
 const DEPARTMENTS = ["HR", "Sales", "Marketing", "IT", "Supply Chain", "Procurement", "Operations", "Finance", "Customer Service", "R&D"];
