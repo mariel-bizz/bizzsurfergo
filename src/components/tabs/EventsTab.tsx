@@ -67,14 +67,17 @@ export function EventsTab() {
     try {
       const res = await rsvp({ data: { eventId: id } });
       setRsvpedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-      if (res?.meet_link) {
-        setMeetLinks((prev) => ({ ...prev, [id]: res.meet_link as string }));
+      const meet = res?.meet_link as string | undefined;
+      if (meet) {
+        setMeetLinks((prev) => ({ ...prev, [id]: meet }));
       }
       game.update((s) => {
         const badges = s.badges.includes("Event Insider") ? s.badges : [...s.badges, "Event Insider"];
         return { ...s, xp: s.xp + 25, badges };
       });
-      toast.success("You're in! Calendar invite sent. +25 XP");
+      const ev = eventsData.find((x) => x.id === id);
+      if (ev) setConfirmation({ event: ev, meetLink: meet });
+      toast.success("You're in! +25 XP");
       if (href !== "#") window.open(href, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
