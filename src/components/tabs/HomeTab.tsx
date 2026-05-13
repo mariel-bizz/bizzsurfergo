@@ -1,7 +1,7 @@
 import { useGame } from "../AppShell";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Store } from "lucide-react";
+import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot } from "lucide-react";
 import { useState } from "react";
 import banner from "@/assets/bizzsurfer-banner.webp";
 import { WaitlistDialog } from "../WaitlistDialog";
@@ -120,15 +120,15 @@ export function HomeTab() {
         </div>
       </section>
 
-      {/* Marketplace */}
+      {/* Go Agentic! */}
       <section className="px-5">
         <Link to="/marketplace" className="block rounded-3xl bg-card border border-border shadow-card p-5 hover:border-primary/40 hover:shadow-soft transition">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0">
-              <Store className="w-6 h-6 text-primary-foreground" />
+            <div className="w-12 h-12 rounded-xl bg-gradient-brand flex items-center justify-center shrink-0">
+              <Bot className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Marketplace</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Go Agentic!</p>
               <h3 className="text-base font-bold text-foreground">Agents, services & playbooks</h3>
               <p className="text-xs text-muted-foreground mt-0.5">Curated tools to accelerate your transformation.</p>
             </div>
