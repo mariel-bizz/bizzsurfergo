@@ -404,17 +404,6 @@ export function MarketplaceTab() {
         </div>
       </section>
 
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search marketplace..."
-          className="w-full h-11 rounded-2xl bg-card border border-border pl-10 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-          aria-label="Search marketplace"
-        />
-      </div>
-
       <div className="flex gap-2 overflow-x-auto -mx-5 px-5 pb-1">
         {categories.map((c) => {
           const isActive = active === c.key;
