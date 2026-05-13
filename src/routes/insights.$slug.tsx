@@ -230,85 +230,60 @@ function ArticlePage() {
   if (!data) return null;
 
   return (
-    <>
-      <ArticleHead post={data} />
-      <article className="px-4 py-4">
-        <Link
-          to="/insights"
-          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
-        >
-          <ArrowLeft className="h-3 w-3" /> All insights
-        </Link>
+    <article className="px-4 py-4">
+      <Link
+        to="/insights"
+        className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
+      >
+        <ArrowLeft className="h-3 w-3" /> All insights
+      </Link>
 
-        <header className="mt-3">
-          {data.category && (
-            <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
-              {prettyCategory(data.category)}
-            </Badge>
-          )}
-          <h1 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{data.title}</h1>
-          {data.excerpt && (
-            <p className="mt-2 text-base text-muted-foreground">{data.excerpt}</p>
-          )}
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
-            {data.author && (
-              <span className="inline-flex items-center gap-1">
-                <User className="h-3 w-3" /> {data.author}
-              </span>
-            )}
-            {data.publishedDate && (
-              <span className="inline-flex items-center gap-1">
-                <Calendar className="h-3 w-3" /> {formatDate(data.publishedDate)}
-              </span>
-            )}
-          </div>
-        </header>
-
-        {data.featuredImage && (
-          <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-muted">
-            <img
-              src={`${data.featuredImage.url}?w=1200&fm=webp&q=80`}
-              alt={data.featuredImage.alt}
-              className="h-full w-full object-cover"
-            />
-          </div>
+      <header className="mt-3">
+        {data.category && (
+          <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
+            {prettyCategory(data.category)}
+          </Badge>
         )}
-
-        <div className="mt-4 max-w-prose text-[15px]">
-          {data.body ? (
-            documentToReactComponents(data.body, richTextOptions)
-          ) : (
-            <p className="text-muted-foreground">No content available.</p>
+        <h1 className="mt-2 text-2xl font-bold text-foreground sm:text-3xl">{data.title}</h1>
+        {data.excerpt && (
+          <p className="mt-2 text-base text-muted-foreground">{data.excerpt}</p>
+        )}
+        <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
+          {data.author && (
+            <span className="inline-flex items-center gap-1">
+              <User className="h-3 w-3" /> {data.author}
+            </span>
+          )}
+          {data.publishedDate && (
+            <span className="inline-flex items-center gap-1">
+              <Calendar className="h-3 w-3" /> {formatDate(data.publishedDate)}
+            </span>
           )}
         </div>
+      </header>
 
-        <ArticleEngagement slug={data.slug} articleTitle={data.title} />
+      {data.featuredImage && (
+        <div className="mt-4 overflow-hidden rounded-2xl border border-border bg-muted">
+          <img
+            src={`${data.featuredImage.url}?w=1200&fm=webp&q=80`}
+            alt={data.featuredImage.alt}
+            className="h-full w-full object-cover"
+          />
+        </div>
+      )}
 
-        <CtaBlock />
-      </article>
-    </>
+      <div className="mt-4 max-w-prose text-[15px]">
+        {data.body ? (
+          documentToReactComponents(data.body, richTextOptions)
+        ) : (
+          <p className="text-muted-foreground">No content available.</p>
+        )}
+      </div>
+
+      <ArticleEngagement slug={data.slug} articleTitle={data.title} />
+
+      <CtaBlock />
+    </article>
   );
 }
 
-function ArticleHead({ post }: { post: { metaTitle: string | null; title: string; metaDescription: string | null; excerpt: string; featuredImage: { url: string } | null; slug: string } }) {
-  const title = post.metaTitle || `${post.title} — BizzSurfer Go!`;
-  const desc = post.metaDescription || post.excerpt;
-  // Canonical points to the marketing site so SEO/views consolidate on www.bizzsurfer.com.
-  const url = marketingUrlForSlug(post.slug);
-  const image = post.featuredImage ? `${post.featuredImage.url}?w=1200&fm=jpg&q=80` : null;
-  return (
-    <>
-      <title>{title}</title>
-      <meta name="description" content={desc} />
-      <meta property="og:title" content={title} />
-      <meta property="og:description" content={desc} />
-      <meta property="og:url" content={url} />
-      <meta property="og:type" content="article" />
-      {image && <meta property="og:image" content={image} />}
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={desc} />
-      {image && <meta name="twitter:image" content={image} />}
-      <link rel="canonical" href={url} />
-    </>
-  );
-}
