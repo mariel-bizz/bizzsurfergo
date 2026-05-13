@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink, Headphones, Music } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
+import { trackEvent } from "@/lib/analytics";
 
 const SPOTIFY_USER_ID = "31l6phq64rtvbtqbgeyozhlbpyly";
 const SPOTIFY_URL = `https://open.spotify.com/user/${SPOTIFY_USER_ID}`;
@@ -42,8 +44,40 @@ export const Route = createFileRoute("/podcast")({
 });
 
 function PodcastPage() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const interactedRef = useRef(false);
+
+  // Fire once when the user first interacts with the podcast section
+  // (pointer/touch/keyboard) — iframes swallow internal clicks, so we listen
+  // on the wrapper section in the capture phase.
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const onInteract = (ev: Event) => {
+      if (interactedRef.current) return;
+      interactedRef.current = true;
+      trackEvent("podcast_interaction_started", { type: ev.type });
+    };
+    const events: (keyof DocumentEventMap)[] = ["pointerdown", "touchstart", "keydown"];
+    events.forEach((e) => el.addEventListener(e, onInteract, { capture: true, once: false }));
+
+    // Also treat focus leaving the page (likely entering the iframe) as an interaction.
+    const onBlur = () => {
+      if (interactedRef.current) return;
+      if (document.activeElement?.tagName === "IFRAME") {
+        interactedRef.current = true;
+        trackEvent("podcast_interaction_started", { type: "iframe_focus" });
+      }
+    };
+    window.addEventListener("blur", onBlur);
+    return () => {
+      events.forEach((e) => el.removeEventListener(e, onInteract, { capture: true }));
+      window.removeEventListener("blur", onBlur);
+    };
+  }, []);
+
   return (
-    <section className="px-5 py-8 space-y-6">
+    <section ref={sectionRef} className="px-5 py-8 space-y-6">
       <div className="flex items-center gap-3">
         <div className="w-12 h-12 rounded-2xl bg-gradient-brand flex items-center justify-center shadow-elegant">
           <Headphones className="w-6 h-6 text-white" />
@@ -64,16 +98,17 @@ function PodcastPage() {
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
           className="block w-full"
+          onLoad={() => trackEvent("podcast_embed_loaded", { title: "BizzSurfer on Spotify", kind: "user" })}
         />
       </div>
 
       <div className="space-y-4">
         <h2 className="text-base font-bold text-foreground">Featured playlist & show</h2>
         {[
-          { title: "Featured playlist", src: "https://open.spotify.com/embed/playlist/6Jvb9W4LCZ6pNpVDlFzayF?utm_source=generator&theme=0" },
-          { title: "Featured show", src: "https://open.spotify.com/embed/show/3sNWski1Zw9mGauajOdToS?utm_source=generator&theme=0" },
-          { title: "Latest episode", src: "https://open.spotify.com/embed/episode/0HJ2oPYS3w5T6UUiUiIAs9?utm_source=generator&theme=0" },
-          { title: "Recommended episode", src: "https://open.spotify.com/embed/episode/5SmYUmU9twq0jf4VGioVca?utm_source=generator&theme=0" },
+          { title: "Featured playlist", kind: "playlist", src: "https://open.spotify.com/embed/playlist/6Jvb9W4LCZ6pNpVDlFzayF?utm_source=generator&theme=0" },
+          { title: "Featured show", kind: "show", src: "https://open.spotify.com/embed/show/3sNWski1Zw9mGauajOdToS?utm_source=generator&theme=0" },
+          { title: "Latest episode", kind: "episode", src: "https://open.spotify.com/embed/episode/0HJ2oPYS3w5T6UUiUiIAs9?utm_source=generator&theme=0" },
+          { title: "Recommended episode", kind: "episode", src: "https://open.spotify.com/embed/episode/5SmYUmU9twq0jf4VGioVca?utm_source=generator&theme=0" },
         ].map((e) => (
           <div key={e.src} className="rounded-3xl overflow-hidden shadow-card border border-border bg-card">
             <iframe
@@ -86,6 +121,7 @@ function PodcastPage() {
               loading="lazy"
               style={{ borderRadius: 12 }}
               className="block w-full"
+              onLoad={() => trackEvent("podcast_embed_loaded", { title: e.title, kind: e.kind })}
             />
           </div>
         ))}
