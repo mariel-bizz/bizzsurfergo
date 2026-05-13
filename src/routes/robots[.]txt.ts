@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const SITE = "https://bizzsurfergo.lovable.app";
+const SITE = "https://go.bizzsurfer.ai";
 
 export const Route = createFileRoute("/robots.txt")({
   server: {
