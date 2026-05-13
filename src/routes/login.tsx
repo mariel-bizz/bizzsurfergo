@@ -162,6 +162,25 @@ function LoginPage() {
     }
   };
 
+  const oauthSupabase = async (provider: "azure" | "linkedin_oidc") => {
+    setError(null);
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}${redirect}`,
+          ...(provider === "azure" ? { scopes: "email openid profile" } : {}),
+        },
+      });
+      if (error) throw error;
+      // Browser will redirect to provider.
+    } catch (err) {
+      setError(friendlyOAuthError(provider, err));
+      setLoading(false);
+    }
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-4">
       <Card className="w-full max-w-sm">
