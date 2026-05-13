@@ -44,19 +44,19 @@ function rateLimit(ip: string): boolean {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeadersFor(req) });
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
     if (!rateLimit(ip)) {
       return new Response(JSON.stringify({ error: "rate_limit" }), {
         status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
       });
     }
     const { texts, target } = await req.json();
     if (!Array.isArray(texts) || !target || target === "en") {
       return new Response(JSON.stringify({ translations: {} }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
       });
     }
     const langName = LANG_NAMES[target] || target;
@@ -94,8 +94,8 @@ Deno.serve(async (req) => {
       }),
     });
 
-    if (resp.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    if (resp.status === 402) return new Response(JSON.stringify({ error: "credits" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (resp.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: { ...corsHeadersFor(req), "Content-Type": "application/json" } });
+    if (resp.status === 402) return new Response(JSON.stringify({ error: "credits" }), { status: 402, headers: { ...corsHeadersFor(req), "Content-Type": "application/json" } });
     if (!resp.ok) throw new Error(`AI ${resp.status}`);
 
     const data = await resp.json();
@@ -107,12 +107,12 @@ Deno.serve(async (req) => {
       if (src && typeof it.t === "string") translations[src] = it.t;
     }
     return new Response(JSON.stringify({ translations }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("translate-ui error", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
     });
   }
 });
