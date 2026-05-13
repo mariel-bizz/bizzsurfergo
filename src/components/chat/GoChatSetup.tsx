@@ -68,7 +68,7 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
       {step === 1 && (
         <section className="space-y-3">
           <div>
-            <h2 className="text-lg font-bold text-foreground">Choose your AI</h2>
+            <h2 className="text-lg font-bold text-foreground">Choose your Language Model</h2>
             <p className="text-xs text-muted-foreground">All five are <span className="font-bold text-primary">FREE</span> with BizzSurfer GO!</p>
           </div>
           <div className="grid grid-cols-1 gap-2">
