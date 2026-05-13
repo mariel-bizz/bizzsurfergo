@@ -47,8 +47,8 @@ export const Route = createFileRoute("/marketplace/$listingId")({
     if (parsed) {
       product.offers = {
         "@type": "Offer",
-        price: parsed.amount,
-        priceCurrency: parsed.currency || "USD",
+        price: (parsed.amountInCents / 100).toFixed(2),
+        priceCurrency: (parsed.currency || "EUR").toUpperCase(),
         availability: "https://schema.org/InStock",
       };
     }
