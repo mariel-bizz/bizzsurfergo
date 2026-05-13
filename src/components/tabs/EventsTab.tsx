@@ -34,11 +34,14 @@ export function EventsTab() {
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
   const [authed, setAuthed] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       const isAuthed = !!data.session;
       setAuthed(isAuthed);
+      setUserEmail(data.session?.user?.email ?? "");
       if (isAuthed) {
         listRsvps()
           .then((r) => {
