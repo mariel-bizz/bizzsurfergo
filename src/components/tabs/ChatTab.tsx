@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import bizzsurferGoLogo from "@/assets/bizzsurfer-go-logo.png";
+import { trackEvent } from "@/lib/analytics";
 
 // Strict RFC-5322-ish email check + length cap.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -95,6 +96,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [emailValue, setEmailValue] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
+  const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -361,19 +364,57 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://bizzsurfergo.lovable.app/pricing" });
 
     doc.save("bizzsurfer-go-summary.pdf");
+    trackEvent("go_chat_pdf_downloaded", {
+      email: submittedEmail || undefined,
+      provider: config?.provider,
+      messages: messages.length - 1,
+    });
   };
 
-  const sendShortSummaryEmail = async () => {
+  // Step 1: validate + persist email to waitlist, then show inline confirmation.
+  const submitEmail = async () => {
     const err = validateEmail(emailValue);
     if (err) { setEmailError(err); return; }
     setEmailError(null);
     setSending(true);
     const cleanEmail = emailValue.trim().toLowerCase();
 
-    // Generate PDF download for the user.
+    try {
+      const { error } = await supabase.from("waitlist").insert({
+        email: cleanEmail,
+        name: cleanEmail.split("@")[0],
+        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+      });
+      if (error && error.code !== "23505") {
+        console.warn("waitlist insert:", error.message);
+      }
+    } catch (e) { /* non-blocking */ }
+
+    trackEvent("go_chat_email_submitted", {
+      email: cleanEmail,
+      provider: config?.provider,
+    });
+
+    setSubmittedEmail(cleanEmail);
+    setEmailSubmitted(true);
+    setSending(false);
+  };
+
+  // Step 2a: trigger the in-browser PDF download.
+  const handleDownloadPdf = async () => {
+    trackEvent("go_chat_pdf_download_clicked", { email: submittedEmail });
+    try { await downloadPdf(); } catch (e) { console.error(e); }
+    toast.success("PDF downloaded.");
+  };
+
+  // Step 2b: open the user's mail client with a short summary.
+  const handleEmailMe = async () => {
+    trackEvent("go_chat_email_me_clicked", {
+      email: submittedEmail,
+      provider: config?.provider,
+    });
     try { await downloadPdf(); } catch (e) { console.error(e); }
 
-    // Compose a short-version email that opens in the user's mail client (mailto).
     const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
     const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
     const subject = `Your BizzSurfer Go! summary`;
@@ -402,21 +443,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       `The full PDF has been downloaded to your device.`,
     ].filter(Boolean).join("\n");
 
-    const mailto = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${encodeURIComponent(submittedEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
-
-    // Capture the lead in waitlist; the case-insensitive unique index dedups silently.
-    try {
-      const { error } = await supabase.from("waitlist").insert({
-        email: cleanEmail,
-        name: cleanEmail.split("@")[0],
-        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
-      });
-      if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
-    } catch (e) { /* non-blocking */ }
-
-    setSending(false);
-    setEmailOpen(false);
     toast.success("PDF downloaded and email drafted.");
   };
 
@@ -593,65 +621,93 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       )}
 
       {/* Email capture popup after 2 questions */}
-      <Dialog open={emailOpen} onOpenChange={setEmailOpen}>
+      <Dialog
+        open={emailOpen}
+        onOpenChange={(o) => {
+          setEmailOpen(o);
+          if (!o) { setEmailSubmitted(false); setSubmittedEmail(""); }
+        }}
+      >
         <DialogContent className="max-w-sm">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2"><Mail className="w-5 h-5 text-primary" /> Get your full report</DialogTitle>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-5 h-5 text-primary" />
+              {emailSubmitted ? "You're all set" : "Get your full report"}
+            </DialogTitle>
             <DialogDescription>
-              We'll email you a short summary with an upgrade offer, and download the full PDF to your device.
+              {emailSubmitted
+                ? "Choose how you'd like to receive your summary."
+                : "Confirm your email so we can send a short summary and download your full PDF."}
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-2">
-            <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
-            <input
-              id="email-confirm"
-              value={emailValue}
-              onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
-              onBlur={() => setEmailError(validateEmail(emailValue))}
-              type="email"
-              autoComplete="email"
-              inputMode="email"
-              maxLength={254}
-              placeholder="you@company.com"
-              aria-invalid={!!emailError}
-              aria-describedby={emailError ? "email-error" : "email-help"}
-              className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                emailError
-                  ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
-                  : "border-border focus:ring-primary/40"
-              }`}
-              autoFocus
-            />
-            {emailError ? (
-              <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
-            ) : (
-              <p id="email-help" className="text-[11px] text-muted-foreground">
-                The email includes a short version of the PDF, an invite to upcoming events,
-                full reports, and a 1:1 demo call when you upgrade.
-              </p>
-            )}
-          </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="outline"
-              onClick={async () => {
-                const err = validateEmail(emailValue);
-                if (err) { setEmailError(err); return; }
-                await downloadPdf();
-              }}
-              disabled={sending || !!validateEmail(emailValue)}
-              className="rounded-xl"
-            >
-              <Download className="w-4 h-4 mr-1" /> PDF only
-            </Button>
-            <Button
-              onClick={sendShortSummaryEmail}
-              disabled={sending || !!validateEmail(emailValue)}
-              className="rounded-xl bg-gradient-primary"
-            >
-              <Mail className="w-4 h-4 mr-1" /> {sending ? "Preparing…" : "Email me"}
-            </Button>
-          </DialogFooter>
+
+          {!emailSubmitted ? (
+            <>
+              <div className="space-y-2">
+                <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
+                <input
+                  id="email-confirm"
+                  value={emailValue}
+                  onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+                  onBlur={() => setEmailError(validateEmail(emailValue))}
+                  type="email"
+                  autoComplete="email"
+                  inputMode="email"
+                  maxLength={254}
+                  placeholder="you@company.com"
+                  aria-invalid={!!emailError}
+                  aria-describedby={emailError ? "email-error" : "email-help"}
+                  className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                    emailError
+                      ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
+                      : "border-border focus:ring-primary/40"
+                  }`}
+                  autoFocus
+                />
+                {emailError ? (
+                  <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
+                ) : (
+                  <p id="email-help" className="text-[11px] text-muted-foreground">
+                    The email includes a short version of the PDF, an invite to upcoming events,
+                    full reports, and a 1:1 demo call when you upgrade.
+                  </p>
+                )}
+              </div>
+              <DialogFooter>
+                <Button
+                  onClick={submitEmail}
+                  disabled={sending || !!validateEmail(emailValue)}
+                  className="rounded-xl bg-gradient-primary w-full"
+                >
+                  {sending ? "Saving…" : "Confirm email"}
+                </Button>
+              </DialogFooter>
+            </>
+          ) : (
+            <>
+              <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm">
+                <p className="font-semibold text-foreground">✓ Email confirmed</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5 break-all">
+                  Saved <span className="font-medium text-foreground">{submittedEmail}</span> to your BizzSurfer list.
+                </p>
+              </div>
+              <DialogFooter className="gap-2">
+                <Button
+                  variant="outline"
+                  onClick={handleDownloadPdf}
+                  className="rounded-xl"
+                >
+                  <Download className="w-4 h-4 mr-1" /> Download PDF
+                </Button>
+                <Button
+                  onClick={handleEmailMe}
+                  className="rounded-xl bg-gradient-primary"
+                >
+                  <Mail className="w-4 h-4 mr-1" /> Email me
+                </Button>
+              </DialogFooter>
+            </>
+          )}
         </DialogContent>
       </Dialog>
     </div>
