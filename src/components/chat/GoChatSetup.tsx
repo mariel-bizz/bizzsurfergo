@@ -80,12 +80,11 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
                   provider === p.id ? "border-primary bg-primary/5 shadow-soft" : "border-border bg-card hover:border-primary/40"
                 }`}
               >
-                <div className="w-11 h-11 rounded-xl bg-muted flex items-center justify-center shrink-0">
-                  <img src={p.logo} alt={`${p.name} logo`} className="w-7 h-7" loading="lazy" />
+                <div className="w-11 h-11 rounded-xl bg-transparent flex items-center justify-center shrink-0">
+                  <img src={p.logo} alt={`${p.name} logo`} className="w-8 h-8 object-contain" loading="lazy" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-foreground">{p.name}</p>
-                  <p className="text-[11px] text-muted-foreground">{p.tagline}</p>
                 </div>
                 <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Free</span>
               </button>
