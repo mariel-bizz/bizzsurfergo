@@ -6,10 +6,10 @@ export const Route = createFileRoute("/marketplace")({
   head: () =>
     pageHead({
       path: "/marketplace",
-      title: "Marketplace — BizzSurfer Go!",
+      title: "Go Agentic! — BizzSurfer Go!",
       description:
         "Curated AI agents, transformation services, and executive playbooks to accelerate your Agentic AI journey.",
-      breadcrumbName: "Marketplace",
+      breadcrumbName: "Go Agentic!",
     }),
   component: MarketplaceTab,
 });
