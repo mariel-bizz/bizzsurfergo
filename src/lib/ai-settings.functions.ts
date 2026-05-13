@@ -44,14 +44,12 @@ export const saveAiSettings = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const row: Record<string, unknown> = {
+    const row = {
       user_id: userId,
       provider: data.provider,
       model: data.model ?? null,
+      ...(data.byokApiKey !== undefined ? { byok_api_key: data.byokApiKey } : {}),
     };
-    if (data.byokApiKey !== undefined) {
-      row.byok_api_key = data.byokApiKey;
-    }
     const { error } = await supabase
       .from("user_ai_settings")
       .upsert(row, { onConflict: "user_id" });
