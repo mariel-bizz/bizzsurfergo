@@ -1,6 +1,11 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Check, X, Plus } from "lucide-react";
+import logoOpenAI from "@/assets/llm-openai.png";
+import logoClaude from "@/assets/llm-claude.png";
+import logoMistral from "@/assets/llm-mistral.png";
+import logoPerplexity from "@/assets/llm-perplexity.png";
+import logoGemini from "@/assets/llm-gemini.png";
 
 export type Provider = "openai" | "claude" | "mistral" | "perplexity" | "gemini";
 
@@ -11,11 +16,11 @@ export type GoChatConfig = {
 };
 
 const PROVIDERS: { id: Provider; name: string; logo: string }[] = [
-  { id: "openai", name: "OpenAI", logo: "https://cdn.simpleicons.org/openai/000000" },
-  { id: "claude", name: "Claude", logo: "https://cdn.simpleicons.org/anthropic/D97757" },
-  { id: "mistral", name: "Mistral AI", logo: "https://cdn.simpleicons.org/mistralai/FA520F" },
-  { id: "perplexity", name: "Perplexity", logo: "https://cdn.simpleicons.org/perplexity/20808D" },
-  { id: "gemini", name: "Gemini", logo: "https://cdn.simpleicons.org/googlegemini/4285F4" },
+  { id: "openai", name: "OpenAI", logo: logoOpenAI },
+  { id: "claude", name: "Claude", logo: logoClaude },
+  { id: "mistral", name: "Mistral AI", logo: logoMistral },
+  { id: "perplexity", name: "Perplexity", logo: logoPerplexity },
+  { id: "gemini", name: "Gemini", logo: logoGemini },
 ];
 
 const DEPARTMENTS = ["HR", "Sales", "Marketing", "IT", "Supply Chain", "Procurement", "Operations", "Finance", "Customer Service", "R&D"];
