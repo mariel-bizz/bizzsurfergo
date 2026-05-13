@@ -601,26 +601,54 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               We'll email you a short summary with an upgrade offer, and download the full PDF to your device.
             </DialogDescription>
           </DialogHeader>
-          <div className="space-y-3">
-            <label className="text-xs font-bold text-foreground">Confirm your email</label>
+          <div className="space-y-2">
+            <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
             <input
+              id="email-confirm"
               value={emailValue}
-              onChange={(e) => setEmailValue(e.target.value)}
+              onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+              onBlur={() => setEmailError(validateEmail(emailValue))}
               type="email"
+              autoComplete="email"
+              inputMode="email"
+              maxLength={254}
               placeholder="you@company.com"
-              className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+              aria-invalid={!!emailError}
+              aria-describedby={emailError ? "email-error" : "email-help"}
+              className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                emailError
+                  ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
+                  : "border-border focus:ring-primary/40"
+              }`}
               autoFocus
             />
-            <p className="text-[11px] text-muted-foreground">
-              The email includes a short version of the PDF, an invite to upcoming events,
-              full reports, and a 1:1 demo call when you upgrade.
-            </p>
+            {emailError ? (
+              <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
+            ) : (
+              <p id="email-help" className="text-[11px] text-muted-foreground">
+                The email includes a short version of the PDF, an invite to upcoming events,
+                full reports, and a 1:1 demo call when you upgrade.
+              </p>
+            )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={downloadPdf} className="rounded-xl">
+            <Button
+              variant="outline"
+              onClick={async () => {
+                const err = validateEmail(emailValue);
+                if (err) { setEmailError(err); return; }
+                await downloadPdf();
+              }}
+              disabled={sending || !!validateEmail(emailValue)}
+              className="rounded-xl"
+            >
               <Download className="w-4 h-4 mr-1" /> PDF only
             </Button>
-            <Button onClick={sendShortSummaryEmail} disabled={sending} className="rounded-xl bg-gradient-primary">
+            <Button
+              onClick={sendShortSummaryEmail}
+              disabled={sending || !!validateEmail(emailValue)}
+              className="rounded-xl bg-gradient-primary"
+            >
               <Mail className="w-4 h-4 mr-1" /> {sending ? "Preparing…" : "Email me"}
             </Button>
           </DialogFooter>
