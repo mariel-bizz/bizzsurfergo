@@ -76,6 +76,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "jtrIX3RxGE1mKrODQ9U7jA_cA956mCZrFMXbd1KJWqk" },
       { title: "BizzSurfer Go!  Agentic AI & Business Transformation" },
       { name: "description", content: "BizzSurfer Go! Agentic AI Intelligence for Business Transformation leaders. Connect your enterprise systems and let Agentic AI orchestrate your transformation." },
       { name: "author", content: "BizzSurfer" },
