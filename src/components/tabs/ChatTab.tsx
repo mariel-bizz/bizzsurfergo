@@ -104,7 +104,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          messages: next,
+          messages: contextPreamble ? [{ role: "system", content: contextPreamble }, ...next] : next,
+          provider: config?.provider ?? null,
           language: typeof window !== "undefined" ? window.localStorage.getItem("bizzsurfer.lang") || "en" : "en",
         }),
       });
