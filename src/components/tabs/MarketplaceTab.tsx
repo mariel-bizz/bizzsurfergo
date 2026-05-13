@@ -529,6 +529,8 @@ export function MarketplaceTab() {
           );
         })}
       </div>
+      </>
+      )}
 
       <p className="text-xs text-muted-foreground">
         Showing {filtered.length} of {listings.length} listings
