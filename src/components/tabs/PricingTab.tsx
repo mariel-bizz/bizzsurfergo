@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Rocket, Sparkles, X, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Crown, Rocket, Sparkles, Users, X, Loader2, Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -7,6 +9,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "@tanstack/react-router";
+
+const HERO_MONTHLY = 14.99;
+const HERO_YEARLY = 149;
+const TEAM_SEAT_MONTHLY = +(HERO_MONTHLY * 0.9).toFixed(2); // 13.49
+const TEAM_SEAT_YEARLY = +(HERO_YEARLY * 0.9).toFixed(2); // 134.10
 
 const tiers = [
   {
@@ -82,6 +89,7 @@ const tiers = [
 
 export function PricingTab() {
   const [yearly, setYearly] = useState(false);
+  const [seats, setSeats] = useState(2);
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
   const { tier: currentTier, isActive } = useSubscription(user?.id ?? null);
@@ -105,9 +113,13 @@ export function PricingTab() {
     const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
     openCheckout({
       priceId,
+      quantity: tierId === "team" ? seats : 1,
       returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
     });
   };
+
+  const teamSeatPrice = yearly ? TEAM_SEAT_YEARLY : TEAM_SEAT_MONTHLY;
+  const teamTotal = (teamSeatPrice * seats).toFixed(2);
 
   return (
     <div className="px-5 py-5 space-y-5">
@@ -246,6 +258,87 @@ export function PricingTab() {
             </div>
           );
         })}
+
+        {/* Team plan — per-seat, no fixed cost */}
+        <div className="relative rounded-3xl p-5 border bg-card border-border shadow-card">
+          <span className="absolute -top-2.5 right-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground shadow-soft">
+            For teams
+          </span>
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-primary">
+              <Users className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <p className="text-base font-bold text-foreground">BizzSurfer Team</p>
+              <p className="text-xs text-muted-foreground">10% off Hero per seat · min 2 seats</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex items-baseline gap-2">
+            <span className="text-4xl font-bold text-foreground">€{teamSeatPrice.toFixed(2)}</span>
+            <span className="text-xs text-muted-foreground">
+              per seat / {yearly ? "year" : "month"}
+            </span>
+          </div>
+
+          <p className="mt-3 text-sm text-muted-foreground">
+            Everything in Hero for every seat, plus team management and Premium AI integrations
+            (Claude, Gemini, OpenAI, Mistral, Perplexity).
+          </p>
+
+          <div className="mt-4 space-y-2">
+            <Label htmlFor="team-seats" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Number of seats
+            </Label>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                onClick={() => setSeats((s) => Math.max(2, s - 1))}
+                aria-label="Decrease seats"
+                disabled={seats <= 2}
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+              <Input
+                id="team-seats"
+                type="number"
+                min={2}
+                max={100}
+                value={seats}
+                onChange={(e) => {
+                  const n = parseInt(e.target.value, 10);
+                  if (Number.isFinite(n)) setSeats(Math.min(100, Math.max(2, n)));
+                }}
+                className="text-center h-10"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 shrink-0"
+                onClick={() => setSeats((s) => Math.min(100, s + 1))}
+                aria-label="Increase seats"
+                disabled={seats >= 100}
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            <p className="text-sm text-foreground">
+              Total: <span className="font-bold">€{teamTotal}</span>{" "}
+              <span className="text-muted-foreground">/ {yearly ? "year" : "month"}</span>
+            </p>
+          </div>
+
+          <Button
+            onClick={() => handleSubscribe("team")}
+            className="mt-5 w-full h-11 font-bold bg-gradient-primary text-primary-foreground"
+          >
+            Get {seats} seats
+          </Button>
+        </div>
       </div>
 
       {isActive && (
