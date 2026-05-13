@@ -561,7 +561,7 @@ function SignedInProfile() {
             </p>
             <Button type="submit" className="w-full" disabled={inviting}>
               <Mail className="w-4 h-4 mr-2" />
-              {inviting ? "Saving…" : "Save emails to team"}
+              {inviting ? "Sending…" : "Send invitations to my team"}
             </Button>
           </form>
 
