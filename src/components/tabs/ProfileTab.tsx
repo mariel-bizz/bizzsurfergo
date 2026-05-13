@@ -153,6 +153,7 @@ function SignedInProfile() {
   const [emailChips, setEmailChips] = useState<string[]>([]);
   const [emailDraft, setEmailDraft] = useState("");
   const [inviting, setInviting] = useState(false);
+  const [resendingId, setResendingId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
