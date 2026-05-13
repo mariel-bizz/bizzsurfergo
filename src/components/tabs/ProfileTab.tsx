@@ -739,9 +739,139 @@ function SignedInProfile() {
         </CardContent>
       </Card>
 
+      {/* AI provider integration */}
+      <AiProviderSection />
+
       {/* Gamification summary */}
       <GameSummary />
     </div>
+  );
+}
+
+function AiProviderSection() {
+  const navigate = useNavigate();
+  const loadFn = useServerFn(getAiSettingsFn);
+  const saveFn = useServerFn(saveAiSettingsFn);
+  const [provider, setProvider] = useState<string>("managed");
+  const [model, setModel] = useState<string>("");
+  const [byok, setByok] = useState<string>("");
+  const [hasKey, setHasKey] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    loadFn()
+      .then((s) => {
+        if (!alive) return;
+        setProvider(s.provider);
+        setModel(s.model ?? "");
+        setHasKey(s.hasByokKey);
+      })
+      .catch(() => {})
+      .finally(() => { if (alive) setLoading(false); });
+    return () => { alive = false; };
+  }, [loadFn]);
+
+  const onSave = async () => {
+    setSaving(true);
+    try {
+      await saveFn({
+        data: {
+          provider: provider as "managed" | "openai" | "anthropic" | "google" | "mistral" | "perplexity",
+          model: model.trim() || null,
+          ...(byok.trim() ? { byokApiKey: byok.trim() } : {}),
+        },
+      });
+      if (byok.trim()) setHasKey(true);
+      setByok("");
+      toast.success("AI settings saved");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const providerOptions = [
+    { value: "managed", label: "Managed (default — we handle it)" },
+    { value: "openai", label: "OpenAI (GPT)" },
+    { value: "anthropic", label: "Anthropic (Claude)" },
+    { value: "google", label: "Google (Gemini)" },
+    { value: "mistral", label: "Mistral AI" },
+    { value: "perplexity", label: "Perplexity" },
+  ];
+
+  const isPremium = provider !== "managed";
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-base flex items-center gap-2">
+          <Sparkles className="w-4 h-4" aria-hidden /> AI integrations
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-xs text-muted-foreground">
+          Choose which AI provider powers your premium features. Managed uses our default
+          gateway — no key needed. Premium plans can also bring their own API key.
+        </p>
+
+        <div className="space-y-2">
+          <Label htmlFor="ai-provider">Provider</Label>
+          <Select value={provider} onValueChange={setProvider} disabled={loading}>
+            <SelectTrigger id="ai-provider">
+              <SelectValue placeholder="Select a provider" />
+            </SelectTrigger>
+            <SelectContent>
+              {providerOptions.map((o) => (
+                <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {isPremium && (
+          <>
+            <div className="space-y-2">
+              <Label htmlFor="ai-model">Model (optional)</Label>
+              <Input
+                id="ai-model"
+                placeholder="e.g. claude-3-5-sonnet, gpt-5, gemini-2.5-pro"
+                value={model}
+                onChange={(e) => setModel(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="ai-byok">
+                Your API key {hasKey && <span className="text-xs text-muted-foreground">(saved)</span>}
+              </Label>
+              <Input
+                id="ai-byok"
+                type="password"
+                placeholder={hasKey ? "•••••••• (leave blank to keep)" : "Paste your provider API key"}
+                value={byok}
+                onChange={(e) => setByok(e.target.value)}
+                autoComplete="off"
+              />
+              <p className="text-xs text-muted-foreground">
+                Optional — leave blank to use the managed default for this provider.
+                BYOK requires a Premium or Team plan.
+              </p>
+            </div>
+          </>
+        )}
+
+        <div className="flex gap-2">
+          <Button onClick={onSave} disabled={loading || saving} className="flex-1">
+            {saving ? "Saving…" : "Save AI settings"}
+          </Button>
+          <Button variant="outline" onClick={() => navigate({ to: "/pricing" })}>
+            View plans
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
