@@ -1,7 +1,25 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// CORS allowlist — explicit production domains only (no wildcards).
+// Override with EXTRA_CORS_ORIGINS env (comma-separated) if needed.
+const ALLOWED_ORIGINS = new Set<string>([
+  "https://go.bizzsurfer.ai",
+  "https://www.bizzsurfer.ai",
+  "https://bizzsurfer.ai",
+  "https://bizzsurfergo.lovable.app",
+  ...((Deno.env.get("EXTRA_CORS_ORIGINS") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean)),
+]);
+
+function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  const allowed = ALLOWED_ORIGINS.has(origin);
+  return {
+    "Access-Control-Allow-Origin": allowed ? origin : "null",
+    "Vary": "Origin",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
 
 const LANG_NAMES: Record<string, string> = {
   en: "English", es: "Spanish", nl: "Dutch", zh: "Mandarin Chinese", hi: "Hindi",
