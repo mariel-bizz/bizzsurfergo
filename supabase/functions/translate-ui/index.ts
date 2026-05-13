@@ -46,7 +46,10 @@ function rateLimit(ip: string): boolean {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeadersFor(req) });
   try {
-    const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+    const ip =
+      req.headers.get("cf-connecting-ip") ||
+      req.headers.get("x-forwarded-for")?.split(",")[0].trim() ||
+      "unknown";
     if (!rateLimit(ip)) {
       return new Response(JSON.stringify({ error: "rate_limit" }), {
         status: 429,
@@ -59,7 +62,29 @@ Deno.serve(async (req) => {
         headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
       });
     }
-    const langName = LANG_NAMES[target] || target;
+    // Validate target against allowlist — reject unknown values to prevent prompt injection
+    if (!Object.prototype.hasOwnProperty.call(LANG_NAMES, target)) {
+      return new Response(JSON.stringify({ error: "invalid_target" }), {
+        status: 400,
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
+      });
+    }
+    // Cap payload size to prevent cost abuse
+    const MAX_ITEMS = 200;
+    const MAX_ITEM_LEN = 500;
+    if (texts.length > MAX_ITEMS) {
+      return new Response(JSON.stringify({ error: "too_many_items" }), {
+        status: 413,
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
+      });
+    }
+    if (!texts.every((t) => typeof t === "string" && t.length <= MAX_ITEM_LEN)) {
+      return new Response(JSON.stringify({ error: "item_too_long" }), {
+        status: 413,
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
+      });
+    }
+    const langName = LANG_NAMES[target];
     const apiKey = Deno.env.get("LOVABLE_API_KEY");
     if (!apiKey) throw new Error("LOVABLE_API_KEY missing");
 
