@@ -324,7 +324,28 @@ function SignedInProfile() {
     }
   };
 
-  const onRemove = async (id: string) => {
+  const onResendInvite = async (m: TeamRow) => {
+    setResendingId(m.id);
+    try {
+      await invite({ data: { email: m.email, role: m.role } });
+      if (teamShareLink) {
+        try {
+          await navigator.clipboard.writeText(teamShareLink);
+          toast.success(`Invite refreshed for ${m.email} — team link copied`);
+        } catch {
+          toast.success(`Invite refreshed for ${m.email}`);
+        }
+      } else {
+        toast.success(`Invite refreshed for ${m.email}`);
+      }
+      const t = await fetchTeam();
+      setTeam((t.team ?? []) as TeamRow[]);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not resend invite");
+    } finally {
+      setResendingId(null);
+    }
+  };
     try {
       await removeMember({ data: { id } });
       setTeam((prev) => prev.filter((m) => m.id !== id));
