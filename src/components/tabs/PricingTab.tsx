@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Check, Crown, Rocket, Sparkles, X, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Check, Crown, Rocket, Sparkles, Users, X, Loader2, Minus, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -7,6 +9,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "@tanstack/react-router";
+
+const HERO_MONTHLY = 14.99;
+const HERO_YEARLY = 149;
+const TEAM_SEAT_MONTHLY = +(HERO_MONTHLY * 0.9).toFixed(2); // 13.49
+const TEAM_SEAT_YEARLY = +(HERO_YEARLY * 0.9).toFixed(2); // 134.10
 
 const tiers = [
   {
