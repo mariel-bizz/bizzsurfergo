@@ -405,13 +405,14 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     const mailto = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
 
-    // Capture the lead in waitlist with dedup on email (case-insensitive unique index).
+    // Capture the lead in waitlist; the case-insensitive unique index dedups silently.
     try {
-      await supabase.from("waitlist").upsert({
+      const { error } = await supabase.from("waitlist").insert({
         email: cleanEmail,
         name: cleanEmail.split("@")[0],
         role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
-      }, { onConflict: "email", ignoreDuplicates: true });
+      });
+      if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
     } catch (e) { /* non-blocking */ }
 
     setSending(false);
