@@ -46,35 +46,90 @@ export const Route = createFileRoute("/podcast")({
 function PodcastPage() {
   const sectionRef = useRef<HTMLElement>(null);
   const interactedRef = useRef(false);
+  const interactionStartRef = useRef<number | null>(null);
+  const visibleRef = useRef(false);
+  const engagementFiredRef = useRef(false);
 
-  // Fire once when the user first interacts with the podcast section
-  // (pointer/touch/keyboard) — iframes swallow internal clicks, so we listen
-  // on the wrapper section in the capture phase.
+  const fireEngagement = (reason: string) => {
+    if (engagementFiredRef.current) return;
+    if (interactionStartRef.current == null) return;
+    engagementFiredRef.current = true;
+    const duration_ms = Math.round(performance.now() - interactionStartRef.current);
+    trackEvent("podcast_engagement_ended", { duration_ms, reason });
+  };
+
+  // First interaction + engagement timer
   useEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
     const onInteract = (ev: Event) => {
       if (interactedRef.current) return;
       interactedRef.current = true;
+      interactionStartRef.current = performance.now();
       trackEvent("podcast_interaction_started", { type: ev.type });
     };
     const events: (keyof DocumentEventMap)[] = ["pointerdown", "touchstart", "keydown"];
     events.forEach((e) => el.addEventListener(e, onInteract, { capture: true, once: false }));
 
-    // Also treat focus leaving the page (likely entering the iframe) as an interaction.
     const onBlur = () => {
-      if (interactedRef.current) return;
-      if (document.activeElement?.tagName === "IFRAME") {
+      if (!interactedRef.current && document.activeElement?.tagName === "IFRAME") {
         interactedRef.current = true;
+        interactionStartRef.current = performance.now();
         trackEvent("podcast_interaction_started", { type: "iframe_focus" });
       }
     };
     window.addEventListener("blur", onBlur);
+
+    const onVisibility = () => {
+      if (document.visibilityState === "hidden") fireEngagement("visibility_hidden");
+    };
+    const onPageHide = () => fireEngagement("pagehide");
+    document.addEventListener("visibilitychange", onVisibility);
+    window.addEventListener("pagehide", onPageHide);
+
     return () => {
       events.forEach((e) => el.removeEventListener(e, onInteract, { capture: true }));
       window.removeEventListener("blur", onBlur);
+      document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("pagehide", onPageHide);
+      fireEngagement("unmount");
     };
   }, []);
+
+  // Viewport visibility — fire once when section scrolls into view
+  useEffect(() => {
+    const el = sectionRef.current;
+    if (!el || typeof IntersectionObserver === "undefined") return;
+    let fired = false;
+    const io = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.25) {
+            if (!visibleRef.current) {
+              visibleRef.current = true;
+              if (!fired) {
+                fired = true;
+                trackEvent("podcast_section_viewed", {
+                  ratio: Number(entry.intersectionRatio.toFixed(2)),
+                });
+              }
+            }
+          } else if (entry.intersectionRatio === 0) {
+            if (visibleRef.current) {
+              visibleRef.current = false;
+              fireEngagement("scrolled_out_of_view");
+            }
+          }
+        }
+      },
+      { threshold: [0, 0.25, 0.5] },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+
+  const trackOutbound = (label: string, url: string) =>
+    trackEvent("podcast_outbound_click", { label, url, destination: "spotify" });
 
   return (
     <section ref={sectionRef} className="px-5 py-8 space-y-6">
