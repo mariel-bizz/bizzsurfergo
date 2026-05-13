@@ -93,6 +93,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [questionCount, setQuestionCount] = useState(0);
   const [emailOpen, setEmailOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
