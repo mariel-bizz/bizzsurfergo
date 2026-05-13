@@ -1,12 +1,12 @@
 import { Link } from "@tanstack/react-router";
-import { Home, MessageCircle, Calendar, Store, Tag, User } from "lucide-react";
+import { Home, MessageCircle, Calendar, Bot, Tag, User } from "lucide-react";
 import type { TabKey } from "./AppShell";
 
 const tabs: { key: TabKey; label: string; icon: typeof Home; to: string }[] = [
   { key: "home", label: "Home", icon: Home, to: "/" },
   { key: "events", label: "Events", icon: Calendar, to: "/events" },
   { key: "chat", label: "Go!", icon: MessageCircle, to: "/chat" },
-  { key: "marketplace", label: "Market", icon: Store, to: "/marketplace" },
+  { key: "marketplace", label: "Go Agentic!", icon: Bot, to: "/marketplace" },
   { key: "pricing", label: "Upgrade", icon: Tag, to: "/pricing" },
   { key: "profile", label: "Profile", icon: User, to: "/profile" },
 ];

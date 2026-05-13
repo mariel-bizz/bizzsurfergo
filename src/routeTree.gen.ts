@@ -15,6 +15,7 @@ import { Route as ResourcesRouteImport } from './routes/resources'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as PodcastRouteImport } from './routes/podcast'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
@@ -69,6 +70,11 @@ const ProfileRoute = ProfileRouteImport.update({
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PodcastRoute = PodcastRouteImport.update({
+  id: '/podcast',
+  path: '/podcast',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -209,6 +215,7 @@ export interface FileRoutesByFullPath {
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -242,6 +249,7 @@ export interface FileRoutesByTo {
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -276,6 +284,7 @@ export interface FileRoutesById {
   '/feed.xml': typeof FeedDotxmlRoute
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
+  '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -311,6 +320,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/login'
     | '/marketplace'
+    | '/podcast'
     | '/pricing'
     | '/profile'
     | '/reset-password'
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/login'
     | '/marketplace'
+    | '/podcast'
     | '/pricing'
     | '/profile'
     | '/reset-password'
@@ -377,6 +388,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/login'
     | '/marketplace'
+    | '/podcast'
     | '/pricing'
     | '/profile'
     | '/reset-password'
@@ -411,6 +423,7 @@ export interface RootRouteChildren {
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
+  PodcastRoute: typeof PodcastRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -477,6 +490,13 @@ declare module '@tanstack/react-router' {
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/podcast': {
+      id: '/podcast'
+      path: '/podcast'
+      fullPath: '/podcast'
+      preLoaderRoute: typeof PodcastRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -679,6 +699,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedDotxmlRoute: FeedDotxmlRoute,
   LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
+  PodcastRoute: PodcastRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
   ResetPasswordRoute: ResetPasswordRoute,
