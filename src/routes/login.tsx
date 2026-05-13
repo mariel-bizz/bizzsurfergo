@@ -56,10 +56,20 @@ function LoginPage() {
   }, [navigate, redirect]);
 
   // Map raw OAuth/provider errors to actionable, user-friendly messages.
-  const friendlyOAuthError = (provider: "google" | "apple", raw: unknown): string => {
+  const friendlyOAuthError = (
+    provider: "google" | "apple" | "azure" | "linkedin_oidc",
+    raw: unknown,
+  ): string => {
     const msg = raw instanceof Error ? raw.message : String(raw ?? "");
     const lower = msg.toLowerCase();
-    const label = provider === "apple" ? "Apple" : "Google";
+    const label =
+      provider === "apple"
+        ? "Apple"
+        : provider === "google"
+          ? "Google"
+          : provider === "azure"
+            ? "Microsoft"
+            : "LinkedIn";
 
     if (
       lower.includes("popup_closed") ||
