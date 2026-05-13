@@ -152,7 +152,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   };
 
   const providerMeta = config ? PROVIDER_META.find((p) => p.id === config.provider) : null;
-  const isGemini = config?.provider === "gemini";
+  
 
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)]">
