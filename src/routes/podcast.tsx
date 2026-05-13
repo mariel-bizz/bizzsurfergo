@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ExternalLink, Headphones, Music } from "lucide-react";
+import { ExternalLink, Headphones } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
