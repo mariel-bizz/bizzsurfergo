@@ -73,9 +73,10 @@ export const Route = createFileRoute("/lovable/email/auth/preview")({
           )
         }
 
-        // Verify the caller is authorized with LOVABLE_API_KEY
-        const authHeader = request.headers.get('Authorization')
-        if (!authHeader || authHeader !== `Bearer ${apiKey}`) {
+        // Verify the caller is authorized with LOVABLE_API_KEY (constant-time)
+        const authHeader = request.headers.get('Authorization') ?? ''
+        const { timingSafeEqualStr } = await import('@/lib/timing-safe')
+        if (!authHeader.startsWith('Bearer ') || !timingSafeEqualStr(authHeader.slice('Bearer '.length).trim(), apiKey)) {
           return Response.json({ error: 'Unauthorized' }, { status: 401 })
         }
 

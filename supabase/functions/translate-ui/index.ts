@@ -1,7 +1,25 @@
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// CORS allowlist — explicit production domains only (no wildcards).
+// Override with EXTRA_CORS_ORIGINS env (comma-separated) if needed.
+const ALLOWED_ORIGINS = new Set<string>([
+  "https://go.bizzsurfer.ai",
+  "https://www.bizzsurfer.ai",
+  "https://bizzsurfer.ai",
+  "https://bizzsurfergo.lovable.app",
+  ...((Deno.env.get("EXTRA_CORS_ORIGINS") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean)),
+]);
+
+function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  const allowed = ALLOWED_ORIGINS.has(origin);
+  return {
+    "Access-Control-Allow-Origin": allowed ? origin : "null",
+    "Vary": "Origin",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
 
 const LANG_NAMES: Record<string, string> = {
   en: "English", es: "Spanish", nl: "Dutch", zh: "Mandarin Chinese", hi: "Hindi",
@@ -26,19 +44,19 @@ function rateLimit(ip: string): boolean {
 }
 
 Deno.serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeadersFor(req) });
   try {
     const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
     if (!rateLimit(ip)) {
       return new Response(JSON.stringify({ error: "rate_limit" }), {
         status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
       });
     }
     const { texts, target } = await req.json();
     if (!Array.isArray(texts) || !target || target === "en") {
       return new Response(JSON.stringify({ translations: {} }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
       });
     }
     const langName = LANG_NAMES[target] || target;
@@ -76,8 +94,8 @@ Deno.serve(async (req) => {
       }),
     });
 
-    if (resp.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    if (resp.status === 402) return new Response(JSON.stringify({ error: "credits" }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (resp.status === 429) return new Response(JSON.stringify({ error: "rate_limit" }), { status: 429, headers: { ...corsHeadersFor(req), "Content-Type": "application/json" } });
+    if (resp.status === 402) return new Response(JSON.stringify({ error: "credits" }), { status: 402, headers: { ...corsHeadersFor(req), "Content-Type": "application/json" } });
     if (!resp.ok) throw new Error(`AI ${resp.status}`);
 
     const data = await resp.json();
@@ -89,12 +107,12 @@ Deno.serve(async (req) => {
       if (src && typeof it.t === "string") translations[src] = it.t;
     }
     return new Response(JSON.stringify({ translations }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("translate-ui error", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "unknown" }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
     });
   }
 });

@@ -1,8 +1,26 @@
 // BizzSurfer Go! AI chat - streaming via Lovable AI Gateway
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-};
+// CORS allowlist — explicit production domains only (no wildcards).
+// Override with EXTRA_CORS_ORIGINS env (comma-separated) if needed.
+const ALLOWED_ORIGINS = new Set<string>([
+  "https://go.bizzsurfer.ai",
+  "https://www.bizzsurfer.ai",
+  "https://bizzsurfer.ai",
+  "https://bizzsurfergo.lovable.app",
+  ...((Deno.env.get("EXTRA_CORS_ORIGINS") ?? "")
+    .split(",").map((s) => s.trim()).filter(Boolean)),
+]);
+
+function corsHeadersFor(req: Request): Record<string, string> {
+  const origin = req.headers.get("origin") ?? "";
+  const allowed = ALLOWED_ORIGINS.has(origin);
+  return {
+    "Access-Control-Allow-Origin": allowed ? origin : "null",
+    "Vary": "Origin",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+  };
+}
+
 
 const SYSTEM_PROMPT = `You are BizzSurfer Go!, an executive-grade Agentic AI advisor for Business Transformation leaders (CEOs, CHROs, CIOs, COOs, board members, transformation directors).
 
@@ -37,15 +55,15 @@ function rateLimited(ip: string): boolean {
   return arr.length > RATE_LIMIT_MAX;
 }
 
-function jsonError(code: string, status: number) {
+function jsonError(req: Request, code: string, status: number) {
   return new Response(JSON.stringify({ error: code }), {
     status,
-    headers: { ...corsHeaders, "Content-Type": "application/json" },
+    headers: { ...corsHeadersFor(req), "Content-Type": "application/json" },
   });
 }
 
 Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeadersFor(req) });
 
   try {
     const ip =
@@ -121,7 +139,7 @@ Deno.serve(async (req: Request) => {
     }
 
     return new Response(response.body, {
-      headers: { ...corsHeaders, "Content-Type": "text/event-stream" },
+      headers: { ...corsHeadersFor(req), "Content-Type": "text/event-stream" },
     });
   } catch (e) {
     console.error("chat error:", e);
