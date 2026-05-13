@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
-import { Send, Sparkles, ExternalLink } from "lucide-react";
+import { Send, Sparkles, ExternalLink, Settings2 } from "lucide-react";
 import { toast } from "sonner";
+import { GoChatSetup, PROVIDER_META, type GoChatConfig } from "@/components/chat/GoChatSetup";
 
 type Msg = { role: "user" | "assistant"; content: string };
+
+const CONFIG_KEY = "bizzsurfer.gochat.config";
+const GEMINI_GEM_URL = "https://gemini.google.com/gem/1AdPnBETuBVjmcevGWDLKAIfatgciplFR?usp=sharing";
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
