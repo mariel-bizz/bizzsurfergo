@@ -32,8 +32,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       return null;
     }
   });
+  const gemPersona = config?.provider === "gemini"
+    ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
+    : "";
   const contextPreamble = config
-    ? `Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope.`
+    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope.`
     : "";
   const initialAssistant = config
     ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**. Ask me anything, or pick a starter below.`
