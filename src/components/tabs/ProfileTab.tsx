@@ -43,6 +43,7 @@ import {
   removeTeamMember,
   updateTeamMember,
 } from "@/lib/profile.functions";
+import { getAiSettings as getAiSettingsFn, saveAiSettings as saveAiSettingsFn } from "@/lib/ai-settings.functions";
 
 const TOPIC_OPTIONS = [
   "Agentic AI",
