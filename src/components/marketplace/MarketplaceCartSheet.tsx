@@ -36,7 +36,7 @@ export function MarketplaceCartSheet({ open, onOpenChange }: Props) {
         <div className="flex-1 overflow-y-auto -mx-6 px-6 py-4 space-y-3">
           {listings.length === 0 ? (
             <div className="text-center py-12 space-y-2">
-              <ShoppingCart className="w-10 h-10 mx-auto text-muted-foreground/50" />
+              <ShoppingCart className="w-10 h-10 mx-auto text-muted-foreground" />
               <p className="text-sm text-muted-foreground">Your cart is empty.</p>
               <p className="text-xs text-muted-foreground">
                 Browse the marketplace and tap “Add to cart” on any listing.
