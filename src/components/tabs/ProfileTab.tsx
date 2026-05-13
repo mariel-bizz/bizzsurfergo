@@ -762,8 +762,8 @@ function AiProviderSection() {
 
   useEffect(() => {
     let alive = true;
-    loadFn()
-      .then((s) => {
+    loadFn({})
+      .then((s: { provider: string; model: string | null; hasByokKey: boolean }) => {
         if (!alive) return;
         setProvider(s.provider);
         setModel(s.model ?? "");
