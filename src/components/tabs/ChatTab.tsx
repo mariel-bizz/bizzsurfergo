@@ -323,11 +323,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
     // Capture the lead in waitlist for follow-up.
     try {
-      await supabase.from("waitlist" as any).insert({
+      await supabase.from("waitlist").insert({
         email: emailValue,
-        source: "go_chat_summary",
-        metadata: { provider: config?.provider, departments: config?.departments, industries: config?.industries },
-      } as any);
+        name: emailValue.split("@")[0],
+        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+      });
     } catch (e) { /* non-blocking */ }
 
     setSending(false);
