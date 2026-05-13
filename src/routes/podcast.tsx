@@ -201,7 +201,13 @@ function PodcastPage() {
           size="lg"
           className="w-full bg-white text-primary hover:bg-white/90 font-bold"
         >
-          <a href={SPOTIFY_URL} target="_blank" rel="noopener noreferrer">
+          <a
+            href={SPOTIFY_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={() => trackOutbound("open_in_spotify_cta", SPOTIFY_URL)}
+            onAuxClick={() => trackOutbound("open_in_spotify_cta_aux", SPOTIFY_URL)}
+          >
             Open in Spotify <ExternalLink className="ml-2 w-4 h-4" />
           </a>
         </Button>
