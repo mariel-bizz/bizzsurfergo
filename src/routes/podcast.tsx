@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink, Headphones, Music } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
+import { trackEvent } from "@/lib/analytics";
 
 const SPOTIFY_USER_ID = "31l6phq64rtvbtqbgeyozhlbpyly";
 const SPOTIFY_URL = `https://open.spotify.com/user/${SPOTIFY_USER_ID}`;
