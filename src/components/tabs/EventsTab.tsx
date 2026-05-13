@@ -18,6 +18,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
 import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
+import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDialog";
+import type { FeedEvent } from "@/lib/events-data";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
 
@@ -32,11 +34,14 @@ export function EventsTab() {
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
   const [authed, setAuthed] = useState(false);
+  const [userEmail, setUserEmail] = useState<string>("");
+  const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       const isAuthed = !!data.session;
       setAuthed(isAuthed);
+      setUserEmail(data.session?.user?.email ?? "");
       if (isAuthed) {
         listRsvps()
           .then((r) => {
@@ -48,6 +53,7 @@ export function EventsTab() {
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
       setAuthed(!!session);
+      setUserEmail(session?.user?.email ?? "");
     });
     return () => sub.subscription.unsubscribe();
   }, [listRsvps]);
@@ -61,14 +67,17 @@ export function EventsTab() {
     try {
       const res = await rsvp({ data: { eventId: id } });
       setRsvpedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
-      if (res?.meet_link) {
-        setMeetLinks((prev) => ({ ...prev, [id]: res.meet_link as string }));
+      const meet = res?.meet_link as string | undefined;
+      if (meet) {
+        setMeetLinks((prev) => ({ ...prev, [id]: meet }));
       }
       game.update((s) => {
         const badges = s.badges.includes("Event Insider") ? s.badges : [...s.badges, "Event Insider"];
         return { ...s, xp: s.xp + 25, badges };
       });
-      toast.success("You're in! Calendar invite sent. +25 XP");
+      const ev = eventsData.find((x) => x.id === id);
+      if (ev) setConfirmation({ event: ev, meetLink: meet });
+      toast.success("You're in! +25 XP");
       if (href !== "#") window.open(href, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
@@ -193,6 +202,14 @@ export function EventsTab() {
           </article>
         );
       })}
+
+      <RsvpConfirmationDialog
+        open={!!confirmation}
+        onOpenChange={(o) => !o && setConfirmation(null)}
+        event={confirmation?.event ?? null}
+        email={userEmail}
+        meetLink={confirmation?.meetLink}
+      />
     </div>
   );
 }

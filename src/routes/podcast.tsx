@@ -16,6 +16,7 @@ export const Route = createFileRoute("/podcast")({
         "Listen on Spotify: candid conversations with founders, CIOs, and operators shipping Agentic AI in production. New episodes every week.",
       breadcrumbName: "Podcast",
     });
+    const ogImage = "https://bizzsurfergo.lovable.app/og-podcast.jpg";
     return {
       ...base,
       meta: [
@@ -24,8 +25,14 @@ export const Route = createFileRoute("/podcast")({
         ),
         { property: "og:type", content: "music.playlist" },
         { property: "og:audio", content: SPOTIFY_URL },
+        { property: "og:image", content: ogImage },
+        { property: "og:image:width", content: "1216" },
+        { property: "og:image:height", content: "640" },
+        { property: "og:image:alt", content: "BizzSurfer Podcast — Operators behind enterprise Agentic AI" },
         { property: "music:creator", content: "BizzSurfer" },
         { name: "twitter:card", content: "summary_large_image" },
+        { name: "twitter:image", content: ogImage },
+        { name: "twitter:image:alt", content: "BizzSurfer Podcast cover" },
         { name: "twitter:label1", content: "Listen on" },
         { name: "twitter:data1", content: "Spotify" },
       ],
