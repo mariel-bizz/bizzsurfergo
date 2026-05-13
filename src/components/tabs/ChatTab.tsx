@@ -269,58 +269,109 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     return lines.join("\n");
   };
 
-  const downloadPdf = () => {
+  const downloadPdf = async () => {
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const margin = 48;
-    const width = doc.internal.pageSize.getWidth() - margin * 2;
+    const pageW = doc.internal.pageSize.getWidth();
+    const width = pageW - margin * 2;
     const pageH = doc.internal.pageSize.getHeight() - margin;
-    let y = margin;
 
+    // Theme colors (matching app's primary teal palette)
+    const PRIMARY: [number, number, number] = [56, 124, 137]; // ~oklch primary
+    const MUTED: [number, number, number] = [110, 118, 128];
+    const TEXT: [number, number, number] = [25, 30, 36];
+
+    // Header band
+    doc.setFillColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+    doc.rect(0, 0, pageW, 90, "F");
+
+    // Logo
+    const logo = await getLogoDataUrl();
+    if (logo) {
+      try { doc.addImage(logo, "PNG", margin, 22, 46, 46); } catch { /* ignore */ }
+    }
+
+    // Wordmark
+    doc.setTextColor(255, 255, 255);
     doc.setFont("helvetica", "bold");
-    doc.setFontSize(16);
-    doc.text("BizzSurfer Go! — Your conversation", margin, y); y += 22;
-
+    doc.setFontSize(18);
+    doc.text("BizzSurfer Go!", margin + 58, 48);
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
-    doc.setTextColor(100);
+    doc.text("Agentic AI advisor for business transformation", margin + 58, 64);
+
+    // Title
+    let y = 130;
+    doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.text("Your conversation report", margin, y); y += 10;
+    doc.setDrawColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+    doc.setLineWidth(2);
+    doc.line(margin, y, margin + 48, y); y += 24;
+
+    // Meta block
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text(new Date().toLocaleString(), margin, y); y += 14;
     if (config) {
       doc.text(`Model: ${PROVIDER_META.find(p => p.id === config.provider)?.name}`, margin, y); y += 14;
       doc.text(`Departments: ${config.departments.join(", ")}`, margin, y); y += 14;
-      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y); y += 20;
+      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y); y += 22;
     }
-    doc.setTextColor(0);
+
+    // Conversation
+    doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
     doc.setFontSize(11);
 
     messages.slice(1).forEach((m) => {
+      if (y > pageH - 40) { doc.addPage(); y = margin; }
       doc.setFont("helvetica", "bold");
-      const who = m.role === "user" ? "You" : "BizzSurfer";
-      const lines = doc.splitTextToSize(`${who}:`, width);
-      lines.forEach((l: string) => { if (y > pageH) { doc.addPage(); y = margin; } doc.text(l, margin, y); y += 14; });
+      doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+      doc.setFontSize(10);
+      doc.text(m.role === "user" ? "YOU" : "BIZZSURFER GO!", margin, y); y += 14;
       doc.setFont("helvetica", "normal");
+      doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+      doc.setFontSize(11);
       const body = doc.splitTextToSize(m.content, width);
-      body.forEach((l: string) => { if (y > pageH) { doc.addPage(); y = margin; } doc.text(l, margin, y); y += 14; });
-      y += 8;
+      body.forEach((l: string) => {
+        if (y > pageH) { doc.addPage(); y = margin; }
+        doc.text(l, margin, y); y += 15;
+      });
+      y += 10;
     });
 
-    if (y > pageH - 80) { doc.addPage(); y = margin; }
-    doc.setDrawColor(200); doc.line(margin, y, margin + width, y); y += 18;
-    doc.setFont("helvetica", "bold"); doc.setFontSize(12);
-    doc.text("Want the full picture?", margin, y); y += 16;
-    doc.setFont("helvetica", "normal"); doc.setFontSize(10);
-    doc.text("Upgrade to BizzSurfer Pro for unlimited questions, full reports,", margin, y); y += 12;
-    doc.text("upcoming events and a 1:1 demo call with our team.", margin, y); y += 18;
-    doc.setTextColor(0, 80, 200);
-    doc.textWithLink("→ Book a demo call", margin, y, { url: "https://bizzsurfergo.lovable.app/pricing" });
+    // CTA card
+    if (y > pageH - 110) { doc.addPage(); y = margin; }
+    y += 10;
+    doc.setFillColor(244, 248, 249);
+    doc.roundedRect(margin, y, width, 90, 8, 8, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(13);
+    doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
+    doc.text("Want the full picture?", margin + 14, y + 22);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(10);
+    doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
+    doc.text("Upgrade to BizzSurfer Pro for unlimited questions, full reports,", margin + 14, y + 40);
+    doc.text("upcoming events and a 1:1 demo call with our team.", margin + 14, y + 54);
+    doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
+    doc.setFont("helvetica", "bold");
+    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://bizzsurfergo.lovable.app/pricing" });
 
     doc.save("bizzsurfer-go-summary.pdf");
   };
 
   const sendShortSummaryEmail = async () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue)) { toast.error("Please enter a valid email."); return; }
+    const err = validateEmail(emailValue);
+    if (err) { setEmailError(err); return; }
+    setEmailError(null);
     setSending(true);
+    const cleanEmail = emailValue.trim().toLowerCase();
 
     // Generate PDF download for the user.
-    try { downloadPdf(); } catch (e) { console.error(e); }
+    try { await downloadPdf(); } catch (e) { console.error(e); }
 
     // Compose a short-version email that opens in the user's mail client (mailto).
     const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
@@ -351,16 +402,16 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       `The full PDF has been downloaded to your device.`,
     ].filter(Boolean).join("\n");
 
-    const mailto = `mailto:${encodeURIComponent(emailValue)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    const mailto = `mailto:${encodeURIComponent(cleanEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.location.href = mailto;
 
-    // Capture the lead in waitlist for follow-up.
+    // Capture the lead in waitlist with dedup on email (case-insensitive unique index).
     try {
-      await supabase.from("waitlist").insert({
-        email: emailValue,
-        name: emailValue.split("@")[0],
+      await supabase.from("waitlist").upsert({
+        email: cleanEmail,
+        name: cleanEmail.split("@")[0],
         role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
-      });
+      }, { onConflict: "email", ignoreDuplicates: true });
     } catch (e) { /* non-blocking */ }
 
     setSending(false);
