@@ -8,7 +8,7 @@ import { GoChatSetup, PROVIDER_META, type GoChatConfig } from "@/components/chat
 type Msg = { role: "user" | "assistant"; content: string };
 
 const CONFIG_KEY = "bizzsurfer.gochat.config";
-const GEMINI_GEM_URL = "https://gemini.google.com/gem/1AdPnBETuBVjmcevGWDLKAIfatgciplFR?usp=sharing";
+
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
