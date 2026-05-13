@@ -202,6 +202,14 @@ export function EventsTab() {
           </article>
         );
       })}
+
+      <RsvpConfirmationDialog
+        open={!!confirmation}
+        onOpenChange={(o) => !o && setConfirmation(null)}
+        event={confirmation?.event ?? null}
+        email={userEmail}
+        meetLink={confirmation?.meetLink}
+      />
     </div>
   );
 }
