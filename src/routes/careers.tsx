@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+const LOAD_TIMEOUT_S = 6;
+const REDIRECT_TIMEOUT_S = 5;
 import {
   AlertTriangle,
   ArrowRight,
@@ -59,8 +62,12 @@ function buildTtFilterUrl(opts: { q: string; location: string; fn: string; type:
 }
 
 function CareersPage() {
+  const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("loading");
   const [reloadKey, setReloadKey] = useState(0);
+  const [loadCountdown, setLoadCountdown] = useState(LOAD_TIMEOUT_S);
+  const [redirectCountdown, setRedirectCountdown] = useState(REDIRECT_TIMEOUT_S);
+  const [redirectCancelled, setRedirectCancelled] = useState(false);
   const loadStartRef = useRef<number>(0);
 
   // Filters
@@ -71,6 +78,9 @@ function CareersPage() {
 
   const reload = useCallback(() => {
     trackEvent("careers_widget_retry", {});
+    setRedirectCancelled(false);
+    setRedirectCountdown(REDIRECT_TIMEOUT_S);
+    setLoadCountdown(LOAD_TIMEOUT_S);
     setStatus("loading");
     setReloadKey((k) => k + 1);
   }, []);
@@ -134,6 +144,37 @@ function CareersPage() {
       s.parentNode?.removeChild(s);
     };
   }, [reloadKey]);
+
+  // Loading countdown — ticks while we wait for the widget script
+  useEffect(() => {
+    if (status !== "loading") return;
+    setLoadCountdown(LOAD_TIMEOUT_S);
+    const id = window.setInterval(() => {
+      setLoadCountdown((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [status, reloadKey]);
+
+  // Auto-redirect countdown after failure → /podcast
+  useEffect(() => {
+    if (status !== "failed" || redirectCancelled) return;
+    setRedirectCountdown(REDIRECT_TIMEOUT_S);
+    trackEvent("careers_redirect_scheduled", {
+      to: "/podcast",
+      seconds: REDIRECT_TIMEOUT_S,
+    });
+    const tick = window.setInterval(() => {
+      setRedirectCountdown((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    const go = window.setTimeout(() => {
+      trackEvent("careers_redirected", { to: "/podcast" });
+      navigate({ to: "/podcast" });
+    }, REDIRECT_TIMEOUT_S * 1000);
+    return () => {
+      window.clearInterval(tick);
+      window.clearTimeout(go);
+    };
+  }, [status, redirectCancelled, navigate]);
 
   const trackOutbound = useCallback(
     (label: string, url: string) =>
@@ -236,10 +277,25 @@ function CareersPage() {
         <div
           role="status"
           aria-live="polite"
-          className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground flex items-center gap-2"
+          className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground"
         >
-          <RefreshCw className="w-4 h-4 animate-spin" />
-          Loading our jobs widget…
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin text-primary" />
+            <span>
+              {reloadKey > 0 ? "Retrying jobs widget…" : "Loading our jobs widget…"}
+            </span>
+            <span className="ml-auto inline-flex items-center gap-1 rounded-md bg-background px-2 py-0.5 text-xs font-mono tabular-nums text-foreground">
+              {loadCountdown}s
+            </span>
+          </div>
+          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+              style={{
+                width: `${Math.max(0, Math.min(100, ((LOAD_TIMEOUT_S - loadCountdown) / LOAD_TIMEOUT_S) * 100))}%`,
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -263,6 +319,40 @@ function CareersPage() {
                   provider can't be embedded here. Try again, or browse open
                   roles on our careers site.
                 </p>
+
+                {!redirectCancelled && (
+                  <div className="mt-4 rounded-lg border border-border bg-background p-3">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <RefreshCw className="w-4 h-4 animate-spin text-primary" />
+                      <span>
+                        Redirecting you to our podcast in{" "}
+                        <span className="font-mono tabular-nums font-semibold text-primary">
+                          {redirectCountdown}s
+                        </span>
+                        …
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRedirectCancelled(true);
+                          trackEvent("careers_redirect_cancelled", {});
+                        }}
+                        className="ml-auto text-xs font-medium text-muted-foreground hover:text-foreground underline"
+                      >
+                        Stay here
+                      </button>
+                    </div>
+                    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+                        style={{
+                          width: `${Math.max(0, Math.min(100, ((REDIRECT_TIMEOUT_S - redirectCountdown) / REDIRECT_TIMEOUT_S) * 100))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button size="sm" onClick={reload} className="gap-2">
                     <RefreshCw className="w-4 h-4" /> Retry
