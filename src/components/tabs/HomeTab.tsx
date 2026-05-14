@@ -6,7 +6,7 @@ import { useState } from "react";
 
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
-import { ResourcesSection, TrustedPartnersSection, FollowSection } from "../ResourcesSection";
+import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
 
 const painPoints: PainItem[] = [
@@ -177,6 +177,8 @@ export function HomeTab() {
       <FollowSection />
 
       <TrustedPartnersSection />
+
+      <PoweredBySection />
 
 
       <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {

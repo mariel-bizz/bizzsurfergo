@@ -216,6 +216,45 @@ export function FollowSection() {
   );
 }
 
+import nvidiaInception from "@/assets/powered-by/nvidia-inception.png";
+import awsActivate from "@/assets/powered-by/aws-activate.png";
+import googleForStartups from "@/assets/powered-by/google-for-startups.png";
+
+const poweredBy: { name: string; src: string }[] = [
+  { name: "NVIDIA Inception Program", src: nvidiaInception },
+  { name: "AWS Activate", src: awsActivate },
+  { name: "Google for Startups", src: googleForStartups },
+];
+
+export function PoweredBySection() {
+  return (
+    <section className="px-5">
+      <div className="rounded-2xl border border-border p-5 bg-transparent">
+        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">
+          BizzSurfer GO! is powered by
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-4 items-center">
+          {poweredBy.map((p) => (
+            <div
+              key={p.name}
+              title={p.name}
+              className="flex h-16 items-center justify-center bg-transparent px-2"
+            >
+              <img
+                src={p.src}
+                alt={`${p.name} logo`}
+                loading="lazy"
+                decoding="async"
+                className="max-h-12 max-w-full object-contain"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function TrustedPartnersSection() {
   return (
     <section className="px-5">
