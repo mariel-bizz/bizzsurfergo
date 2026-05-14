@@ -178,6 +178,8 @@ export function HomeTab() {
 
       <TrustedPartnersSection />
 
+      <PoweredBySection />
+
 
       <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {
         game.update((s) => {
