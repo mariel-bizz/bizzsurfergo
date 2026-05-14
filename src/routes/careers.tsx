@@ -215,9 +215,9 @@ function CareersPage() {
             <Briefcase className="w-5 h-5 text-primary" />
           </div>
           <div className="flex-1 min-w-0">
-            <h2 className="text-lg font-bold text-foreground">Join the team</h2>
+            <h2 className="inline-flex items-center gap-2 rounded-lg border-border bg-background text-sm font-medium text-foreground hover:bg-muted transition text-[#206de9] border-0 border-none py-[8px] px-[25px]">Join the team</h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              We're hiring builders, operators, and applied-AI engineers shipping
+              We're hiring builders, operators, and applied-Agentic AI engineers shipping
               autonomous workflows for enterprise transformation.
             </p>
           </div>
