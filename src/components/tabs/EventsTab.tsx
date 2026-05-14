@@ -37,7 +37,20 @@ export function EventsTab() {
   const [authed, setAuthed] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
-  const [view, setView] = useState<"upcoming" | "past">("upcoming");
+  const [view, setView] = useState<"upcoming" | "past">(() => {
+    if (typeof window !== "undefined" && window.location.hash === "#past") return "past";
+    return "upcoming";
+  });
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sync = () => {
+      if (window.location.hash === "#past") setView("past");
+      else if (window.location.hash === "#upcoming") setView("upcoming");
+    };
+    sync();
+    window.addEventListener("hashchange", sync);
+    return () => window.removeEventListener("hashchange", sync);
+  }, []);
   const [platform, setPlatform] = useState<"all" | "linkedin" | "youtube" | "spotify">("all");
 
   const detectPlatform = (href: string): "linkedin" | "youtube" | "spotify" | "other" => {
