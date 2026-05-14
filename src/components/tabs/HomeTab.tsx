@@ -180,7 +180,7 @@ export function HomeTab() {
         </div>
       </section>
 
-      <FollowSection />
+      {/* FollowSection moved up under ROI */}
 
       <TrustedPartnersSection />
 
