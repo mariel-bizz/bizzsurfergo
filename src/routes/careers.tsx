@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+
+const LOAD_TIMEOUT_S = 6;
+const REDIRECT_TIMEOUT_S = 5;
 import {
   AlertTriangle,
   ArrowRight,
