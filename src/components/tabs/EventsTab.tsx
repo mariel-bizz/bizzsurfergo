@@ -347,6 +347,7 @@ export function EventsTab() {
                   {e.cta} →
                 </a>
               )}
+              </div>
             </article>
               ))}
             </div>
