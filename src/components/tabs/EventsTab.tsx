@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X, Video } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X, Video, Youtube, Music2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
