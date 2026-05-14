@@ -78,8 +78,8 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         </div>
 
         <div className="mt-6 w-full max-w-md">
-          <div className="flex items-center justify-center gap-1.5 text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-3">
-            <Globe className="w-3.5 h-3.5" /> Language
+          <div className="flex items-center justify-center gap-1.5 font-semibold uppercase tracking-widest text-muted-foreground mb-3 text-xs text-[#ff6f00]">
+            <Globe className="w-3.5 h-3.5" /> LANGUAGE
           </div>
 
           <div className="grid grid-cols-3 gap-1.5">
