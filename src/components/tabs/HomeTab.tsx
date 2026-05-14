@@ -93,6 +93,46 @@ export function HomeTab() {
         </Link>
       </section>
 
+      {/* Last event — rewatch, above ROI */}
+      {pastEvents[0] && (
+        <section className="px-5">
+          <a
+            href={eventLink(pastEvents[0])}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group block rounded-3xl overflow-hidden bg-card border border-border shadow-card hover:border-primary/40 hover:shadow-soft transition"
+          >
+            <div className="flex items-stretch">
+              <div className="relative w-32 sm:w-40 shrink-0 bg-muted">
+                <img
+                  src={eventAgenticVsAgents}
+                  alt={pastEvents[0].title}
+                  loading="lazy"
+                  className="h-full w-full object-cover"
+                />
+                <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/70 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest text-white">
+                  <Play className="w-3 h-3 fill-current" /> Replay
+                </span>
+              </div>
+              <div className="flex-1 p-4 sm:p-5 min-w-0">
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 text-primary px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
+                  Last event
+                </span>
+                <h2 className="mt-2 text-base sm:text-lg font-bold leading-tight text-foreground">
+                  {pastEvents[0].title}
+                </h2>
+                <p className="mt-1 text-xs text-muted-foreground line-clamp-2">
+                  {pastEvents[0].date} · {pastEvents[0].location}
+                </p>
+                <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                  Rewatch now <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                </div>
+              </div>
+            </div>
+          </a>
+        </section>
+      )}
+
       {/* ROI Calculator — above Reality Check */}
       <section className="px-5">
         <ROICalculator />
