@@ -18,6 +18,7 @@ import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PodcastRouteImport } from './routes/podcast'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
@@ -91,6 +92,11 @@ const MarketplaceRoute = MarketplaceRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const IntegrationsRoute = IntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
   getParentRoute: () => rootRouteImport,
 } as any)
 const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
@@ -253,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/podcast': typeof PodcastRoute
@@ -293,6 +300,7 @@ export interface FileRoutesByTo {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/podcast': typeof PodcastRoute
@@ -334,6 +342,7 @@ export interface FileRoutesById {
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
+  '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
   '/marketplace': typeof MarketplaceRouteWithChildren
   '/podcast': typeof PodcastRoute
@@ -376,6 +385,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
+    | '/integrations'
     | '/login'
     | '/marketplace'
     | '/podcast'
@@ -416,6 +426,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
+    | '/integrations'
     | '/login'
     | '/marketplace'
     | '/podcast'
@@ -456,6 +467,7 @@ export interface FileRouteTypes {
     | '/chat'
     | '/events'
     | '/feed.xml'
+    | '/integrations'
     | '/login'
     | '/marketplace'
     | '/podcast'
@@ -497,6 +509,7 @@ export interface RootRouteChildren {
   ChatRoute: typeof ChatRoute
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
+  IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
   MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PodcastRoute: typeof PodcastRoute
@@ -592,6 +605,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/integrations': {
+      id: '/integrations'
+      path: '/integrations'
+      fullPath: '/integrations'
+      preLoaderRoute: typeof IntegrationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/feed.xml': {
@@ -821,6 +841,7 @@ const rootRouteChildren: RootRouteChildren = {
   ChatRoute: ChatRoute,
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
+  IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
   MarketplaceRoute: MarketplaceRouteWithChildren,
   PodcastRoute: PodcastRoute,

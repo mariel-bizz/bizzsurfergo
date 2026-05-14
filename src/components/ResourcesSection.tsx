@@ -132,12 +132,44 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
+import { Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useSubscription } from "@/hooks/useSubscription";
+
+const PREMIUM_BENEFITS = [
+  { label: "ERP connectors", desc: "SAP, Oracle, NetSuite, Dynamics" },
+  { label: "CRM connectors", desc: "Salesforce, HubSpot, Pipedrive" },
+  { label: "HRIS connectors", desc: "Workday, BambooHR, Personio" },
+  { label: "BI & analytics", desc: "Looker, Power BI, Tableau, Amplitude" },
+];
 
 export function ConnectApisSection() {
   const [open, setOpen] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { isActive, loading } = useSubscription(userId);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUserId(data.user?.id ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
+  const handleClick = () => {
+    if (loading) return;
+    if (isActive) {
+      navigate({ to: "/integrations" });
+    } else {
+      setOpen(true);
+    }
+  };
+
   return (
     <section className="px-5">
       <div className="rounded-2xl bg-gradient-primary p-5 text-primary-foreground shadow-elegant">
@@ -154,7 +186,8 @@ export function ConnectApisSection() {
           size="sm"
           variant="secondary"
           className="mt-4 w-full bg-white text-primary hover:bg-white/90 font-bold"
-          onClick={() => setOpen(true)}
+          onClick={handleClick}
+          disabled={loading}
         >
           Browse integrations
         </Button>
@@ -165,9 +198,30 @@ export function ConnectApisSection() {
           <AlertDialogHeader>
             <AlertDialogTitle>Only available for Premium Plans</AlertDialogTitle>
             <AlertDialogDescription>
-              Integrations are part of our Premium tier. Upgrade now to plug in your ERP, CRM, HRIS, BI and SaaS tools.
+              Upgrade to unlock integrations across your enterprise stack:
             </AlertDialogDescription>
           </AlertDialogHeader>
+
+          <ul className="space-y-2 -mt-1">
+            {PREMIUM_BENEFITS.map((b) => (
+              <li key={b.label} className="flex items-start gap-2 text-sm">
+                <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                <div>
+                  <p className="font-semibold text-foreground leading-tight">{b.label}</p>
+                  <p className="text-xs text-muted-foreground leading-snug">{b.desc}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+
+          <button
+            type="button"
+            onClick={() => { setOpen(false); navigate({ to: "/pricing" }); }}
+            className="text-xs font-semibold text-primary underline-offset-2 hover:underline text-left"
+          >
+            Compare all plans →
+          </button>
+
           <AlertDialogFooter>
             <AlertDialogCancel>Not now</AlertDialogCancel>
             <AlertDialogAction onClick={() => { setOpen(false); navigate({ to: "/pricing" }); }}>
@@ -179,6 +233,7 @@ export function ConnectApisSection() {
     </section>
   );
 }
+
 
 const socialStyles: Record<string, { bg: string; label: string; sub: string }> = {
   "bizzsurfer.com": {
