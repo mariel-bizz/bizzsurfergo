@@ -189,11 +189,23 @@ export function FollowSection() {
 export function TrustedPartnersSection() {
   return (
     <section className="px-5">
-      <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+      <div className="rounded-2xl border border-border p-5 bg-transparent">
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
-            <PartnerLogo key={p.name} name={p.name} slug={p.slug} />
+            <div
+              key={p.name}
+              title={p.name}
+              className="flex h-14 items-center justify-center bg-transparent px-2"
+            >
+              <img
+                src={p.src}
+                alt={`${p.name} logo`}
+                loading="lazy"
+                decoding="async"
+                className="max-h-8 max-w-full object-contain"
+              />
+            </div>
           ))}
         </div>
       </div>
