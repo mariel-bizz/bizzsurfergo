@@ -15,6 +15,16 @@ import lambdaLogo from "@/assets/partners/lambda.png";
 import miroLogo from "@/assets/partners/miro.png";
 import bubbleLogo from "@/assets/partners/bubble.png";
 import salesforceLogo from "@/assets/partners/salesforce.png";
+import porterLogo from "@/assets/partners/porter.png";
+import intercomLogo from "@/assets/partners/intercom.png";
+import cloudflareLogo from "@/assets/partners/cloudflare.png";
+import databricksLogo from "@/assets/partners/databricks.png";
+import mongodbLogo from "@/assets/partners/mongodb.png";
+import datadogLogo from "@/assets/partners/datadog.png";
+import loomLogo from "@/assets/partners/loom.png";
+import deelLogo from "@/assets/partners/deel.png";
+import confluentLogo from "@/assets/partners/confluent.png";
+import auth0Logo from "@/assets/partners/auth0.png";
 
 const partners: { name: string; src: string }[] = [
   { name: "Apollo.io", src: apolloLogo },
@@ -27,6 +37,16 @@ const partners: { name: string; src: string }[] = [
   { name: "Miro", src: miroLogo },
   { name: "Bubble", src: bubbleLogo },
   { name: "Salesforce", src: salesforceLogo },
+  { name: "Porter", src: porterLogo },
+  { name: "Intercom", src: intercomLogo },
+  { name: "Cloudflare", src: cloudflareLogo },
+  { name: "Databricks", src: databricksLogo },
+  { name: "MongoDB", src: mongodbLogo },
+  { name: "Datadog", src: datadogLogo },
+  { name: "Loom", src: loomLogo },
+  { name: "Deel", src: deelLogo },
+  { name: "Confluent", src: confluentLogo },
+  { name: "Auth0", src: auth0Logo },
 ];
 
 const resources = [
