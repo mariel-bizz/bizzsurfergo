@@ -231,23 +231,23 @@ const poweredBy: { name: string; src: string }[] = [
 export function PoweredBySection() {
   return (
     <section className="px-5">
-      <div className="rounded-2xl border border-border p-5 bg-transparent">
-        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">
+      <div className="rounded-xl border border-border p-3 bg-transparent">
+        <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold text-center">
           BizzSurfer GO! is powered by
         </p>
-        <div className="mt-4 grid grid-cols-1 gap-4 items-center sm:grid-cols-2 md:grid-cols-3">
+        <div className="mt-2 grid grid-cols-3 gap-2 items-center">
           {poweredBy.map((p) => (
             <div
               key={p.name}
               title={p.name}
-              className="flex h-20 sm:h-16 items-center justify-center bg-transparent px-2"
+              className="flex h-10 items-center justify-center bg-transparent px-1"
             >
               <img
                 src={p.src}
                 alt={`${p.name} logo`}
                 loading="lazy"
                 decoding="async"
-                className="max-h-16 sm:max-h-12 max-w-full object-contain"
+                className="max-h-8 max-w-full object-contain opacity-90"
               />
             </div>
           ))}
