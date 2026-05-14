@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles } from "lucide-react";
+import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles, BookOpen, Video, Music2, Youtube } from "lucide-react";
 
 export const Route = createFileRoute("/insights/")({
   head: () => {
@@ -118,6 +118,51 @@ function InsightsPage() {
           Playbooks, frameworks and insights from BizzSurfer.
         </p>
       </header>
+
+      <nav aria-label="Insights sections" className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <a
+          href="#blog-articles"
+          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <BookOpen className="h-4 w-4" />
+          </span>
+          <span className="text-sm font-bold text-foreground group-hover:text-primary">Blog Articles</span>
+        </a>
+        <Link
+          to="/events"
+          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0a66c2]/10 text-[#0a66c2]">
+            <Video className="h-4 w-4" />
+          </span>
+          <span className="text-sm font-bold text-foreground group-hover:text-primary">Rewatch webinars</span>
+        </Link>
+        <a
+          href="https://open.spotify.com/show/2nLBP8ZjbqBeYvkfzNYYnJ"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1db954]/10 text-[#1db954]">
+            <Music2 className="h-4 w-4" />
+          </span>
+          <span className="text-sm font-bold text-foreground group-hover:text-primary">Spotify</span>
+        </a>
+        <a
+          href="https://www.youtube.com/@BizzSurfer"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ff0000]/10 text-[#ff0000]">
+            <Youtube className="h-4 w-4" />
+          </span>
+          <span className="text-sm font-bold text-foreground group-hover:text-primary">YouTube</span>
+        </a>
+      </nav>
+
+      <h2 id="blog-articles" className="mb-3 scroll-mt-20 text-lg font-bold text-foreground">Blog Articles</h2>
 
       <div className="mb-4 space-y-3">
         <div className="relative">
