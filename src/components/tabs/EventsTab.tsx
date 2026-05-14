@@ -123,7 +123,51 @@ export function EventsTab() {
       </div>
 
 
-      {events.map((e) => {
+      {/* View toggle: Upcoming / Past */}
+      <div className="inline-flex w-full rounded-full border border-border bg-muted p-1">
+        {(["upcoming", "past"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-full transition-colors ${
+              view === v ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            {v === "upcoming" ? "Upcoming" : "Past"}
+          </button>
+        ))}
+      </div>
+
+      {/* Past view: platform filter */}
+      {view === "past" && (
+        <div className="flex flex-wrap gap-2">
+          {([
+            { k: "all", label: "All", icon: null },
+            { k: "linkedin", label: "LinkedIn", icon: Linkedin },
+            { k: "youtube", label: "YouTube", icon: Youtube },
+            { k: "spotify", label: "Spotify", icon: Music2 },
+          ] as const).map((p) => {
+            const active = platform === p.k;
+            const Icon = p.icon;
+            return (
+              <button
+                key={p.k}
+                onClick={() => setPlatform(p.k)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border transition-colors ${
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {view === "upcoming" && events.map((e) => {
         const isRsvped = rsvpedIds.includes(e.id);
         return (
           <article key={e.id} className="rounded-3xl bg-card border border-border shadow-card overflow-hidden">
