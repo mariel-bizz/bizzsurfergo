@@ -223,6 +223,7 @@ type CartItemInput = {
   listingTitle: string;
   amountInCents: number;
   currency: "eur";
+  interval?: "month" | null;
 };
 
 export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
