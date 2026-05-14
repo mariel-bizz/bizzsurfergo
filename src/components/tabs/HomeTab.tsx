@@ -97,7 +97,7 @@ export function HomeTab() {
       {pastEvents[0] && (
         <section className="px-5">
           <div className="flex items-center gap-3 mb-3">
-            <h2 className="flex items-center gap-3 text-[#ff6f00] font-bold">Last event — rewatch</h2>
+            <h2 className="flex items-center gap-3 text-[#ff6f00] font-bold">Rewatch our Last Event! </h2>
             <span className="h-px flex-1 bg-border" />
           </div>
           <a
