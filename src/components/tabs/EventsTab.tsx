@@ -281,9 +281,13 @@ export function EventsTab() {
               {filteredPast.map((e) => (
             <article
               key={e.id}
-              className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95 py-[6px]"
+              className="rounded-2xl bg-card border border-border shadow-card overflow-hidden opacity-95"
             >
-              <div className="flex items-center gap-2 flex-wrap mb-2">
+              {pastImages[e.id] && (
+                <img src={pastImages[e.id]} alt={e.title} className="w-full aspect-[4/3] object-cover" />
+              )}
+              <div className="p-4 py-[6px]">
+              <div className="flex items-center gap-2 flex-wrap mb-2 mt-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {e.badge}
                 </span>
