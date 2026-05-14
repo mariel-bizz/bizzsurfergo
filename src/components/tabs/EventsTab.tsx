@@ -205,7 +205,7 @@ export function EventsTab() {
 
       <section className="pt-4">
         <div className="flex items-center gap-3 mb-3">
-          <h2 className="text-xl font-bold text-foreground">Past Events</h2>
+          <h2 className="flex items-center gap-3 mb-3 text-[#ff6f00]">Past Events</h2>
           <span className="h-px flex-1 bg-border" />
         </div>
         <p className="text-sm text-muted-foreground mb-4">
