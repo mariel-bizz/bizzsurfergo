@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 
 import {
-  BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, MessageCircle, Music, Plug, Twitter, Youtube,
+  BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
 
 import apolloLogo from "@/assets/partners/apollo.png";
