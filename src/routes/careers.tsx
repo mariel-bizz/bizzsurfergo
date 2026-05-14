@@ -277,10 +277,25 @@ function CareersPage() {
         <div
           role="status"
           aria-live="polite"
-          className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground flex items-center gap-2"
+          className="mt-6 rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground"
         >
-          <RefreshCw className="w-4 h-4 animate-spin" />
-          Loading our jobs widget…
+          <div className="flex items-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin text-primary" />
+            <span>
+              {reloadKey > 0 ? "Retrying jobs widget…" : "Loading our jobs widget…"}
+            </span>
+            <span className="ml-auto inline-flex items-center gap-1 rounded-md bg-background px-2 py-0.5 text-xs font-mono tabular-nums text-foreground">
+              {loadCountdown}s
+            </span>
+          </div>
+          <div className="mt-3 h-1 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+              style={{
+                width: `${Math.max(0, Math.min(100, ((LOAD_TIMEOUT_S - loadCountdown) / LOAD_TIMEOUT_S) * 100))}%`,
+              }}
+            />
+          </div>
         </div>
       )}
 
@@ -304,6 +319,40 @@ function CareersPage() {
                   provider can't be embedded here. Try again, or browse open
                   roles on our careers site.
                 </p>
+
+                {!redirectCancelled && (
+                  <div className="mt-4 rounded-lg border border-border bg-background p-3">
+                    <div className="flex items-center gap-2 text-sm text-foreground">
+                      <RefreshCw className="w-4 h-4 animate-spin text-primary" />
+                      <span>
+                        Redirecting you to our podcast in{" "}
+                        <span className="font-mono tabular-nums font-semibold text-primary">
+                          {redirectCountdown}s
+                        </span>
+                        …
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setRedirectCancelled(true);
+                          trackEvent("careers_redirect_cancelled", {});
+                        }}
+                        className="ml-auto text-xs font-medium text-muted-foreground hover:text-foreground underline"
+                      >
+                        Stay here
+                      </button>
+                    </div>
+                    <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+                        style={{
+                          width: `${Math.max(0, Math.min(100, ((REDIRECT_TIMEOUT_S - redirectCountdown) / REDIRECT_TIMEOUT_S) * 100))}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Button size="sm" onClick={reload} className="gap-2">
                     <RefreshCw className="w-4 h-4" /> Retry
