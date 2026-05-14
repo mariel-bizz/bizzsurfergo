@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X, Video } from "lucide-react";
+import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X, Video, Youtube, Music2 } from "lucide-react";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
@@ -36,6 +36,19 @@ export function EventsTab() {
   const [authed, setAuthed] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
+  const [view, setView] = useState<"upcoming" | "past">("upcoming");
+  const [platform, setPlatform] = useState<"all" | "linkedin" | "youtube" | "spotify">("all");
+
+  const detectPlatform = (href: string): "linkedin" | "youtube" | "spotify" | "other" => {
+    if (/linkedin\.com/.test(href)) return "linkedin";
+    if (/youtube\.com|youtu\.be/.test(href)) return "youtube";
+    if (/spotify\.com/.test(href)) return "spotify";
+    return "other";
+  };
+
+  const filteredPast = pastEvents.filter((e) =>
+    platform === "all" ? true : detectPlatform(e.href ?? "") === platform
+  );
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -78,7 +91,8 @@ export function EventsTab() {
       const ev = eventsData.find((x) => x.id === id);
       if (ev) setConfirmation({ event: ev, meetLink: meet });
       toast.success("You're in! +25 XP");
-      if (href !== "#") window.open(href, "_blank");
+      const target = meet || (href !== "#" ? href : null);
+      if (target) window.open(target, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
     }
@@ -109,7 +123,51 @@ export function EventsTab() {
       </div>
 
 
-      {events.map((e) => {
+      {/* View toggle: Upcoming / Past */}
+      <div className="inline-flex w-full rounded-full border border-border bg-muted p-1">
+        {(["upcoming", "past"] as const).map((v) => (
+          <button
+            key={v}
+            onClick={() => setView(v)}
+            className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-full transition-colors ${
+              view === v ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
+            }`}
+          >
+            {v === "upcoming" ? "Upcoming" : "Past"}
+          </button>
+        ))}
+      </div>
+
+      {/* Past view: platform filter */}
+      {view === "past" && (
+        <div className="flex flex-wrap gap-2">
+          {([
+            { k: "all", label: "All", icon: null },
+            { k: "linkedin", label: "LinkedIn", icon: Linkedin },
+            { k: "youtube", label: "YouTube", icon: Youtube },
+            { k: "spotify", label: "Spotify", icon: Music2 },
+          ] as const).map((p) => {
+            const active = platform === p.k;
+            const Icon = p.icon;
+            return (
+              <button
+                key={p.k}
+                onClick={() => setPlatform(p.k)}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold border transition-colors ${
+                  active
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-muted-foreground border-border hover:text-foreground"
+                }`}
+              >
+                {Icon && <Icon className="w-3.5 h-3.5" />}
+                {p.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {view === "upcoming" && events.map((e) => {
         const isRsvped = rsvpedIds.includes(e.id);
         return (
           <article key={e.id} className="rounded-3xl bg-card border border-border shadow-card overflow-hidden">
@@ -203,16 +261,22 @@ export function EventsTab() {
         );
       })}
 
-      <section className="pt-4">
-        <div className="flex items-center gap-3 mb-3">
-          <h2 className="flex items-center gap-3 mb-3 text-[#ff6f00]">Past Events</h2>
-          <span className="h-px flex-1 bg-border" />
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Replays and recaps from previous BizzSurfer Go! sessions.
-        </p>
-        <div className="space-y-3">
-          {pastEvents.map((e) => (
+      {view === "past" && (
+        <section className="pt-2">
+          <div className="flex items-center gap-3 mb-3">
+            <h2 className="flex items-center gap-3 text-[#ff6f00] font-bold">Past Events</h2>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Replays and recaps from previous BizzSurfer Go! sessions.
+          </p>
+          {filteredPast.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+              No replays on this platform yet — check back soon.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredPast.map((e) => (
             <article
               key={e.id}
               className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95 py-[6px]"
@@ -278,9 +342,11 @@ export function EventsTab() {
                 </a>
               )}
             </article>
-          ))}
-        </div>
-      </section>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <RsvpConfirmationDialog
         open={!!confirmation}
