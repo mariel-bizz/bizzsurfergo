@@ -113,6 +113,33 @@ export const Route = createFileRoute("/lovable/email/transactional/send")({
           )
         }
 
+        // Recipient authorization: prevent abuse of the transactional send endpoint
+        // to spam arbitrary addresses. Allowed recipients:
+        //   1. A fixed `template.to` address (developer-controlled at scaffold time).
+        //   2. The authenticated caller's own verified email.
+        //   3. Any address, when the caller has the `admin` role.
+        if (!template.to) {
+          const callerEmail = (user.email ?? '').toLowerCase()
+          const requestedEmail = effectiveRecipient.toLowerCase()
+          if (!callerEmail || callerEmail !== requestedEmail) {
+            const { data: isAdmin, error: roleError } = await supabase.rpc('has_role', {
+              _user_id: user.id,
+              _role: 'admin',
+            })
+            if (roleError || !isAdmin) {
+              console.warn('Transactional send blocked: recipient mismatch', {
+                templateName,
+                caller_redacted: redactEmail(callerEmail),
+                recipient_redacted: redactEmail(requestedEmail),
+              })
+              return Response.json(
+                { error: 'Recipient must match the authenticated user' },
+                { status: 403 }
+              )
+            }
+          }
+        }
+
         // 2. Check suppression list (fail-closed: if we can't verify, don't send)
         const { data: suppressed, error: suppressionError } = await supabase
           .from('suppressed_emails')
