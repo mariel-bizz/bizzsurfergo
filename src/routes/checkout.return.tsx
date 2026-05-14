@@ -43,6 +43,12 @@ function CheckoutReturn() {
     enabled: !!session_id,
     retry: 2,
     retryDelay: 1500,
+    // Poll until the webhook has written the orders row, so the receipt
+    // page can show a confirmed status (and not just "Stripe says paid").
+    refetchInterval: (q) =>
+      (q.state.data as { webhookConfirmed?: boolean } | undefined)?.webhookConfirmed
+        ? false
+        : 2500,
   });
 
   // After a successful purchase, remove the item(s) from the local cart.
