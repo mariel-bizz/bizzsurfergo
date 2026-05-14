@@ -21,9 +21,22 @@ export const Route = createFileRoute("/insights/")({
       breadcrumbName: "Insights",
     });
     // Canonical points to marketing site so SEO/views consolidate on www.bizzsurfer.com.
+    const blogLd = {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "@id": "https://go.bizzsurfer.ai/insights#blog",
+      name: "BizzSurfer Insights",
+      description: "Playbooks, frameworks and insights for transformation leaders exploring Agentic AI.",
+      url: "https://go.bizzsurfer.ai/insights",
+      publisher: { "@type": "Organization", name: "BizzSurfer", url: "https://go.bizzsurfer.ai" },
+    };
     return {
       ...base,
       links: [{ rel: "canonical", href: "https://www.bizzsurfer.com/insights" }],
+      scripts: [
+        ...(base.scripts ?? []),
+        { type: "application/ld+json", children: JSON.stringify(blogLd) },
+      ],
     };
   },
   component: InsightsPage,
