@@ -151,12 +151,12 @@ export function HomeTab() {
             <AlertTriangle className="w-3 h-3" /> Reality check
           </span>
           <h2 className="mt-3 text-2xl font-bold text-foreground leading-tight">
-            The pain you <span className="italic text-primary relative">
+            Your pain points you <span className="italic text-primary relative">
               feel
               <svg className="absolute left-0 -bottom-1 w-full" height="6" viewBox="0 0 120 6" preserveAspectRatio="none" aria-hidden="true">
                 <path d="M2 4 Q 30 0, 60 3 T 118 2" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
               </svg>
-            </span> every quarter
+            </span> !
           </h2>
           <p className="mt-2 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
         </div>
