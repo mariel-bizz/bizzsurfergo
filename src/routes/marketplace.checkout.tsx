@@ -90,6 +90,10 @@ function MarketplaceCheckoutPage() {
             from each listing.
           </p>
         )}
+        <p className="text-[11px] text-muted-foreground pt-2 border-t border-border">
+          Any applicable VAT or sales tax is calculated and shown in the
+          payment step below before you confirm.
+        </p>
       </div>
 
       <MarketplaceCartCheckout listings={payable} />
