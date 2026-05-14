@@ -23,7 +23,7 @@ function MarketplaceCheckoutPage() {
 
   const payable = listings.filter((l) => {
     const p = parseListingPrice(l.price);
-    return p && !p.interval;
+    return p !== null;
   });
   const skipped = listings.filter((l) => !payable.includes(l));
 
