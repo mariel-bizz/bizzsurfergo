@@ -21,6 +21,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
 import { Route as ChatRouteImport } from './routes/chat'
+import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
@@ -105,6 +106,11 @@ const EventsRoute = EventsRouteImport.update({
 const ChatRoute = ChatRouteImport.update({
   id: '/chat',
   path: '/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CareersRoute = CareersRouteImport.update({
+  id: '/careers',
+  path: '/careers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
@@ -243,6 +249,7 @@ const ApiPublicChatEmailSummaryRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/atom.xml': typeof AtomDotxmlRoute
+  '/careers': typeof CareersRoute
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
@@ -282,6 +289,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/atom.xml': typeof AtomDotxmlRoute
+  '/careers': typeof CareersRoute
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
@@ -322,6 +330,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/atom.xml': typeof AtomDotxmlRoute
+  '/careers': typeof CareersRoute
   '/chat': typeof ChatRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
@@ -363,6 +372,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/atom.xml'
+    | '/careers'
     | '/chat'
     | '/events'
     | '/feed.xml'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/atom.xml'
+    | '/careers'
     | '/chat'
     | '/events'
     | '/feed.xml'
@@ -441,6 +452,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/atom.xml'
+    | '/careers'
     | '/chat'
     | '/events'
     | '/feed.xml'
@@ -481,6 +493,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AtomDotxmlRoute: typeof AtomDotxmlRoute
+  CareersRoute: typeof CareersRoute
   ChatRoute: typeof ChatRoute
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
@@ -600,6 +613,13 @@ declare module '@tanstack/react-router' {
       path: '/chat'
       fullPath: '/chat'
       preLoaderRoute: typeof ChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/careers': {
+      id: '/careers'
+      path: '/careers'
+      fullPath: '/careers'
+      preLoaderRoute: typeof CareersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/atom.xml': {
@@ -797,6 +817,7 @@ const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtomDotxmlRoute: AtomDotxmlRoute,
+  CareersRoute: CareersRoute,
   ChatRoute: ChatRoute,
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
