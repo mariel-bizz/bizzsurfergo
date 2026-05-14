@@ -44,6 +44,7 @@ import {
   updateTeamMember,
 } from "@/lib/profile.functions";
 import { getAiSettings as getAiSettingsFn, saveAiSettings as saveAiSettingsFn } from "@/lib/ai-settings.functions";
+import { ConnectApisSection } from "@/components/ResourcesSection";
 
 const TOPIC_OPTIONS = [
   "Agentic AI",
