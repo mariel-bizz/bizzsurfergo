@@ -23,7 +23,7 @@ function MarketplaceCheckoutPage() {
 
   const payable = listings.filter((l) => {
     const p = parseListingPrice(l.price);
-    return p && !p.interval;
+    return p !== null;
   });
   const skipped = listings.filter((l) => !payable.includes(l));
 
@@ -85,7 +85,7 @@ function MarketplaceCheckoutPage() {
         ))}
         {skipped.length > 0 && (
           <p className="text-[11px] text-muted-foreground pt-2 border-t border-border">
-            Skipped (quote-only or subscription):{" "}
+            Skipped (quote-only or free):{" "}
             {skipped.map((s) => s.title).join(", ")}. Check out individually
             from each listing.
           </p>

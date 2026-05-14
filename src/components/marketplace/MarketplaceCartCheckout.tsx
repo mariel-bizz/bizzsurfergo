@@ -19,12 +19,13 @@ export function MarketplaceCartCheckout({ listings, returnUrl }: Props) {
     const items = listings
       .map((l) => {
         const parsed = parseListingPrice(l.price);
-        if (!parsed || parsed.interval) return null;
+        if (!parsed) return null;
         return {
           listingId: l.id,
           listingTitle: l.title,
           amountInCents: parsed.amountInCents,
           currency: parsed.currency,
+          interval: parsed.interval,
         };
       })
       .filter((x): x is NonNullable<typeof x> => !!x);
