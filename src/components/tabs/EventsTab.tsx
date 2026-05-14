@@ -241,25 +241,30 @@ export function EventsTab() {
                 const m = e.href?.match(/linkedin\.com\/events\/(\d+)/);
                 if (!m) return null;
                 return (
-                  <div className="mt-3 space-y-2">
-                    <div className="rounded-xl overflow-hidden border border-border bg-muted">
-                      <iframe
-                        src={`https://www.linkedin.com/embed/events/${m[1]}`}
-                        title={`LinkedIn event preview — ${e.title}`}
-                        loading="lazy"
-                        className="w-full h-[420px] block"
-                        allow="encrypted-media"
-                      />
+                  <a
+                    href={e.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="mt-3 group block rounded-xl overflow-hidden border border-border bg-gradient-to-br from-[#0a66c2]/10 via-card to-card hover:border-[#0a66c2]/50 transition-colors"
+                  >
+                    <div className="aspect-[1.91/1] bg-[#0a66c2] relative flex items-center justify-center overflow-hidden">
+                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
+                      <Linkedin className="w-14 h-14 text-white relative" strokeWidth={1.5} />
+                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Replay
+                      </span>
                     </div>
-                    <a
-                      href={e.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
-                    >
-                      <Linkedin className="w-3.5 h-3.5" /> Rewatch on LinkedIn →
-                    </a>
-                  </div>
+                    <div className="p-3 flex items-center gap-3">
+                      <div className="min-w-0 flex-1">
+                        <p className="text-[11px] font-semibold uppercase tracking-wider text-[#0a66c2]">LinkedIn Event</p>
+                        <p className="text-sm font-bold text-foreground truncate">{e.title}</p>
+                        <p className="text-xs text-muted-foreground truncate">linkedin.com/events</p>
+                      </div>
+                      <span className="text-xs font-semibold text-[#0a66c2] group-hover:underline shrink-0">
+                        Rewatch →
+                      </span>
+                    </div>
+                  </a>
                 );
               })()}
               {e.href && e.href !== "#" && !/linkedin\.com\/events/.test(e.href) && (
