@@ -342,9 +342,11 @@ export function EventsTab() {
                 </a>
               )}
             </article>
-          ))}
-        </div>
-      </section>
+              ))}
+            </div>
+          )}
+        </section>
+      )}
 
       <RsvpConfirmationDialog
         open={!!confirmation}
