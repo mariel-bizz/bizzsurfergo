@@ -293,6 +293,7 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
       });
 
       const listingIds = data.items.map((i) => i.listingId).join(",");
+      const hasRecurring = data.items.some((it) => it.interval === "month");
       const session = await stripe.checkout.sessions.create({
         line_items: data.items.map((it) => ({
           price_data: {
@@ -302,10 +303,11 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
               metadata: { listingId: it.listingId },
             },
             unit_amount: it.amountInCents,
+            ...(it.interval === "month" && { recurring: { interval: "month" } }),
           },
           quantity: 1,
         })),
-        mode: "payment",
+        mode: hasRecurring ? "subscription" : "payment",
         ui_mode: "embedded_page",
         return_url: data.returnUrl,
         automatic_tax: { enabled: true },
@@ -317,6 +319,11 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
           cartCheckout: "1",
           expectedSubtotalCents: String(computedSubtotal),
         },
+        ...(hasRecurring && {
+          subscription_data: {
+            metadata: { userId, listingIds, cartCheckout: "1" },
+          },
+        }),
       });
 
       console.log(
