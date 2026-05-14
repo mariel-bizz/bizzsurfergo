@@ -203,6 +203,55 @@ export function EventsTab() {
         );
       })}
 
+      <section className="pt-4">
+        <div className="flex items-center gap-3 mb-3">
+          <h2 className="text-xl font-bold text-foreground">Past Events</h2>
+          <span className="h-px flex-1 bg-border" />
+        </div>
+        <p className="text-sm text-muted-foreground mb-4">
+          Replays and recaps from previous BizzSurfer Go! sessions.
+        </p>
+        <div className="space-y-3">
+          {pastEvents.map((e) => (
+            <article
+              key={e.id}
+              className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95"
+            >
+              <div className="flex items-center gap-2 flex-wrap mb-2">
+                <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  {e.badge}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                  Past
+                </span>
+              </div>
+              <h3 className="text-base font-bold text-foreground leading-tight">{e.title}</h3>
+              <p className="text-sm text-muted-foreground mt-1">{e.subtitle}</p>
+              <div className="grid grid-cols-2 gap-2 pt-2">
+                <Meta icon={Calendar} label={e.date} />
+                <Meta icon={Clock} label={e.time} />
+                <Meta icon={MapPin} label={e.location} />
+                <Meta icon={Users} label={e.audience} />
+              </div>
+              <div className="flex items-center gap-2 pt-2 mt-2 border-t border-border">
+                <Mic className="w-4 h-4 text-primary" />
+                <p className="text-xs font-medium text-foreground">{e.speaker}</p>
+              </div>
+              {e.href && e.href !== "#" && (
+                <a
+                  href={e.href}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                >
+                  {e.cta} →
+                </a>
+              )}
+            </article>
+          ))}
+        </div>
+      </section>
+
       <RsvpConfirmationDialog
         open={!!confirmation}
         onOpenChange={(o) => !o && setConfirmation(null)}
