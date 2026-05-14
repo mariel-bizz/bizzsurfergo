@@ -99,11 +99,14 @@ export function ROICalculator() {
 
   return (
     <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
-      <div className="flex items-center gap-2 mb-4">
-        <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
+      <div className="flex items-start gap-2 mb-4">
+        <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft shrink-0">
           <Calculator className="w-4 h-4 text-primary-foreground" />
         </div>
-        <h3 className="text-base font-bold text-foreground">ROI Calculator</h3>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-bold text-foreground leading-tight">Business Transformation ROI Calculator</h3>
+          <p className="text-xs text-muted-foreground mt-1 leading-snug">Calculate the impact of not implementing Agentic AI in your organisation.</p>
+        </div>
       </div>
 
       <TooltipProvider delayDuration={150}>
