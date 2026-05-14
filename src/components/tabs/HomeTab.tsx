@@ -138,7 +138,10 @@ export function HomeTab() {
         <ROICalculator />
       </section>
 
-      {/* Resources, partners, socials, integrations */}
+      {/* Social media — under ROI */}
+      <FollowSection />
+
+      {/* Resources, partners, integrations */}
       <ResourcesSection />
 
       {/* FAQs */}
@@ -177,7 +180,7 @@ export function HomeTab() {
         </div>
       </section>
 
-      <FollowSection />
+      {/* FollowSection moved up under ROI */}
 
       <TrustedPartnersSection />
 
