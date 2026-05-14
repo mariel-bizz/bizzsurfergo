@@ -15,7 +15,7 @@ import event2 from "@/assets/event-chro-playbook.png";
 import event3 from "@/assets/event-boards-csuite.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { events as eventsData } from "@/lib/events-data";
+import { events as eventsData, pastEvents } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
 import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
 import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDialog";
