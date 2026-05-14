@@ -1,95 +1,32 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@tanstack/react-router";
 import { toast } from "sonner";
 import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, MessageCircle, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
 
-function PartnerLogo({ name, slug }: { name: string; slug?: string }) {
-  const [status, setStatus] = useState<"loading" | "loaded" | "error">(
-    slug ? "loading" : "error",
-  );
-  const showImage = slug && status !== "error";
-  return (
-    <div
-      title={name}
-      className="relative flex h-14 items-center justify-center rounded-xl border border-border bg-background px-2"
-    >
-      {status === "loading" && (
-        <Skeleton className="absolute inset-1 rounded-lg" />
-      )}
-      {showImage ? (
-        <img
-          src={`https://cdn.simpleicons.org/${slug}`}
-          alt={`${name} logo`}
-          width={28}
-          height={28}
-          loading="lazy"
-          decoding="async"
-          // @ts-expect-error fetchpriority is a valid HTML hint not yet typed
-          fetchpriority="low"
-          onLoad={() => setStatus("loaded")}
-          onError={() => setStatus("error")}
-          className={`max-h-7 max-w-full object-contain opacity-80 transition-opacity duration-200 ${
-            status === "loaded" ? "opacity-80" : "opacity-0"
-          }`}
-        />
-      ) : (
-        !slug && (
-          <span className="text-center text-[11px] font-bold text-foreground leading-tight">
-            {name}
-          </span>
-        )
-      )}
-      {slug && status === "error" && (
-        <span className="text-center text-[11px] font-bold text-foreground leading-tight">
-          {name}
-        </span>
-      )}
-    </div>
-  );
-}
+import apolloLogo from "@/assets/partners/apollo.png";
+import hubspotLogo from "@/assets/partners/hubspot.png";
+import devrevLogo from "@/assets/partners/devrev.png";
+import atlassianLogo from "@/assets/partners/atlassian.png";
+import zendeskLogo from "@/assets/partners/zendesk.png";
+import amplitudeLogo from "@/assets/partners/amplitude.png";
+import lambdaLogo from "@/assets/partners/lambda.png";
+import miroLogo from "@/assets/partners/miro.png";
+import bubbleLogo from "@/assets/partners/bubble.png";
+import salesforceLogo from "@/assets/partners/salesforce.png";
 
-
-// Logos served from simple-icons CDN (https://simpleicons.org). Brands without a
-// matching slug fall back to a styled text chip so layout stays consistent.
-const partners: { name: string; slug?: string }[] = [
-  { name: "Notion", slug: "notion" },
-  { name: "Apollo.io" },
-  { name: "Google for Startups", slug: "google" },
-  { name: "Google Maps Cloud Program", slug: "googlemaps" },
-  { name: "NVIDIA", slug: "nvidia" },
-  { name: "GitLab", slug: "gitlab" },
-  { name: "Scaleway", slug: "scaleway" },
-  { name: "HubSpot for Startups", slug: "hubspot" },
-  { name: "MongoDB", slug: "mongodb" },
-  { name: "NVIDIA Inception", slug: "nvidia" },
-  { name: "Miro", slug: "miro" },
-  { name: "Microsoft Azure", slug: "microsoftazure" },
-  { name: "Databricks", slug: "databricks" },
-  { name: "DevRev" },
-  { name: "Datadog", slug: "datadog" },
-  { name: "Nebius" },
-  { name: "Bubble" },
-  { name: "Loom", slug: "loom" },
-  { name: "Atlassian", slug: "atlassian" },
-  { name: "Zendesk", slug: "zendesk" },
-  { name: "Salesforce", slug: "salesforce" },
-  { name: "CircleCI", slug: "circleci" },
-  { name: "Amplitude", slug: "amplitude" },
-  { name: "Lambda", slug: "awslambda" },
-  { name: "Auth0", slug: "auth0" },
-  { name: "AWS", slug: "amazonwebservices" },
-  { name: "QuantPI" },
-  { name: "Perplexity", slug: "perplexity" },
-  { name: "Deel" },
-  { name: "Grafana", slug: "grafana" },
-  { name: "Porter" },
-  { name: "Cloudflare", slug: "cloudflare" },
-  { name: "Confluent" },
-  { name: "Intercom", slug: "intercom" },
+const partners: { name: string; src: string }[] = [
+  { name: "Apollo.io", src: apolloLogo },
+  { name: "HubSpot", src: hubspotLogo },
+  { name: "DevRev", src: devrevLogo },
+  { name: "Atlassian", src: atlassianLogo },
+  { name: "Zendesk", src: zendeskLogo },
+  { name: "Amplitude", src: amplitudeLogo },
+  { name: "Lambda", src: lambdaLogo },
+  { name: "Miro", src: miroLogo },
+  { name: "Bubble", src: bubbleLogo },
+  { name: "Salesforce", src: salesforceLogo },
 ];
 
 const resources = [
@@ -252,11 +189,23 @@ export function FollowSection() {
 export function TrustedPartnersSection() {
   return (
     <section className="px-5">
-      <div className="rounded-2xl bg-card border border-border p-5 shadow-card">
+      <div className="rounded-2xl border border-border p-5 bg-transparent">
         <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
-            <PartnerLogo key={p.name} name={p.name} slug={p.slug} />
+            <div
+              key={p.name}
+              title={p.name}
+              className="flex h-14 items-center justify-center bg-transparent px-2"
+            >
+              <img
+                src={p.src}
+                alt={`${p.name} logo`}
+                loading="lazy"
+                decoding="async"
+                className="max-h-8 max-w-full object-contain"
+              />
+            </div>
           ))}
         </div>
       </div>
