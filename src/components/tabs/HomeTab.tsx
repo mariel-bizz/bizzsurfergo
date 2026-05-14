@@ -96,6 +96,9 @@ export function HomeTab() {
         <ROICalculator />
       </section>
 
+      {/* Powered by — compact, under ROI */}
+      <PoweredBySection />
+
       {/* Pain points */}
       <section className="relative px-5 py-8 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -120,9 +123,6 @@ export function HomeTab() {
 
         <PainTracker items={painPoints} />
       </section>
-
-      {/* Powered by */}
-      <PoweredBySection />
 
       {/* Gamification card */}
       <section className="px-5">
