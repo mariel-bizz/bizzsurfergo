@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { MarketplaceTab } from "@/components/tabs/MarketplaceTab";
 import { pageHead } from "@/lib/page-head";
 
-export const Route = createFileRoute("/marketplace")({
+export const Route = createFileRoute("/marketplace/")({
   head: () =>
     pageHead({
       path: "/marketplace",
