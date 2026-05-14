@@ -66,13 +66,15 @@ const resources = [
   { icon: Briefcase, title: "Careers", desc: "Help us build the agentic future. We're hiring.", href: "/careers", internal: true },
 ];
 
-const socials = [
-  { icon: Globe, label: "bizzsurfer.com", href: "https://bizzsurfer.com" },
-  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer" },
-  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@bizzsurfer" },
-  { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer" },
-  { icon: Music, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly" },
-  { icon: MessageCircle, label: "WhatsApp", href: "https://wa.me/31614630463" },
+type Social = { icon: typeof Globe; label: string; href: string; color: string };
+
+const socials: Social[] = [
+  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer", color: "#0A66C2" },
+  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@bizzsurfer", color: "#FF0000" },
+  { icon: Music, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly", color: "#1DB954" },
+  { icon: Globe, label: "Website", href: "https://bizzsurfer.com", color: "#3B82F6" },
+  { icon: Headphones, label: "Podcast", href: "/podcast", color: "#8B5CF6" },
+  { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer", color: "#1DA1F2" },
 ];
 
 export function ResourcesSection() {
