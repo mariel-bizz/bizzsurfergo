@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
-import { getCheckoutReceipt } from "@/lib/payments.functions";
+import { getCheckoutReceipt, type CheckoutReceipt } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { removeFromCart, clearCart } from "@/lib/marketplace-cart";
 
