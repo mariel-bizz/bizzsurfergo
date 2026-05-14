@@ -8,7 +8,7 @@ import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
-import podcastCover from "@/assets/podcast-cover-mariel-v2.png";
+import podcastCover from "@/assets/podcast-card-v3.png";
 
 const painPoints: PainItem[] = [
   { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
