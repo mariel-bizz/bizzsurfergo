@@ -9,6 +9,14 @@ const SITE_NAME = 'bizzsurfergo'
 const SENDER_DOMAIN = 'notify.bizzsurfer.com'
 const FROM_DOMAIN = 'notify.bizzsurfer.com'
 const TEMPLATE_NAME = 'bizzsurfer-summary'
+const UPGRADE_URL = 'https://bizzsurfergo.lovable.app/pricing'
+
+const ALLOWED_ORIGIN_HOSTS = new Set([
+  'bizzsurfergo.lovable.app',
+  'go.bizzsurfer.ai',
+  'www.bizzsurfer.ai',
+  'bizzsurfer.ai',
+])
 
 const BodySchema = z.object({
   recipientEmail: z.string().email().max(254),
@@ -16,7 +24,6 @@ const BodySchema = z.object({
   modelUsed: z.string().max(120).optional(),
   question: z.string().max(4000).optional(),
   excerpt: z.string().max(4000).optional(),
-  upgradeUrl: z.string().url().max(500).optional(),
 })
 
 function redact(email: string) {
@@ -35,6 +42,21 @@ export const Route = createFileRoute('/api/public/chat/email-summary')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Same-origin check: block cross-site abuse of this public endpoint.
+        const originHeader = request.headers.get('origin') || request.headers.get('referer')
+        if (originHeader) {
+          try {
+            const host = new URL(originHeader).hostname
+            if (!ALLOWED_ORIGIN_HOSTS.has(host) && !host.endsWith('.lovable.app')) {
+              return Response.json({ error: 'Forbidden' }, { status: 403 })
+            }
+          } catch {
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
+          }
+        } else {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
         let parsed
         try {
           parsed = BodySchema.parse(await request.json())
@@ -98,7 +120,7 @@ export const Route = createFileRoute('/api/public/chat/email-summary')({
           modelUsed: parsed.modelUsed ?? 'BizzSurfer Go!',
           question: parsed.question ?? '',
           excerpt: parsed.excerpt ?? '',
-          upgradeUrl: parsed.upgradeUrl ?? 'https://bizzsurfergo.lovable.app/pricing',
+          upgradeUrl: UPGRADE_URL,
         }
         const element = React.createElement(template.component, data)
         const html = await render(element)

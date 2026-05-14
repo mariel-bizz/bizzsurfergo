@@ -431,7 +431,6 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           modelUsed: providerMeta?.name ?? "BizzSurfer Go!",
           question: lastUser,
           excerpt: lastAi.length > 1200 ? lastAi.slice(0, 1200) + "…" : lastAi,
-          upgradeUrl: "https://bizzsurfergo.lovable.app/pricing",
         }),
       });
       const json = await res.json().catch(() => ({}));
