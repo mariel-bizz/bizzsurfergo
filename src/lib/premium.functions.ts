@@ -1,12 +1,16 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import { getStripeEnvironment } from "@/lib/stripe";
+
+function detectEnv(): "sandbox" | "live" {
+  const token = process.env.VITE_PAYMENTS_CLIENT_TOKEN ?? "";
+  return token.startsWith("pk_test_") ? "sandbox" : "live";
+}
 
 export const getPremiumStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context;
-    const env = getStripeEnvironment();
+    const env = detectEnv();
     const { data } = await supabase
       .from("subscriptions")
       .select("status,current_period_end,price_id")
