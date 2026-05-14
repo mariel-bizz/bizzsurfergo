@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResourcesRouteImport } from './routes/resources'
@@ -50,6 +51,11 @@ import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
 import { Route as ApiPublicChatEmailSummaryRouteImport } from './routes/api/public/chat/email-summary'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -275,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
@@ -317,6 +324,7 @@ export interface FileRoutesByTo {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
@@ -360,6 +368,7 @@ export interface FileRoutesById {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
@@ -404,6 +413,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
@@ -446,6 +456,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
@@ -488,6 +499,7 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
@@ -531,6 +543,7 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
@@ -559,6 +572,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -859,6 +879,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
