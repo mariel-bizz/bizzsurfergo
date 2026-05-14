@@ -80,6 +80,9 @@ export function HomeTab() {
         <PainTracker items={painPoints} />
       </section>
 
+      {/* Powered by */}
+      <PoweredBySection />
+
       {/* Gamification card */}
       <section className="px-5">
         <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
@@ -177,9 +180,6 @@ export function HomeTab() {
       <FollowSection />
 
       <TrustedPartnersSection />
-
-      <PoweredBySection />
-
 
       <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {
         game.update((s) => {
