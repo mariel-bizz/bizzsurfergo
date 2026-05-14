@@ -85,7 +85,7 @@ export function HomeTab() {
               <p className="mt-1 text-xs opacity-90 line-clamp-2">
                 With Mariel Schaab, CEO &amp; Founder of BizzSurfer. New episodes weekly.
               </p>
-              <div className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-white/95 group-hover:text-white">
+              <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold">
                 Listen now <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
               </div>
             </div>
