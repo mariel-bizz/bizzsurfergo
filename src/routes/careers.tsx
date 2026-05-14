@@ -145,6 +145,37 @@ function CareersPage() {
     };
   }, [reloadKey]);
 
+  // Loading countdown — ticks while we wait for the widget script
+  useEffect(() => {
+    if (status !== "loading") return;
+    setLoadCountdown(LOAD_TIMEOUT_S);
+    const id = window.setInterval(() => {
+      setLoadCountdown((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    return () => window.clearInterval(id);
+  }, [status, reloadKey]);
+
+  // Auto-redirect countdown after failure → /podcast
+  useEffect(() => {
+    if (status !== "failed" || redirectCancelled) return;
+    setRedirectCountdown(REDIRECT_TIMEOUT_S);
+    trackEvent("careers_redirect_scheduled", {
+      to: "/podcast",
+      seconds: REDIRECT_TIMEOUT_S,
+    });
+    const tick = window.setInterval(() => {
+      setRedirectCountdown((s) => (s > 0 ? s - 1 : 0));
+    }, 1000);
+    const go = window.setTimeout(() => {
+      trackEvent("careers_redirected", { to: "/podcast" });
+      navigate({ to: "/podcast" });
+    }, REDIRECT_TIMEOUT_S * 1000);
+    return () => {
+      window.clearInterval(tick);
+      window.clearTimeout(go);
+    };
+  }, [status, redirectCancelled, navigate]);
+
   const trackOutbound = useCallback(
     (label: string, url: string) =>
       trackEvent("careers_outbound_click", { label, url, destination: "teamtailor" }),
