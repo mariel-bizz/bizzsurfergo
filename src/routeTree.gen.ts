@@ -135,14 +135,14 @@ const InsightsIndexRoute = InsightsIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceCheckoutRoute = MarketplaceCheckoutRouteImport.update({
-  id: '/checkout',
-  path: '/checkout',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/checkout',
+  path: '/marketplace/checkout',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
-  id: '/$listingId',
-  path: '/$listingId',
-  getParentRoute: () => MarketplaceRoute,
+  id: '/marketplace/$listingId',
+  path: '/marketplace/$listingId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const JoinTeamOwnerIdRoute = JoinTeamOwnerIdRouteImport.update({
   id: '/join-team/$ownerId',
@@ -528,6 +528,8 @@ export interface RootRouteChildren {
   InsightsSlugRoute: typeof InsightsSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
   JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
+  MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
+  MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
@@ -665,17 +667,17 @@ declare module '@tanstack/react-router' {
     }
     '/marketplace/checkout': {
       id: '/marketplace/checkout'
-      path: '/checkout'
+      path: '/marketplace/checkout'
       fullPath: '/marketplace/checkout'
       preLoaderRoute: typeof MarketplaceCheckoutRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/marketplace/$listingId': {
       id: '/marketplace/$listingId'
-      path: '/$listingId'
+      path: '/marketplace/$listingId'
       fullPath: '/marketplace/$listingId'
       preLoaderRoute: typeof MarketplaceListingIdRouteImport
-      parentRoute: typeof MarketplaceRoute
+      parentRoute: typeof rootRouteImport
     }
     '/join-team/$ownerId': {
       id: '/join-team/$ownerId'
@@ -846,6 +848,8 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsSlugRoute: InsightsSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
   JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
+  MarketplaceListingIdRoute: MarketplaceListingIdRoute,
+  MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
@@ -862,13 +866,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
