@@ -469,6 +469,28 @@ function SignedInProfile() {
         </CardContent>
       </Card>
 
+      {/* Integrations */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <LinkIcon className="w-4 h-4 text-primary" /> Integrations
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Connect ERP, CRM, HRIS, BI and SaaS tools so agents can orchestrate across your stack.
+            Available on Premium plans.
+          </p>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => navigate({ to: "/integrations" })}
+          >
+            Manage integrations
+          </Button>
+        </CardContent>
+      </Card>
+
       <Button className="w-full" onClick={onSave} disabled={saving}>
         <Save className="w-4 h-4 mr-2" />
         {saving ? "Saving…" : "Save preferences"}
