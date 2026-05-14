@@ -16,7 +16,6 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PodcastRouteImport } from './routes/podcast'
-import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
@@ -25,6 +24,7 @@ import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
 import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
@@ -84,11 +84,6 @@ const PodcastRoute = PodcastRouteImport.update({
   path: '/podcast',
   getParentRoute: () => rootRouteImport,
 } as any)
-const MarketplaceRoute = MarketplaceRouteImport.update({
-  id: '/marketplace',
-  path: '/marketplace',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -127,6 +122,11 @@ const AtomDotxmlRoute = AtomDotxmlRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceIndexRoute = MarketplaceIndexRouteImport.update({
+  id: '/marketplace/',
+  path: '/marketplace/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsIndexRoute = InsightsIndexRouteImport.update({
@@ -261,7 +261,6 @@ export interface FileRoutesByFullPath {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -282,6 +281,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
@@ -302,7 +302,6 @@ export interface FileRoutesByTo {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -323,6 +322,7 @@ export interface FileRoutesByTo {
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights': typeof InsightsIndexRoute
+  '/marketplace': typeof MarketplaceIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
@@ -344,7 +344,6 @@ export interface FileRoutesById {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
-  '/marketplace': typeof MarketplaceRouteWithChildren
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -365,6 +364,7 @@ export interface FileRoutesById {
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
+  '/marketplace/': typeof MarketplaceIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
@@ -387,7 +387,6 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
-    | '/marketplace'
     | '/podcast'
     | '/pricing'
     | '/profile'
@@ -408,6 +407,7 @@ export interface FileRouteTypes {
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
     | '/insights/'
+    | '/marketplace/'
     | '/lovable/email/suppression'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
@@ -428,7 +428,6 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
-    | '/marketplace'
     | '/podcast'
     | '/pricing'
     | '/profile'
@@ -449,6 +448,7 @@ export interface FileRouteTypes {
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
     | '/insights'
+    | '/marketplace'
     | '/lovable/email/suppression'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
@@ -469,7 +469,6 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
-    | '/marketplace'
     | '/podcast'
     | '/pricing'
     | '/profile'
@@ -490,6 +489,7 @@ export interface FileRouteTypes {
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
     | '/insights/'
+    | '/marketplace/'
     | '/lovable/email/suppression'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
@@ -511,7 +511,6 @@ export interface RootRouteChildren {
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
-  MarketplaceRoute: typeof MarketplaceRouteWithChildren
   PodcastRoute: typeof PodcastRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
@@ -530,6 +529,7 @@ export interface RootRouteChildren {
   InviteTokenRoute: typeof InviteTokenRoute
   JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
+  MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
@@ -593,13 +593,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PodcastRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/marketplace': {
-      id: '/marketplace'
-      path: '/marketplace'
-      fullPath: '/marketplace'
-      preLoaderRoute: typeof MarketplaceRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -654,6 +647,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/': {
+      id: '/marketplace/'
+      path: '/marketplace'
+      fullPath: '/marketplace/'
+      preLoaderRoute: typeof MarketplaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/insights/': {
@@ -820,20 +820,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface MarketplaceRouteChildren {
-  MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
-  MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
-}
-
-const MarketplaceRouteChildren: MarketplaceRouteChildren = {
-  MarketplaceListingIdRoute: MarketplaceListingIdRoute,
-  MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
-}
-
-const MarketplaceRouteWithChildren = MarketplaceRoute._addFileChildren(
-  MarketplaceRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AtomDotxmlRoute: AtomDotxmlRoute,
@@ -843,7 +829,6 @@ const rootRouteChildren: RootRouteChildren = {
   FeedDotxmlRoute: FeedDotxmlRoute,
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
-  MarketplaceRoute: MarketplaceRouteWithChildren,
   PodcastRoute: PodcastRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,
@@ -862,6 +847,7 @@ const rootRouteChildren: RootRouteChildren = {
   InviteTokenRoute: InviteTokenRoute,
   JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
   InsightsIndexRoute: InsightsIndexRoute,
+  MarketplaceIndexRoute: MarketplaceIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
@@ -876,3 +862,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
