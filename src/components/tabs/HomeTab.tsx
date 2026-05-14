@@ -1,13 +1,14 @@
 import { useGame } from "../AppShell";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot } from "lucide-react";
+import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot, Headphones } from "lucide-react";
 import { useState } from "react";
 
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
+import podcastCover from "@/assets/podcast-cover-mariel.png";
 
 const painPoints: PainItem[] = [
   { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
