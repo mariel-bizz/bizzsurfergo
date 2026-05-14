@@ -80,29 +80,29 @@ function CareersPage() {
       </noscript>
 
       {widgetFailed && (
-        <div className="mt-6 space-y-4">
-          <div className="rounded-lg border border-border bg-muted/40 p-4 text-sm text-foreground">
-            Our jobs widget couldn't load — this can happen if scripts are
-            blocked. Please enable scripts for this page, or browse roles
-            directly below.{" "}
-            <a
-              href={TT_URL}
-              className="underline text-primary"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Open in a new tab ↗
-            </a>
-          </div>
-          <div className="overflow-hidden rounded-xl border border-border bg-background shadow-sm">
-            <iframe
-              src={TT_URL}
-              title="BizzSurfer open roles — Teamtailor"
-              className="w-full h-[80vh] min-h-[600px]"
-              loading="lazy"
-              referrerPolicy="no-referrer-when-downgrade"
-            />
-          </div>
+        <div className="mt-6 rounded-xl border border-border bg-muted/40 p-6 text-sm text-foreground">
+          <h2 className="text-base font-semibold text-foreground">
+            View our open roles
+          </h2>
+          <p className="mt-2 text-muted-foreground">
+            Our embedded jobs widget couldn't load here — this usually happens
+            when scripts are blocked, or because our careers provider doesn't
+            allow being embedded in another page. You can browse all current
+            openings on our careers site:
+          </p>
+          <a
+            href={TT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:opacity-90 transition"
+          >
+            Open BizzSurfer Careers ↗
+          </a>
+          <p className="mt-3 text-xs text-muted-foreground">
+            Tip: if you're using a script blocker, allow{" "}
+            <code className="font-mono">teamtailor.com</code> on this page to
+            see roles inline.
+          </p>
         </div>
       )}
     </div>
