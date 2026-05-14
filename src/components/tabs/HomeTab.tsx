@@ -80,7 +80,7 @@ export function HomeTab() {
                 </span>
               </div>
               <h2 className="mt-2 text-base sm:text-lg font-bold leading-tight">
-                Agentic AI Intelligence for Business Transformation
+                Changing the Status Quo with Agentic AI for Business Transformation
               </h2>
               <p className="mt-1 text-xs opacity-90 line-clamp-2">
                 With Mariel Schaab, CEO &amp; Founder of BizzSurfer. New episodes weekly.
