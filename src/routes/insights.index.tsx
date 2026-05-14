@@ -131,6 +131,7 @@ function InsightsPage() {
         </a>
         <Link
           to="/events"
+          hash="past"
           className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0a66c2]/10 text-[#0a66c2]">
