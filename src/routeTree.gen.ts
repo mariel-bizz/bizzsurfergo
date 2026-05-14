@@ -37,6 +37,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
+import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
@@ -191,6 +192,11 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
   path: '/admin/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSalesRoute = AdminSalesRouteImport.update({
+  id: '/admin/sales',
+  path: '/admin/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   id: '/admin/insights-comments',
   path: '/admin/insights-comments',
@@ -285,6 +291,7 @@ export interface FileRoutesByFullPath {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -328,6 +335,7 @@ export interface FileRoutesByTo {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -372,6 +380,7 @@ export interface FileRoutesById {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -417,6 +426,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
+    | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
     | '/checkout/return'
@@ -460,6 +470,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
+    | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
     | '/checkout/return'
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
+    | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
     | '/checkout/return'
@@ -547,6 +559,7 @@ export interface RootRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
+  AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -768,6 +781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/sales': {
+      id: '/admin/sales'
+      path: '/admin/sales'
+      fullPath: '/admin/sales'
+      preLoaderRoute: typeof AdminSalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/insights-comments': {
       id: '/admin/insights-comments'
       path: '/admin/insights-comments'
@@ -883,6 +903,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
+  AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
