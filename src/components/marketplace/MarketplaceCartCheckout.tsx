@@ -34,10 +34,13 @@ export function MarketplaceCartCheckout({ listings, returnUrl }: Props) {
       throw new Error(msg);
     }
 
+    const expectedSubtotalCents = items.reduce((s, it) => s + it.amountInCents, 0);
+
     try {
       const secret = await createMarketplaceCartCheckout({
         data: {
           items,
+          expectedSubtotalCents,
           returnUrl:
             returnUrl ||
             `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&clear_cart=1`,
