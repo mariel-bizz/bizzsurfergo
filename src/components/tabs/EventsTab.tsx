@@ -91,7 +91,8 @@ export function EventsTab() {
       const ev = eventsData.find((x) => x.id === id);
       if (ev) setConfirmation({ event: ev, meetLink: meet });
       toast.success("You're in! +25 XP");
-      if (href !== "#") window.open(href, "_blank");
+      const target = meet || (href !== "#" ? href : null);
+      if (target) window.open(target, "_blank");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "RSVP failed");
     }
