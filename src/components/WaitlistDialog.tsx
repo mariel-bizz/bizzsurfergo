@@ -4,7 +4,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
-import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
+import { submitWaitlist } from "@/lib/waitlist.functions";
 import { toast } from "sonner";
 import { Rocket, CheckCircle2 } from "lucide-react";
 
@@ -15,6 +17,7 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
   const [consent, setConsent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const submitFn = useServerFn(submitWaitlist);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,12 +27,27 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.from("waitlist").insert({
-      name: form.name, email: form.email, role: form.role || null, company: form.company || null,
-    });
-    setLoading(false);
-    if (error) {
-      if (error.code === "23505") { toast.error("This email is already on the list."); return; }
+    try {
+      const result = await submitFn({
+        data: {
+          name: form.name,
+          email: form.email,
+          role: form.role || null,
+          company: form.company || null,
+          source: "waitlist_dialog",
+        },
+      });
+      setLoading(false);
+      if (!result.success) {
+        if (result.reason === "already_joined") {
+          toast.error("This email is already on the list.");
+        } else {
+          toast.error("Something went wrong. Try again.");
+        }
+        return;
+      }
+    } catch {
+      setLoading(false);
       toast.error("Something went wrong. Try again.");
       return;
     }
@@ -93,9 +111,9 @@ export function WaitlistDialog({ open, onOpenChange, onJoined }: {
                 />
                 <Label htmlFor="consent" className="text-xs leading-snug font-normal text-muted-foreground cursor-pointer">
                   I agree to BizzSurfer's{" "}
-                  <a href="https://www.bizzsurfer.com/terms" target="_blank" rel="noopener noreferrer" className="text-primary underline">Terms</a>{" "}
+                  <Link to="/terms" target="_blank" className="text-primary underline">Terms</Link>{" "}
                   and{" "}
-                  <a href="https://www.bizzsurfer.com/privacy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a>{" "}
+                  <a href="https://bizzsurfer.com/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-primary underline">Privacy Policy</a>{" "}
                   and consent to be contacted about the launch (GDPR).
                 </Label>
               </div>

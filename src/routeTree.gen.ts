@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as RobotsDottxtRouteImport } from './routes/robots[.]txt'
 import { Route as ResourcesRouteImport } from './routes/resources'
@@ -36,6 +37,7 @@ import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
+import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
@@ -50,6 +52,11 @@ import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
 import { Route as ApiPublicChatEmailSummaryRouteImport } from './routes/api/public/chat/email-summary'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
   path: '/sitemap.xml',
@@ -185,6 +192,11 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
   path: '/admin/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSalesRoute = AdminSalesRouteImport.update({
+  id: '/admin/sales',
+  path: '/admin/sales',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   id: '/admin/insights-comments',
   path: '/admin/insights-comments',
@@ -275,9 +287,11 @@ export interface FileRoutesByFullPath {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -317,9 +331,11 @@ export interface FileRoutesByTo {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -360,9 +376,11 @@ export interface FileRoutesById {
   '/resources': typeof ResourcesRoute
   '/robots.txt': typeof RobotsDottxtRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/checkout/return': typeof CheckoutReturnRoute
@@ -404,9 +422,11 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
+    | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
     | '/checkout/return'
@@ -446,9 +466,11 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
+    | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
     | '/checkout/return'
@@ -488,9 +510,11 @@ export interface FileRouteTypes {
     | '/resources'
     | '/robots.txt'
     | '/sitemap.xml'
+    | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/insights-comments'
+    | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
     | '/checkout/return'
@@ -531,9 +555,11 @@ export interface RootRouteChildren {
   ResourcesRoute: typeof ResourcesRoute
   RobotsDottxtRoute: typeof RobotsDottxtRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  TermsRoute: typeof TermsRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
+  AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
@@ -559,6 +585,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sitemap.xml': {
       id: '/sitemap.xml'
       path: '/sitemap.xml'
@@ -748,6 +781,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/sales': {
+      id: '/admin/sales'
+      path: '/admin/sales'
+      fullPath: '/admin/sales'
+      preLoaderRoute: typeof AdminSalesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/insights-comments': {
       id: '/admin/insights-comments'
       path: '/admin/insights-comments'
@@ -859,9 +899,11 @@ const rootRouteChildren: RootRouteChildren = {
   ResourcesRoute: ResourcesRoute,
   RobotsDottxtRoute: RobotsDottxtRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  TermsRoute: TermsRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
+  AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
