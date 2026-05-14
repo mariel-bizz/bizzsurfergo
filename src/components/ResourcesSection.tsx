@@ -171,70 +171,44 @@ export function ConnectApisSection() {
   );
 }
 
-const socialStyles: Record<string, { bg: string; label: string; sub: string }> = {
-  "bizzsurfer.com": {
-    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.20_265),oklch(0.65_0.18_220))]",
-    label: "Website",
-    sub: "bizzsurfer.com",
-  },
-  LinkedIn: {
-    bg: "bg-[linear-gradient(135deg,oklch(0.45_0.15_245),oklch(0.55_0.18_240))]",
-    label: "LinkedIn",
-    sub: "@bizzsurfer",
-  },
-  YouTube: {
-    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.24_25),oklch(0.62_0.22_15))]",
-    label: "YouTube",
-    sub: "@bizzsurfer",
-  },
-  Twitter: {
-    bg: "bg-[linear-gradient(135deg,oklch(0.55_0.18_230),oklch(0.65_0.16_220))]",
-    label: "Twitter",
-    sub: "@bizzsurfer",
-  },
-  Spotify: {
-    bg: "bg-[linear-gradient(135deg,oklch(0.65_0.20_145),oklch(0.55_0.22_150))]",
-    label: "Spotify",
-    sub: "BizzSurfer",
-  },
-  WhatsApp: {
-    bg: "bg-[linear-gradient(135deg,oklch(0.65_0.18_150),oklch(0.55_0.20_155))]",
-    label: "WhatsApp",
-    sub: "+31 6 14630463",
-  },
-};
-
 export function FollowSection() {
   return (
     <section className="px-5">
       <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Follow BizzSurfer</p>
-            <h2 className="text-lg font-bold text-foreground mt-1">Stay in the loop</h2>
-          </div>
+        <div className="mb-4">
+          <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Follow BizzSurfer</p>
+          <h2 className="text-lg font-bold text-foreground mt-1">Stay in the loop</h2>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        <div className="flex flex-wrap items-start justify-center gap-x-5 gap-y-4 sm:justify-between">
           {socials.map((s) => {
-            const style = socialStyles[s.label] ?? socialStyles["bizzsurfer.com"];
-            return (
+            const Icon = s.icon;
+            const isInternal = s.href.startsWith("/");
+            const content = (
+              <>
+                <span
+                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-card transition-transform group-hover:scale-105 group-active:scale-95"
+                  style={{ backgroundColor: s.color }}
+                >
+                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2.25} />
+                </span>
+                <span className="text-[10px] font-semibold text-muted-foreground">{s.label}</span>
+              </>
+            );
+            const className = "group flex flex-col items-center gap-1.5";
+            return isInternal ? (
+              <Link key={s.label} to={s.href} aria-label={`BizzSurfer ${s.label}`} className={className}>
+                {content}
+              </Link>
+            ) : (
               <a
                 key={s.label}
                 href={s.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={`Follow BizzSurfer on ${style.label}`}
-                className={`relative overflow-hidden rounded-2xl ${style.bg} p-3 text-white shadow-elegant active:scale-95 transition-transform flex flex-col items-start gap-2 min-h-[110px]`}
+                aria-label={`Follow BizzSurfer on ${s.label}`}
+                className={className}
               >
-                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-white/15 blur-xl" />
-                <div className="absolute -bottom-8 -left-4 w-16 h-16 rounded-full bg-white/10 blur-lg" />
-                <div className="relative w-9 h-9 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
-                  <s.icon className="w-5 h-5 text-white fill-white/30" />
-                </div>
-                <div className="relative mt-auto">
-                  <p className="text-[13px] font-bold leading-tight">{style.label}</p>
-                  <p className="text-[10px] opacity-90 leading-tight">{style.sub}</p>
-                </div>
+                {content}
               </a>
             );
           })}
