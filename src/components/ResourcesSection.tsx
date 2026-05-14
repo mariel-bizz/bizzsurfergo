@@ -122,48 +122,19 @@ export function ResourcesSection() {
   );
 }
 
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
-import { Check } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useSubscription } from "@/hooks/useSubscription";
-
-const PREMIUM_BENEFITS = [
-  { label: "ERP connectors", desc: "SAP, Oracle, NetSuite, Dynamics" },
-  { label: "CRM connectors", desc: "Salesforce, HubSpot, Pipedrive" },
-  { label: "HRIS connectors", desc: "Workday, BambooHR, Personio" },
-  { label: "BI & analytics", desc: "Looker, Power BI, Tableau, Amplitude" },
-];
+import { usePremium } from "@/hooks/usePremium";
+import { UpgradeToPremiumDialog } from "@/components/UpgradeToPremiumDialog";
 
 export function ConnectApisSection() {
   const [open, setOpen] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
   const navigate = useNavigate();
-  const { isActive, loading } = useSubscription(userId);
-
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setUserId(data.user?.id ?? null);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUserId(session?.user?.id ?? null);
-    });
-    return () => sub.subscription.unsubscribe();
-  }, []);
+  const { isPremium, loading } = usePremium();
 
   const handleClick = () => {
     if (loading) return;
-    if (isActive) {
+    if (isPremium) {
       navigate({ to: "/integrations" });
     } else {
       setOpen(true);
@@ -193,47 +164,10 @@ export function ConnectApisSection() {
         </Button>
       </div>
 
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Only available for Premium Plans</AlertDialogTitle>
-            <AlertDialogDescription>
-              Upgrade to unlock integrations across your enterprise stack:
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-
-          <ul className="space-y-2 -mt-1">
-            {PREMIUM_BENEFITS.map((b) => (
-              <li key={b.label} className="flex items-start gap-2 text-sm">
-                <Check className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-                <div>
-                  <p className="font-semibold text-foreground leading-tight">{b.label}</p>
-                  <p className="text-xs text-muted-foreground leading-snug">{b.desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-
-          <button
-            type="button"
-            onClick={() => { setOpen(false); navigate({ to: "/pricing" }); }}
-            className="text-xs font-semibold text-primary underline-offset-2 hover:underline text-left"
-          >
-            Compare all plans →
-          </button>
-
-          <AlertDialogFooter>
-            <AlertDialogCancel>Not now</AlertDialogCancel>
-            <AlertDialogAction onClick={() => { setOpen(false); navigate({ to: "/pricing" }); }}>
-              Upgrade NOW
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <UpgradeToPremiumDialog open={open} onOpenChange={setOpen} />
     </section>
   );
 }
-
 
 const socialStyles: Record<string, { bg: string; label: string; sub: string }> = {
   "bizzsurfer.com": {

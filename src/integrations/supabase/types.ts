@@ -583,6 +583,51 @@ export type Database = {
         }
         Relationships: []
       }
+      user_integrations: {
+        Row: {
+          category: string
+          config: Json
+          created_at: string
+          display_name: string | null
+          health: string
+          id: string
+          last_error: string | null
+          last_sync_at: string | null
+          provider: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          config?: Json
+          created_at?: string
+          display_name?: string | null
+          health?: string
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          provider: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          config?: Json
+          created_at?: string
+          display_name?: string | null
+          health?: string
+          id?: string
+          last_error?: string | null
+          last_sync_at?: string | null
+          provider?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_preferences: {
         Row: {
           company: string | null
