@@ -132,7 +132,7 @@ export function EventsTab() {
             key={v}
             onClick={() => setView(v)}
             className={`flex-1 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-full transition-colors ${
-              view === v ? "text-[#ff6f00] font-extrabold" : "text-muted-foreground"
+              view === v ? "bg-background text-foreground shadow-sm" : "text-muted-foreground"
             }`}
           >
             {v === "upcoming" ? "Upcoming" : "Past"}
