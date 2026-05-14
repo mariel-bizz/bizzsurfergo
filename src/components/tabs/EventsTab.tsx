@@ -13,6 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
 import event2 from "@/assets/event-chro-playbook.png";
 import event3 from "@/assets/event-boards-csuite.png";
+import eventAgenticVsAgents from "@/assets/event-agentic-vs-agents.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData, pastEvents } from "@/lib/events-data";
