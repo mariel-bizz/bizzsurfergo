@@ -368,9 +368,18 @@ export const createPortalSession = createServerFn({ method: "POST" })
     return portal.url;
   });
 
+export type CheckoutReceiptItem = {
+  description: string;
+  quantity: number | null;
+  amountSubtotal: number | null;
+  amountTotal: number | null;
+};
+
 export type CheckoutReceipt = {
   sessionId: string;
   amountTotal: number | null;
+  amountSubtotal: number | null;
+  amountTax: number | null;
   currency: string | null;
   status: string | null;
   paymentStatus: string | null;
@@ -380,6 +389,13 @@ export type CheckoutReceipt = {
   listingTitle: string | null;
   receiptUrl: string | null;
   createdAt: string | null;
+  items: CheckoutReceiptItem[];
+  /**
+   * True only when the webhook has confirmed the session as paid/complete
+   * and the orders row has been written. Until then, the UI should show a
+   * "processing" state rather than a green check.
+   */
+  webhookConfirmed: boolean;
 };
 
 export const getCheckoutReceipt = createServerFn({ method: "GET" })
@@ -391,49 +407,69 @@ export const getCheckoutReceipt = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<CheckoutReceipt> => {
     const { supabase, userId } = context;
 
-    // Try the database first (populated by webhook)
+    // Webhook-populated row (source of truth for "is the payment confirmed?")
     const { data: order } = await supabase
       .from("orders")
       .select("*")
       .eq("stripe_session_id", data.sessionId)
       .maybeSingle();
 
-    if (order) {
-      if (order.user_id && order.user_id !== userId) {
-        throw new Error("Not authorized to view this order");
-      }
-      return {
-        sessionId: order.stripe_session_id,
-        amountTotal: order.amount_total,
-        currency: order.currency,
-        status: order.status,
-        paymentStatus: order.status,
-        mode: order.mode,
-        customerEmail: order.customer_email,
-        listingId: order.listing_id,
-        listingTitle: order.listing_title,
-        receiptUrl: order.receipt_url,
-        createdAt: order.created_at,
-      };
+    if (order && order.user_id && order.user_id !== userId) {
+      throw new Error("Not authorized to view this order");
     }
 
-    // Fallback: fetch directly from Stripe (webhook may not have arrived yet)
+    // Always pull the canonical line-item / tax breakdown from Stripe — the
+    // orders row only stores the rolled-up total. We expand line_items and
+    // total_details so the receipt page can render exactly what the user
+    // paid: items, subtotal, tax, total.
     const stripe = createStripeClient(data.environment);
-    const session = await stripe.checkout.sessions.retrieve(data.sessionId);
+    let session: any;
+    try {
+      session = await stripe.checkout.sessions.retrieve(data.sessionId, {
+        expand: ["line_items", "line_items.data.price.product", "total_details"],
+      });
+    } catch (err) {
+      throw logAndMapStripeError(
+        "receipt_retrieve_failed",
+        { userId, sessionId: data.sessionId, environment: data.environment },
+        err,
+      );
+    }
+
     if (session.metadata?.userId && session.metadata.userId !== userId) {
       throw new Error("Not authorized to view this order");
     }
+
+    const items: CheckoutReceiptItem[] = (session.line_items?.data ?? []).map(
+      (li: any) => ({
+        description: li.description ?? li.price?.product?.name ?? "Item",
+        quantity: typeof li.quantity === "number" ? li.quantity : null,
+        amountSubtotal: typeof li.amount_subtotal === "number" ? li.amount_subtotal : null,
+        amountTotal: typeof li.amount_total === "number" ? li.amount_total : null,
+      }),
+    );
+
+    const webhookConfirmed = !!order && (order.status === "completed" || order.status === "paid");
+
     return {
       sessionId: session.id,
-      amountTotal: session.amount_total,
-      currency: session.currency,
-      status: session.status,
-      paymentStatus: session.payment_status,
-      mode: session.mode,
-      customerEmail: session.customer_details?.email ?? session.customer_email ?? null,
-      listingId: (session.metadata?.listingId as string) ?? null,
-      listingTitle: (session.metadata?.listingTitle as string) ?? null,
-      receiptUrl: null,
-      createdAt: new Date(session.created * 1000).toISOString(),
+      amountTotal: session.amount_total ?? order?.amount_total ?? null,
+      amountSubtotal: session.amount_subtotal ?? null,
+      amountTax: session.total_details?.amount_tax ?? null,
+      currency: session.currency ?? order?.currency ?? null,
+      status: session.status ?? order?.status ?? null,
+      paymentStatus: session.payment_status ?? order?.status ?? null,
+      mode: session.mode ?? order?.mode ?? null,
+      customerEmail:
+        session.customer_details?.email
+          ?? session.customer_email
+          ?? order?.customer_email
+          ?? null,
+      listingId: (session.metadata?.listingId as string) ?? order?.listing_id ?? null,
+      listingTitle: (session.metadata?.listingTitle as string) ?? order?.listing_title ?? null,
+      receiptUrl: order?.receipt_url ?? null,
+      createdAt: order?.created_at ?? new Date(session.created * 1000).toISOString(),
+      items,
+      webhookConfirmed,
     };
   });
