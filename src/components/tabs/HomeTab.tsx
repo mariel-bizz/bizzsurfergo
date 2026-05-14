@@ -71,7 +71,7 @@ export function HomeTab() {
                 loading="lazy"
               />
             </div>
-            <div className="flex-1 p-4 sm:p-5 min-w-0">
+            <div className="mt-1 text-xs opacity-90 line-clamp-2 font-medium">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
                   <Headphones className="w-3 h-3" /> Podcast
