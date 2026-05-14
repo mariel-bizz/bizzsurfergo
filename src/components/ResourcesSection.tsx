@@ -245,7 +245,7 @@ export function PoweredBySection() {
                 alt={`${p.name} logo`}
                 loading="lazy"
                 decoding="async"
-                className="max-h-12 max-w-full object-contain"
+                className="max-h-16 sm:max-h-12 max-w-full object-contain"
               />
             </div>
           ))}
