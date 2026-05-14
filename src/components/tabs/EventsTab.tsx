@@ -13,6 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
 import event2 from "@/assets/event-chro-playbook.png";
 import event3 from "@/assets/event-boards-csuite.png";
+import eventAgenticVsAgents from "@/assets/event-agentic-vs-agents.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData, pastEvents } from "@/lib/events-data";
@@ -22,6 +23,7 @@ import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDial
 import type { FeedEvent } from "@/lib/events-data";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
+const pastImages: Record<number, string> = { 1: eventAgenticVsAgents };
 
 const events = eventsData.map((e) => ({ ...e, image: images[e.id] }));
 
@@ -279,9 +281,13 @@ export function EventsTab() {
               {filteredPast.map((e) => (
             <article
               key={e.id}
-              className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95 py-[6px]"
+              className="rounded-2xl bg-card border border-border shadow-card overflow-hidden opacity-95"
             >
-              <div className="flex items-center gap-2 flex-wrap mb-2">
+              {pastImages[e.id] && (
+                <img src={pastImages[e.id]} alt={e.title} className="w-full aspect-[4/3] object-cover" />
+              )}
+              <div className="p-4 py-[6px]">
+              <div className="flex items-center gap-2 flex-wrap mb-2 mt-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                   {e.badge}
                 </span>
@@ -341,6 +347,7 @@ export function EventsTab() {
                   {e.cta} →
                 </a>
               )}
+              </div>
             </article>
               ))}
             </div>
