@@ -163,7 +163,7 @@ function InsightsPage() {
         </a>
       </nav>
 
-      <h2 id="blog-articles" className="mb-3 scroll-mt-20 text-lg font-bold text-foreground">Blog Articles</h2>
+      <h2 id="blog-articles" className="mb-3 scroll-mt-20 text-lg font-bold text-[#ff6f00]">Blog Articles</h2>
 
       <div className="mb-4 space-y-3">
         <div className="relative">
