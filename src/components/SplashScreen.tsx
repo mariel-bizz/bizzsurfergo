@@ -93,7 +93,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
                   data-no-translate
                   className={`flex flex-col items-center justify-center gap-0.5 rounded-lg border p-1.5 backdrop-blur transition shadow-sm ${
                     active
-                      ? "bg-primary text-primary-foreground border-primary shadow-soft"
+                      ? "bg-primary text-primary-foreground border-primary shadow-soft opacity-80"
                       : "bg-card/80 border-border hover:bg-card"
                   }`}
                 >
