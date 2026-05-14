@@ -23,6 +23,7 @@ import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDial
 import type { FeedEvent } from "@/lib/events-data";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
+const pastImages: Record<number, string> = { 1: eventAgenticVsAgents };
 
 const events = eventsData.map((e) => ({ ...e, image: images[e.id] }));
 
