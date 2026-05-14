@@ -42,6 +42,21 @@ export const Route = createFileRoute('/api/public/chat/email-summary')({
   server: {
     handlers: {
       POST: async ({ request }) => {
+        // Same-origin check: block cross-site abuse of this public endpoint.
+        const originHeader = request.headers.get('origin') || request.headers.get('referer')
+        if (originHeader) {
+          try {
+            const host = new URL(originHeader).hostname
+            if (!ALLOWED_ORIGIN_HOSTS.has(host) && !host.endsWith('.lovable.app')) {
+              return Response.json({ error: 'Forbidden' }, { status: 403 })
+            }
+          } catch {
+            return Response.json({ error: 'Forbidden' }, { status: 403 })
+          }
+        } else {
+          return Response.json({ error: 'Forbidden' }, { status: 403 })
+        }
+
         let parsed
         try {
           parsed = BodySchema.parse(await request.json())
@@ -105,7 +120,7 @@ export const Route = createFileRoute('/api/public/chat/email-summary')({
           modelUsed: parsed.modelUsed ?? 'BizzSurfer Go!',
           question: parsed.question ?? '',
           excerpt: parsed.excerpt ?? '',
-          upgradeUrl: parsed.upgradeUrl ?? 'https://bizzsurfergo.lovable.app/pricing',
+          upgradeUrl: UPGRADE_URL,
         }
         const element = React.createElement(template.component, data)
         const html = await render(element)
