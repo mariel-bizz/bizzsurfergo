@@ -156,40 +156,66 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
-    const stripe = createStripeClient(data.environment);
+    try {
+      const stripe = createStripeClient(data.environment);
 
-    const customerId = await resolveOrCreateCustomer(stripe, {
-      email: customerEmail,
-      userId,
-    });
+      const customerId = await resolveOrCreateCustomer(stripe, {
+        email: customerEmail,
+        userId,
+      });
 
-    const isRecurring = data.interval === "month";
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{
-        price_data: {
-          currency: data.currency,
-          product_data: {
-            name: data.listingTitle,
-            metadata: { listingId: data.listingId },
+      const isRecurring = data.interval === "month";
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{
+          price_data: {
+            currency: data.currency,
+            product_data: {
+              name: data.listingTitle,
+              metadata: { listingId: data.listingId },
+            },
+            unit_amount: data.amountInCents,
+            ...(isRecurring && { recurring: { interval: "month" } }),
           },
-          unit_amount: data.amountInCents,
-          ...(isRecurring && { recurring: { interval: "month" } }),
-        },
-        quantity: 1,
-      }],
-      mode: isRecurring ? "subscription" : "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      automatic_tax: { enabled: true },
-      customer: customerId,
-      customer_update: { address: "auto", name: "auto" },
-      metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle },
-      ...(isRecurring && {
-        subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle } },
-      }),
-    });
+          quantity: 1,
+        }],
+        mode: isRecurring ? "subscription" : "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        automatic_tax: { enabled: true },
+        customer: customerId,
+        customer_update: { address: "auto", name: "auto" },
+        metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle },
+        ...(isRecurring && {
+          subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle } },
+        }),
+      });
 
-    return session.client_secret;
+      console.log(
+        "[payments] listing_session_created",
+        JSON.stringify({
+          event: "listing_session_created",
+          userId,
+          sessionId: session.id,
+          listingId: data.listingId,
+          amountCents: data.amountInCents,
+          interval: data.interval,
+          environment: data.environment,
+        }),
+      );
+
+      return session.client_secret;
+    } catch (err) {
+      throw logAndMapStripeError(
+        "listing_session_create_failed",
+        {
+          userId,
+          listingId: data.listingId,
+          amountCents: data.amountInCents,
+          environment: data.environment,
+        },
+        err,
+      );
+    }
   });
 
 type CartItemInput = {
