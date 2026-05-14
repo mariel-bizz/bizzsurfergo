@@ -35,8 +35,8 @@ export const Route = createFileRoute("/integrations")({
         throw redirect({ to: "/pricing" });
       }
     } catch (e) {
-      // Unauthorized → send to login; redirect throws are re-thrown
-      if (e && typeof e === "object" && "to" in (e as object)) throw e;
+      if (isRedirect(e)) throw e;
+      // Unauthorized or unknown error → send to login
       throw redirect({ to: "/login", search: { redirect: "/integrations" } });
     }
   },
