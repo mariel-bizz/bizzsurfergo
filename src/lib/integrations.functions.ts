@@ -9,6 +9,7 @@ export type IntegrationRow = {
   provider: string;
   display_name: string | null;
   config: Record<string, unknown>;
+  config_secret_id: string | null;
   status: "connected" | "disconnected" | "error";
   health: "healthy" | "degraded" | "down";
   last_sync_at: string | null;
