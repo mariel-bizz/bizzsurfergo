@@ -232,7 +232,7 @@ export function PoweredBySection() {
   return (
     <section className="px-5">
       <div className="rounded-xl border border-border p-3 bg-transparent">
-        <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold text-center">
+        <p className="uppercase tracking-widest text-muted-foreground font-semibold text-center text-sm text-[#02459c]">
           BizzSurfer GO! is powered by
         </p>
         <div className="mt-2 grid grid-cols-3 gap-2 items-center">
