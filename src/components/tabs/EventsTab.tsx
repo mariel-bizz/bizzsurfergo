@@ -215,7 +215,7 @@ export function EventsTab() {
           {pastEvents.map((e) => (
             <article
               key={e.id}
-              className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95"
+              className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95 py-[6px]"
             >
               <div className="flex items-center gap-2 flex-wrap mb-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
@@ -244,7 +244,7 @@ export function EventsTab() {
                   rel="noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                 >
-                  {e.cta} →
+                  {""}
                 </a>
               )}
             </article>
