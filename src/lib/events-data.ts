@@ -56,6 +56,48 @@ export const events: FeedEvent[] = [
   },
 ];
 
+export const pastEvents: FeedEvent[] = [
+  {
+    id: 101,
+    badge: "REPLAY",
+    title: "Agentic AI: From Hype to Operating Model",
+    subtitle: "How early adopters moved from pilots to production agents.",
+    date: "Mar 12, 2026",
+    time: "17:00 CET",
+    location: "LinkedIn Live",
+    audience: "Transformation leaders",
+    speaker: "Mariel Schaab — CEO & Founder, BizzSurfer",
+    cta: "Watch replay",
+    href: "https://www.linkedin.com",
+  },
+  {
+    id: 102,
+    badge: "ROUNDTABLE",
+    title: "CFO roundtable: Measuring ROI of AI agents",
+    subtitle: "Finance leaders share frameworks for valuing agentic workflows.",
+    date: "Feb 20, 2026",
+    time: "16:00 CET",
+    location: "Virtual — Invite only",
+    audience: "CFOs & Finance leaders",
+    speaker: "BizzSurfer Executive Circle",
+    cta: "Request recap",
+    href: "#",
+  },
+  {
+    id: 103,
+    badge: "MASTERCLASS",
+    title: "Boardroom briefing: Governing Agentic AI",
+    subtitle: "Risk, compliance, and oversight patterns for autonomous agents.",
+    date: "Jan 28, 2026",
+    time: "15:00 CET",
+    location: "Live online",
+    audience: "Board members & C-Suite",
+    speaker: "BizzSurfer Faculty",
+    cta: "Watch replay",
+    href: "#",
+  },
+];
+
 // Convert "May 14, 2026" + "17:00 CET" -> Date (CET = UTC+1)
 export function eventDate(e: FeedEvent): Date {
   const [hh, mm] = e.time.split(" ")[0].split(":").map(Number);

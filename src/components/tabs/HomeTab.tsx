@@ -8,7 +8,7 @@ import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
-import podcastCover from "@/assets/podcast-cover-mariel.png";
+import podcastCover from "@/assets/podcast-cover-mariel-v2.png";
 
 const painPoints: PainItem[] = [
   { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
@@ -59,7 +59,7 @@ export function HomeTab() {
       {/* Podcast promo — above Reality Check */}
       <section className="px-5">
         <Link
-          to="/podcast"
+          to="/insights"
           className="group block rounded-3xl overflow-hidden bg-gradient-deep text-white shadow-elegant border border-white/10 hover:shadow-soft transition"
         >
           <div className="flex items-stretch">
