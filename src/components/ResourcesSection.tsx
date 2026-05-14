@@ -25,6 +25,11 @@ import loomLogo from "@/assets/partners/loom.png";
 import deelLogo from "@/assets/partners/deel.png";
 import confluentLogo from "@/assets/partners/confluent.png";
 import auth0Logo from "@/assets/partners/auth0.png";
+import nebiusLogo from "@/assets/partners/nebius.png";
+import azureLogo from "@/assets/partners/azure.png";
+import gitlabLogo from "@/assets/partners/gitlab.png";
+import scalewayLogo from "@/assets/partners/scaleway.png";
+import notionLogo from "@/assets/partners/notion.png";
 
 const partners: { name: string; src: string }[] = [
   { name: "Apollo.io", src: apolloLogo },
@@ -47,6 +52,11 @@ const partners: { name: string; src: string }[] = [
   { name: "Deel", src: deelLogo },
   { name: "Confluent", src: confluentLogo },
   { name: "Auth0", src: auth0Logo },
+  { name: "Nebius", src: nebiusLogo },
+  { name: "Microsoft Azure", src: azureLogo },
+  { name: "GitLab", src: gitlabLogo },
+  { name: "Scaleway", src: scalewayLogo },
+  { name: "Notion", src: notionLogo },
 ];
 
 const resources = [
