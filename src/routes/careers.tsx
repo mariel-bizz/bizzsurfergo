@@ -62,8 +62,12 @@ function buildTtFilterUrl(opts: { q: string; location: string; fn: string; type:
 }
 
 function CareersPage() {
+  const navigate = useNavigate();
   const [status, setStatus] = useState<Status>("loading");
   const [reloadKey, setReloadKey] = useState(0);
+  const [loadCountdown, setLoadCountdown] = useState(LOAD_TIMEOUT_S);
+  const [redirectCountdown, setRedirectCountdown] = useState(REDIRECT_TIMEOUT_S);
+  const [redirectCancelled, setRedirectCancelled] = useState(false);
   const loadStartRef = useRef<number>(0);
 
   // Filters
@@ -74,6 +78,9 @@ function CareersPage() {
 
   const reload = useCallback(() => {
     trackEvent("careers_widget_retry", {});
+    setRedirectCancelled(false);
+    setRedirectCountdown(REDIRECT_TIMEOUT_S);
+    setLoadCountdown(LOAD_TIMEOUT_S);
     setStatus("loading");
     setReloadKey((k) => k + 1);
   }, []);
