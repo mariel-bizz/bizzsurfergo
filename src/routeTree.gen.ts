@@ -16,6 +16,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PodcastRouteImport } from './routes/podcast'
+import { Route as OrdersRouteImport } from './routes/orders'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
@@ -82,6 +83,11 @@ const PricingRoute = PricingRouteImport.update({
 const PodcastRoute = PodcastRouteImport.update({
   id: '/podcast',
   path: '/podcast',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrdersRoute = OrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRoute
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -302,6 +309,7 @@ export interface FileRoutesByTo {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRoute
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -344,6 +352,7 @@ export interface FileRoutesById {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/orders': typeof OrdersRoute
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
   '/profile': typeof ProfileRoute
@@ -387,6 +396,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
+    | '/orders'
     | '/podcast'
     | '/pricing'
     | '/profile'
@@ -428,6 +438,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
+    | '/orders'
     | '/podcast'
     | '/pricing'
     | '/profile'
@@ -469,6 +480,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
+    | '/orders'
     | '/podcast'
     | '/pricing'
     | '/profile'
@@ -511,6 +523,7 @@ export interface RootRouteChildren {
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
+  OrdersRoute: typeof OrdersRoute
   PodcastRoute: typeof PodcastRoute
   PricingRoute: typeof PricingRoute
   ProfileRoute: typeof ProfileRoute
@@ -593,6 +606,13 @@ declare module '@tanstack/react-router' {
       path: '/podcast'
       fullPath: '/podcast'
       preLoaderRoute: typeof PodcastRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/orders': {
+      id: '/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof OrdersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -831,6 +851,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedDotxmlRoute: FeedDotxmlRoute,
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
+  OrdersRoute: OrdersRoute,
   PodcastRoute: PodcastRoute,
   PricingRoute: PricingRoute,
   ProfileRoute: ProfileRoute,

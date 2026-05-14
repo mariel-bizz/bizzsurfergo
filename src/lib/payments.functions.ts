@@ -398,6 +398,46 @@ export type CheckoutReceipt = {
   webhookConfirmed: boolean;
 };
 
+export type OrderHistoryItem = {
+  sessionId: string;
+  amountTotal: number | null;
+  currency: string | null;
+  status: string;
+  mode: string | null;
+  listingTitle: string | null;
+  listingId: string | null;
+  customerEmail: string | null;
+  receiptUrl: string | null;
+  createdAt: string;
+};
+
+export const listMyOrders = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<OrderHistoryItem[]> => {
+    const { supabase, userId } = context;
+    const { data, error } = await supabase
+      .from("orders")
+      .select(
+        "stripe_session_id, amount_total, currency, status, mode, listing_title, listing_id, customer_email, receipt_url, created_at",
+      )
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(100);
+    if (error) throw new Error("Could not load your orders");
+    return (data ?? []).map((o) => ({
+      sessionId: o.stripe_session_id as string,
+      amountTotal: (o.amount_total as number | null) ?? null,
+      currency: (o.currency as string | null) ?? null,
+      status: (o.status as string) ?? "completed",
+      mode: (o.mode as string | null) ?? null,
+      listingTitle: (o.listing_title as string | null) ?? null,
+      listingId: (o.listing_id as string | null) ?? null,
+      customerEmail: (o.customer_email as string | null) ?? null,
+      receiptUrl: (o.receipt_url as string | null) ?? null,
+      createdAt: o.created_at as string,
+    }));
+  });
+
 export const getCheckoutReceipt = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { sessionId: string; environment: StripeEnv }) => {

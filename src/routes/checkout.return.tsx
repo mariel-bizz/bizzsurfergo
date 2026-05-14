@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
-import { getCheckoutReceipt } from "@/lib/payments.functions";
+import { getCheckoutReceipt, type CheckoutReceipt } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { removeFromCart, clearCart } from "@/lib/marketplace-cart";
 
@@ -214,15 +214,119 @@ function CheckoutReturn() {
           </dl>
         </div>
 
-        <div className="flex gap-2 justify-center">
-          <Button asChild className="bg-gradient-primary text-primary-foreground">
-            <Link to="/profile">Go to Profile</Link>
+        <div className="flex flex-wrap gap-2 justify-center">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!confirmed}
+            onClick={() => downloadReceiptPdf(data)}
+            title={confirmed ? "Download PDF receipt" : "Available after confirmation"}
+          >
+            <Download className="w-4 h-4 mr-2" />
+            Download PDF
           </Button>
           <Button asChild variant="outline">
-            <Link to="/">Home</Link>
+            <Link to="/orders">Order history</Link>
+          </Button>
+          <Button asChild className="bg-gradient-primary text-primary-foreground">
+            <Link to="/profile">Go to Profile</Link>
           </Button>
         </div>
       </div>
     </div>
   );
+}
+
+async function downloadReceiptPdf(data: CheckoutReceipt) {
+  const { jsPDF } = await import("jspdf");
+  const doc = new jsPDF({ unit: "pt", format: "a4" });
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const margin = 48;
+  let y = margin;
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text("Receipt", margin, y);
+  y += 28;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  doc.setTextColor(100);
+  doc.text(`Order ID: ${data.sessionId}`, margin, y);
+  y += 14;
+  if (data.createdAt) {
+    doc.text(`Date: ${new Date(data.createdAt).toLocaleString()}`, margin, y);
+    y += 14;
+  }
+  if (data.customerEmail) {
+    doc.text(`Email: ${data.customerEmail}`, margin, y);
+    y += 14;
+  }
+  doc.text(
+    `Status: ${data.webhookConfirmed ? "Paid · confirmed" : data.paymentStatus ?? data.status ?? "—"}`,
+    margin,
+    y,
+  );
+  y += 24;
+
+  doc.setDrawColor(220);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 18;
+
+  doc.setTextColor(0);
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(11);
+  doc.text("Item", margin, y);
+  doc.text("Amount", pageWidth - margin, y, { align: "right" });
+  y += 14;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(10);
+  const items = data.items.length
+    ? data.items
+    : data.listingTitle
+    ? [{ description: data.listingTitle, quantity: 1, amountSubtotal: data.amountSubtotal, amountTotal: data.amountTotal }]
+    : [];
+  for (const item of items) {
+    if (y > 760) {
+      doc.addPage();
+      y = margin;
+    }
+    const desc = item.quantity && item.quantity > 1
+      ? `${item.description} × ${item.quantity}`
+      : item.description;
+    const amt = formatAmount(item.amountTotal ?? item.amountSubtotal, data.currency);
+    const lines = doc.splitTextToSize(desc, pageWidth - margin * 2 - 100);
+    doc.text(lines, margin, y);
+    doc.text(amt, pageWidth - margin, y, { align: "right" });
+    y += Math.max(14, lines.length * 14);
+  }
+
+  y += 8;
+  doc.setDrawColor(220);
+  doc.line(margin, y, pageWidth - margin, y);
+  y += 16;
+
+  if (data.amountSubtotal != null) {
+    doc.text("Subtotal", pageWidth - margin - 120, y);
+    doc.text(formatAmount(data.amountSubtotal, data.currency), pageWidth - margin, y, { align: "right" });
+    y += 14;
+  }
+  if (data.amountTax != null && data.amountTax > 0) {
+    doc.text("Tax", pageWidth - margin - 120, y);
+    doc.text(formatAmount(data.amountTax, data.currency), pageWidth - margin, y, { align: "right" });
+    y += 14;
+  }
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(12);
+  doc.text("Total", pageWidth - margin - 120, y);
+  doc.text(formatAmount(data.amountTotal, data.currency), pageWidth - margin, y, { align: "right" });
+  y += 28;
+
+  doc.setFont("helvetica", "normal");
+  doc.setFontSize(9);
+  doc.setTextColor(120);
+  doc.text("Thank you for your purchase.", margin, y);
+
+  doc.save(`receipt-${data.sessionId}.pdf`);
 }
