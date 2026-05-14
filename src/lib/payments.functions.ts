@@ -2,6 +2,46 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
 
+/**
+ * Map any error from Stripe / our handlers into a short, user-safe message.
+ * Full details stay in structured server logs; we never leak raw Stripe error
+ * bodies (which can include account / request ids) to the client.
+ */
+function logAndMapStripeError(
+  event: string,
+  fields: Record<string, unknown>,
+  err: unknown,
+): Error {
+  const e = err as { type?: string; code?: string; message?: string; statusCode?: number };
+  const log = {
+    event,
+    ts: new Date().toISOString(),
+    ...fields,
+    errorType: e?.type ?? null,
+    errorCode: e?.code ?? null,
+    errorStatus: e?.statusCode ?? null,
+    errorMessage: e?.message ?? String(err),
+  };
+  console.error(`[payments] ${event}`, JSON.stringify(log));
+
+  switch (e?.type) {
+    case "StripeCardError":
+      return new Error(e.message || "Your card was declined. Please try a different payment method.");
+    case "StripeInvalidRequestError":
+      return new Error("We couldn't start your checkout. Please refresh and try again.");
+    case "StripeAuthenticationError":
+    case "StripePermissionError":
+      return new Error("Payments are temporarily unavailable. Please try again shortly.");
+    case "StripeRateLimitError":
+      return new Error("Too many requests right now. Please wait a moment and try again.");
+    case "StripeAPIError":
+    case "StripeConnectionError":
+      return new Error("Payment provider is unreachable. Please try again in a moment.");
+    default:
+      return new Error("We couldn't start your checkout session. Please try again.");
+  }
+}
+
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
   options: { email?: string; userId?: string },
