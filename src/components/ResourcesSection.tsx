@@ -177,7 +177,7 @@ export function FollowSection() {
       <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
         <div className="mb-4">
           <p className="uppercase tracking-widest text-muted-foreground text-center font-bold text-sm text-[#ff6f00]">Follow BizzSurfer</p>
-          <h2 className="text-lg font-bold text-foreground mt-1">Stay in the loop</h2>
+          <h2 className="text-lg font-bold text-foreground mt-1 text-center text-[#ff6f00]">Stay in the loop</h2>
         </div>
         <div className="grid grid-cols-3 gap-x-3 gap-y-4 justify-items-center">
           {socials.map((s) => {
