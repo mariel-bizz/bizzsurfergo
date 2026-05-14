@@ -25,7 +25,7 @@ export function BottomNav({ active }: { active: TabKey }) {
               className="relative flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors"
             >
               {isChat ? (
-                <div className={`-mt-7 w-14 h-14 rounded-full flex items-center justify-center bg-gradient-primary shadow-elegant ${isActive ? "animate-pulse-ring" : ""}`}>
+                <div className={`-mt-7 w-14 h-14 rounded-full flex items-center justify-center bg-gradient-primary shadow-elegant shadow-xl ${isActive ? "animate-pulse-ring" : ""}`}>
                   <Icon className="w-7 h-7 text-primary-foreground" strokeWidth={2.4} />
                 </div>
               ) : (
