@@ -89,31 +89,50 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
-    const stripe = createStripeClient(data.environment);
+    try {
+      const stripe = createStripeClient(data.environment);
 
-    const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
-    if (!prices.data.length) throw new Error("Price not found");
-    const stripePrice = prices.data[0];
-    const isRecurring = stripePrice.type === "recurring";
+      const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
+      if (!prices.data.length) throw new Error("Price not found");
+      const stripePrice = prices.data[0];
+      const isRecurring = stripePrice.type === "recurring";
 
-    const customerId = await resolveOrCreateCustomer(stripe, {
-      email: customerEmail,
-      userId,
-    });
+      const customerId = await resolveOrCreateCustomer(stripe, {
+        email: customerEmail,
+        userId,
+      });
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
-      mode: isRecurring ? "subscription" : "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      automatic_tax: { enabled: true },
-      customer: customerId,
-      customer_update: { address: "auto", name: "auto" },
-      metadata: { userId },
-      ...(isRecurring && { subscription_data: { metadata: { userId } } }),
-    });
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
+        mode: isRecurring ? "subscription" : "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        automatic_tax: { enabled: true },
+        customer: customerId,
+        customer_update: { address: "auto", name: "auto" },
+        metadata: { userId },
+        ...(isRecurring && { subscription_data: { metadata: { userId } } }),
+      });
 
-    return session.client_secret;
+      console.log(
+        "[payments] price_session_created",
+        JSON.stringify({
+          event: "price_session_created",
+          userId,
+          sessionId: session.id,
+          priceId: data.priceId,
+          environment: data.environment,
+        }),
+      );
+
+      return session.client_secret;
+    } catch (err) {
+      throw logAndMapStripeError(
+        "price_session_create_failed",
+        { userId, priceId: data.priceId, environment: data.environment },
+        err,
+      );
+    }
   });
 
 export const createMarketplaceListingCheckout = createServerFn({ method: "POST" })
