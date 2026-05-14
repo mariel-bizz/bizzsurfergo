@@ -59,7 +59,7 @@ export const events: FeedEvent[] = [
 export const pastEvents: FeedEvent[] = [
   {
     id: 101,
-    badge: "REPLAY",
+    badge: "WORKSHOP",
     title: "Agentic AI: From Hype to Operating Model",
     subtitle: "How early adopters moved from pilots to production agents.",
     date: "Mar 12, 2026",
