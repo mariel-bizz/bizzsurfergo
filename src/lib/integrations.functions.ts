@@ -34,11 +34,14 @@ const upsertInput = z.object({
 
 const idInput = z.object({ id: z.string().uuid() });
 
-function maskConfig(config: Record<string, unknown>) {
-  const out: Record<string, unknown> = { ...config };
-  if (typeof out.api_key === "string" && out.api_key.length > 0) {
-    const k = out.api_key as string;
-    out.api_key = `••••${k.slice(-4)}`;
+function maskConfig(config: Record<string, unknown>): Record<string, string> {
+  const out: Record<string, string> = {};
+  for (const [k, v] of Object.entries(config ?? {})) {
+    if (v == null) continue;
+    out[k] = typeof v === "string" ? v : String(v);
+  }
+  if (out.api_key && out.api_key.length > 0) {
+    out.api_key = `••••${out.api_key.slice(-4)}`;
   }
   return out;
 }
