@@ -20,6 +20,14 @@ export const Route = createFileRoute("/")({
           "@context": "https://schema.org",
           "@graph": [
             {
+              "@type": "WebSite",
+              "@id": `${SITE}/#website`,
+              name: "BizzSurfer Go!",
+              url: `${SITE}/`,
+              publisher: { "@id": `${SITE}/#organization` },
+              inLanguage: "en-US",
+            },
+            {
               "@type": "Organization",
               "@id": `${SITE}/#organization`,
               name: "BizzSurfer",
