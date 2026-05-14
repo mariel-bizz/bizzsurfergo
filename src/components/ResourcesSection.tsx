@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { toast } from "sonner";
+
 import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, MessageCircle, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
@@ -118,7 +118,28 @@ export function ResourcesSection() {
         </div>
       </div>
 
-      {/* Connect APIs */}
+    </section>
+  );
+}
+
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useState } from "react";
+import { useNavigate } from "@tanstack/react-router";
+
+export function ConnectApisSection() {
+  const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
+  return (
+    <section className="px-5">
       <div className="rounded-2xl bg-gradient-primary p-5 text-primary-foreground shadow-elegant">
         <div className="flex items-start gap-3">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
@@ -133,12 +154,28 @@ export function ResourcesSection() {
           size="sm"
           variant="secondary"
           className="mt-4 w-full bg-white text-primary hover:bg-white/90 font-bold"
-          onClick={() => toast.info("Integrations launching with the Agentic AI release. Join the waitlist to get early access.")}
+          onClick={() => setOpen(true)}
         >
           Browse integrations
         </Button>
       </div>
 
+      <AlertDialog open={open} onOpenChange={setOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Only available for Premium Plans</AlertDialogTitle>
+            <AlertDialogDescription>
+              Integrations are part of our Premium tier. Upgrade now to plug in your ERP, CRM, HRIS, BI and SaaS tools.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Not now</AlertDialogCancel>
+            <AlertDialogAction onClick={() => { setOpen(false); navigate({ to: "/pricing" }); }}>
+              Upgrade NOW
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </section>
   );
 }
