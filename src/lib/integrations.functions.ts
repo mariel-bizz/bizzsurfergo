@@ -63,9 +63,12 @@ export const listMyIntegrations = createServerFn({ method: "GET" })
       .eq("user_id", userId)
       .order("updated_at", { ascending: false });
     if (error) throw new Error(error.message);
-    const rows = (data ?? []) as IntegrationRow[];
+    const rows = (data ?? []) as unknown as IntegrationRow[];
     return {
-      integrations: rows.map((r) => ({ ...r, config: maskConfig(r.config ?? {}) })),
+      integrations: rows.map((r) => ({
+        ...r,
+        config: maskConfig(r.config ?? {}, !!r.config_secret_id),
+      })),
     };
   });
 
@@ -74,7 +77,9 @@ export const upsertIntegration = createServerFn({ method: "POST" })
   .inputValidator((d) => upsertInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    const { error } = await supabase
+    // Strip api_key from config before persisting — keys go to Vault only.
+    const { api_key, ...safeConfig } = data.config;
+    const { data: row, error } = await supabase
       .from("user_integrations")
       .upsert(
         {
@@ -82,14 +87,49 @@ export const upsertIntegration = createServerFn({ method: "POST" })
           category: data.category,
           provider: data.provider,
           display_name: data.display_name ?? data.provider,
-          config: data.config,
+          config: safeConfig,
           status: "connected",
           health: "healthy",
           last_sync_at: new Date().toISOString(),
           last_error: null,
         },
         { onConflict: "user_id,provider" },
-      );
+      )
+      .select("id")
+      .single();
+    if (error) throw new Error(error.message);
+
+    if (api_key && row?.id) {
+      const { error: rpcError } = await supabase.rpc("set_integration_api_key", {
+        _integration_id: row.id,
+        _key: api_key,
+      });
+      if (rpcError) throw new Error(rpcError.message);
+    }
+    return { ok: true };
+  });
+
+export const setIntegrationApiKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => setKeyInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.rpc("set_integration_api_key", {
+      _integration_id: data.id,
+      _key: data.api_key,
+    });
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const clearIntegrationApiKey = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d) => idInput.parse(d))
+  .handler(async ({ data, context }) => {
+    const { supabase } = context;
+    const { error } = await supabase.rpc("clear_integration_api_key", {
+      _integration_id: data.id,
+    });
     if (error) throw new Error(error.message);
     return { ok: true };
   });
@@ -99,7 +139,6 @@ export const syncIntegration = createServerFn({ method: "POST" })
   .inputValidator((d) => idInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
-    // Stub sync: in prod, would call provider API. Mark healthy + bump last_sync_at.
     const ok = Math.random() > 0.1;
     const { error } = await supabase
       .from("user_integrations")
@@ -120,6 +159,8 @@ export const disconnectIntegration = createServerFn({ method: "POST" })
   .inputValidator((d) => idInput.parse(d))
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
+    // Best-effort: clear vault secret first, then delete row.
+    await supabase.rpc("clear_integration_api_key", { _integration_id: data.id });
     const { error } = await supabase
       .from("user_integrations")
       .delete()
