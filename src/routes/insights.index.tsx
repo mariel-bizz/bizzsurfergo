@@ -140,7 +140,7 @@ function InsightsPage() {
           <span className="text-sm font-bold text-foreground group-hover:text-primary">Rewatch webinars</span>
         </Link>
         <a
-          href="https://open.spotify.com/show/2nLBP8ZjbqBeYvkfzNYYnJ"
+          href="https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly"
           target="_blank"
           rel="noopener noreferrer"
           className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
