@@ -81,7 +81,7 @@ export function HomeTab() {
       </section>
 
       {/* Powered by */}
-      <PoweredBySection>
+      <PoweredBySection />
 
       {/* Gamification card */}
       <section className="px-5">
