@@ -124,6 +124,9 @@ export function HomeTab() {
         <PainTracker items={painPoints} />
       </section>
 
+      {/* Explore & download — under Reality Check */}
+      <ResourcesSection />
+
       {/* Gamification card */}
       <section className="px-5">
         <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
@@ -176,9 +179,6 @@ export function HomeTab() {
 
       {/* Social media */}
       <FollowSection />
-
-      {/* Resources, partners, integrations */}
-      <ResourcesSection />
 
       {/* FAQs */}
       <section className="px-5">
