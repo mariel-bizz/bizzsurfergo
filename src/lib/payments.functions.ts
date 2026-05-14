@@ -2,6 +2,46 @@ import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
 
+/**
+ * Map any error from Stripe / our handlers into a short, user-safe message.
+ * Full details stay in structured server logs; we never leak raw Stripe error
+ * bodies (which can include account / request ids) to the client.
+ */
+function logAndMapStripeError(
+  event: string,
+  fields: Record<string, unknown>,
+  err: unknown,
+): Error {
+  const e = err as { type?: string; code?: string; message?: string; statusCode?: number };
+  const log = {
+    event,
+    ts: new Date().toISOString(),
+    ...fields,
+    errorType: e?.type ?? null,
+    errorCode: e?.code ?? null,
+    errorStatus: e?.statusCode ?? null,
+    errorMessage: e?.message ?? String(err),
+  };
+  console.error(`[payments] ${event}`, JSON.stringify(log));
+
+  switch (e?.type) {
+    case "StripeCardError":
+      return new Error(e.message || "Your card was declined. Please try a different payment method.");
+    case "StripeInvalidRequestError":
+      return new Error("We couldn't start your checkout. Please refresh and try again.");
+    case "StripeAuthenticationError":
+    case "StripePermissionError":
+      return new Error("Payments are temporarily unavailable. Please try again shortly.");
+    case "StripeRateLimitError":
+      return new Error("Too many requests right now. Please wait a moment and try again.");
+    case "StripeAPIError":
+    case "StripeConnectionError":
+      return new Error("Payment provider is unreachable. Please try again in a moment.");
+    default:
+      return new Error("We couldn't start your checkout session. Please try again.");
+  }
+}
+
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
   options: { email?: string; userId?: string },
@@ -49,31 +89,50 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
-    const stripe = createStripeClient(data.environment);
+    try {
+      const stripe = createStripeClient(data.environment);
 
-    const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
-    if (!prices.data.length) throw new Error("Price not found");
-    const stripePrice = prices.data[0];
-    const isRecurring = stripePrice.type === "recurring";
+      const prices = await stripe.prices.list({ lookup_keys: [data.priceId] });
+      if (!prices.data.length) throw new Error("Price not found");
+      const stripePrice = prices.data[0];
+      const isRecurring = stripePrice.type === "recurring";
 
-    const customerId = await resolveOrCreateCustomer(stripe, {
-      email: customerEmail,
-      userId,
-    });
+      const customerId = await resolveOrCreateCustomer(stripe, {
+        email: customerEmail,
+        userId,
+      });
 
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
-      mode: isRecurring ? "subscription" : "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      automatic_tax: { enabled: true },
-      customer: customerId,
-      customer_update: { address: "auto", name: "auto" },
-      metadata: { userId },
-      ...(isRecurring && { subscription_data: { metadata: { userId } } }),
-    });
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{ price: stripePrice.id, quantity: data.quantity || 1 }],
+        mode: isRecurring ? "subscription" : "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        automatic_tax: { enabled: true },
+        customer: customerId,
+        customer_update: { address: "auto", name: "auto" },
+        metadata: { userId },
+        ...(isRecurring && { subscription_data: { metadata: { userId } } }),
+      });
 
-    return session.client_secret;
+      console.log(
+        "[payments] price_session_created",
+        JSON.stringify({
+          event: "price_session_created",
+          userId,
+          sessionId: session.id,
+          priceId: data.priceId,
+          environment: data.environment,
+        }),
+      );
+
+      return session.client_secret;
+    } catch (err) {
+      throw logAndMapStripeError(
+        "price_session_create_failed",
+        { userId, priceId: data.priceId, environment: data.environment },
+        err,
+      );
+    }
   });
 
 export const createMarketplaceListingCheckout = createServerFn({ method: "POST" })
@@ -97,40 +156,66 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
-    const stripe = createStripeClient(data.environment);
+    try {
+      const stripe = createStripeClient(data.environment);
 
-    const customerId = await resolveOrCreateCustomer(stripe, {
-      email: customerEmail,
-      userId,
-    });
+      const customerId = await resolveOrCreateCustomer(stripe, {
+        email: customerEmail,
+        userId,
+      });
 
-    const isRecurring = data.interval === "month";
-    const session = await stripe.checkout.sessions.create({
-      line_items: [{
-        price_data: {
-          currency: data.currency,
-          product_data: {
-            name: data.listingTitle,
-            metadata: { listingId: data.listingId },
+      const isRecurring = data.interval === "month";
+      const session = await stripe.checkout.sessions.create({
+        line_items: [{
+          price_data: {
+            currency: data.currency,
+            product_data: {
+              name: data.listingTitle,
+              metadata: { listingId: data.listingId },
+            },
+            unit_amount: data.amountInCents,
+            ...(isRecurring && { recurring: { interval: "month" } }),
           },
-          unit_amount: data.amountInCents,
-          ...(isRecurring && { recurring: { interval: "month" } }),
-        },
-        quantity: 1,
-      }],
-      mode: isRecurring ? "subscription" : "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      automatic_tax: { enabled: true },
-      customer: customerId,
-      customer_update: { address: "auto", name: "auto" },
-      metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle },
-      ...(isRecurring && {
-        subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle } },
-      }),
-    });
+          quantity: 1,
+        }],
+        mode: isRecurring ? "subscription" : "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        automatic_tax: { enabled: true },
+        customer: customerId,
+        customer_update: { address: "auto", name: "auto" },
+        metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle },
+        ...(isRecurring && {
+          subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle } },
+        }),
+      });
 
-    return session.client_secret;
+      console.log(
+        "[payments] listing_session_created",
+        JSON.stringify({
+          event: "listing_session_created",
+          userId,
+          sessionId: session.id,
+          listingId: data.listingId,
+          amountCents: data.amountInCents,
+          interval: data.interval,
+          environment: data.environment,
+        }),
+      );
+
+      return session.client_secret;
+    } catch (err) {
+      throw logAndMapStripeError(
+        "listing_session_create_failed",
+        {
+          userId,
+          listingId: data.listingId,
+          amountCents: data.amountInCents,
+          environment: data.environment,
+        },
+        err,
+      );
+    }
   });
 
 type CartItemInput = {
@@ -144,6 +229,13 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: {
     items: CartItemInput[];
+    /**
+     * Subtotal (sum of unit_amount * 1) the user sees in their cart UI, in
+     * the smallest currency unit. Server recomputes the same sum from
+     * `items` and rejects the request if they disagree — this catches cart
+     * tampering and price drift.
+     */
+    expectedSubtotalCents?: number;
     returnUrl: string;
     environment: StripeEnv;
   }) => {
@@ -151,48 +243,106 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
       throw new Error("Cart is empty");
     }
     if (data.items.length > 20) throw new Error("Too many items");
+    const currencies = new Set<string>();
     for (const it of data.items) {
       if (!/^[a-zA-Z0-9_-]+$/.test(it.listingId)) throw new Error("Invalid listingId");
       if (!Number.isInteger(it.amountInCents) || it.amountInCents < 50) {
         throw new Error("Amount must be at least 50 cents");
       }
       if (it.listingTitle.length > 250) throw new Error("Title too long");
+      currencies.add(it.currency);
     }
+    if (currencies.size > 1) throw new Error("All cart items must use the same currency");
     return data;
   })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
-    const stripe = createStripeClient(data.environment);
 
-    const customerId = await resolveOrCreateCustomer(stripe, {
-      email: customerEmail,
-      userId,
-    });
+    // Server-side reconciliation: recompute the subtotal from the line
+    // items the server is about to send to Stripe and compare it against
+    // the value the cart UI displayed. If a client tampered with the
+    // amounts (or our own price parsing changed between page-load and
+    // checkout), we refuse to create the session.
+    const computedSubtotal = data.items.reduce((sum, it) => sum + it.amountInCents, 0);
+    if (
+      typeof data.expectedSubtotalCents === "number" &&
+      data.expectedSubtotalCents !== computedSubtotal
+    ) {
+      console.error(
+        "[payments] cart_subtotal_mismatch",
+        JSON.stringify({
+          event: "cart_subtotal_mismatch",
+          userId,
+          expected: data.expectedSubtotalCents,
+          computed: computedSubtotal,
+          itemCount: data.items.length,
+        }),
+      );
+      throw new Error(
+        "Your cart total changed. Please review your cart and try checkout again.",
+      );
+    }
 
-    const listingIds = data.items.map((i) => i.listingId).join(",");
-    const session = await stripe.checkout.sessions.create({
-      line_items: data.items.map((it) => ({
-        price_data: {
-          currency: it.currency,
-          product_data: {
-            name: it.listingTitle,
-            metadata: { listingId: it.listingId },
+    try {
+      const stripe = createStripeClient(data.environment);
+      const customerId = await resolveOrCreateCustomer(stripe, {
+        email: customerEmail,
+        userId,
+      });
+
+      const listingIds = data.items.map((i) => i.listingId).join(",");
+      const session = await stripe.checkout.sessions.create({
+        line_items: data.items.map((it) => ({
+          price_data: {
+            currency: it.currency,
+            product_data: {
+              name: it.listingTitle,
+              metadata: { listingId: it.listingId },
+            },
+            unit_amount: it.amountInCents,
           },
-          unit_amount: it.amountInCents,
+          quantity: 1,
+        })),
+        mode: "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        automatic_tax: { enabled: true },
+        customer: customerId,
+        customer_update: { address: "auto", name: "auto" },
+        metadata: {
+          userId,
+          listingIds,
+          cartCheckout: "1",
+          expectedSubtotalCents: String(computedSubtotal),
         },
-        quantity: 1,
-      })),
-      mode: "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      automatic_tax: { enabled: true },
-      customer: customerId,
-      customer_update: { address: "auto", name: "auto" },
-      metadata: { userId, listingIds, cartCheckout: "1" },
-    });
+      });
 
-    return session.client_secret;
+      console.log(
+        "[payments] cart_session_created",
+        JSON.stringify({
+          event: "cart_session_created",
+          userId,
+          sessionId: session.id,
+          itemCount: data.items.length,
+          subtotalCents: computedSubtotal,
+          environment: data.environment,
+        }),
+      );
+
+      return session.client_secret;
+    } catch (err) {
+      throw logAndMapStripeError(
+        "cart_session_create_failed",
+        {
+          userId,
+          itemCount: data.items.length,
+          subtotalCents: computedSubtotal,
+          environment: data.environment,
+        },
+        err,
+      );
+    }
   });
 
 export const createPortalSession = createServerFn({ method: "POST" })
@@ -218,9 +368,18 @@ export const createPortalSession = createServerFn({ method: "POST" })
     return portal.url;
   });
 
+export type CheckoutReceiptItem = {
+  description: string;
+  quantity: number | null;
+  amountSubtotal: number | null;
+  amountTotal: number | null;
+};
+
 export type CheckoutReceipt = {
   sessionId: string;
   amountTotal: number | null;
+  amountSubtotal: number | null;
+  amountTax: number | null;
   currency: string | null;
   status: string | null;
   paymentStatus: string | null;
@@ -230,6 +389,13 @@ export type CheckoutReceipt = {
   listingTitle: string | null;
   receiptUrl: string | null;
   createdAt: string | null;
+  items: CheckoutReceiptItem[];
+  /**
+   * True only when the webhook has confirmed the session as paid/complete
+   * and the orders row has been written. Until then, the UI should show a
+   * "processing" state rather than a green check.
+   */
+  webhookConfirmed: boolean;
 };
 
 export const getCheckoutReceipt = createServerFn({ method: "GET" })
@@ -241,49 +407,69 @@ export const getCheckoutReceipt = createServerFn({ method: "GET" })
   .handler(async ({ data, context }): Promise<CheckoutReceipt> => {
     const { supabase, userId } = context;
 
-    // Try the database first (populated by webhook)
+    // Webhook-populated row (source of truth for "is the payment confirmed?")
     const { data: order } = await supabase
       .from("orders")
       .select("*")
       .eq("stripe_session_id", data.sessionId)
       .maybeSingle();
 
-    if (order) {
-      if (order.user_id && order.user_id !== userId) {
-        throw new Error("Not authorized to view this order");
-      }
-      return {
-        sessionId: order.stripe_session_id,
-        amountTotal: order.amount_total,
-        currency: order.currency,
-        status: order.status,
-        paymentStatus: order.status,
-        mode: order.mode,
-        customerEmail: order.customer_email,
-        listingId: order.listing_id,
-        listingTitle: order.listing_title,
-        receiptUrl: order.receipt_url,
-        createdAt: order.created_at,
-      };
+    if (order && order.user_id && order.user_id !== userId) {
+      throw new Error("Not authorized to view this order");
     }
 
-    // Fallback: fetch directly from Stripe (webhook may not have arrived yet)
+    // Always pull the canonical line-item / tax breakdown from Stripe — the
+    // orders row only stores the rolled-up total. We expand line_items and
+    // total_details so the receipt page can render exactly what the user
+    // paid: items, subtotal, tax, total.
     const stripe = createStripeClient(data.environment);
-    const session = await stripe.checkout.sessions.retrieve(data.sessionId);
+    let session: any;
+    try {
+      session = await stripe.checkout.sessions.retrieve(data.sessionId, {
+        expand: ["line_items", "line_items.data.price.product", "total_details"],
+      });
+    } catch (err) {
+      throw logAndMapStripeError(
+        "receipt_retrieve_failed",
+        { userId, sessionId: data.sessionId, environment: data.environment },
+        err,
+      );
+    }
+
     if (session.metadata?.userId && session.metadata.userId !== userId) {
       throw new Error("Not authorized to view this order");
     }
+
+    const items: CheckoutReceiptItem[] = (session.line_items?.data ?? []).map(
+      (li: any) => ({
+        description: li.description ?? li.price?.product?.name ?? "Item",
+        quantity: typeof li.quantity === "number" ? li.quantity : null,
+        amountSubtotal: typeof li.amount_subtotal === "number" ? li.amount_subtotal : null,
+        amountTotal: typeof li.amount_total === "number" ? li.amount_total : null,
+      }),
+    );
+
+    const webhookConfirmed = !!order && (order.status === "completed" || order.status === "paid");
+
     return {
       sessionId: session.id,
-      amountTotal: session.amount_total,
-      currency: session.currency,
-      status: session.status,
-      paymentStatus: session.payment_status,
-      mode: session.mode,
-      customerEmail: session.customer_details?.email ?? session.customer_email ?? null,
-      listingId: (session.metadata?.listingId as string) ?? null,
-      listingTitle: (session.metadata?.listingTitle as string) ?? null,
-      receiptUrl: null,
-      createdAt: new Date(session.created * 1000).toISOString(),
+      amountTotal: session.amount_total ?? order?.amount_total ?? null,
+      amountSubtotal: session.amount_subtotal ?? null,
+      amountTax: session.total_details?.amount_tax ?? null,
+      currency: session.currency ?? order?.currency ?? null,
+      status: session.status ?? order?.status ?? null,
+      paymentStatus: session.payment_status ?? order?.status ?? null,
+      mode: session.mode ?? order?.mode ?? null,
+      customerEmail:
+        session.customer_details?.email
+          ?? session.customer_email
+          ?? order?.customer_email
+          ?? null,
+      listingId: (session.metadata?.listingId as string) ?? order?.listing_id ?? null,
+      listingTitle: (session.metadata?.listingTitle as string) ?? order?.listing_title ?? null,
+      receiptUrl: order?.receipt_url ?? null,
+      createdAt: order?.created_at ?? new Date(session.created * 1000).toISOString(),
+      items,
+      webhookConfirmed,
     };
   });

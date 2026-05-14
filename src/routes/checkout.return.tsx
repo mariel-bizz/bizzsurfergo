@@ -43,6 +43,12 @@ function CheckoutReturn() {
     enabled: !!session_id,
     retry: 2,
     retryDelay: 1500,
+    // Poll until the webhook has written the orders row, so the receipt
+    // page can show a confirmed status (and not just "Stripe says paid").
+    refetchInterval: (q) =>
+      (q.state.data as { webhookConfirmed?: boolean } | undefined)?.webhookConfirmed
+        ? false
+        : 2500,
   });
 
   // After a successful purchase, remove the item(s) from the local cart.
@@ -97,43 +103,94 @@ function CheckoutReturn() {
     );
   }
 
-  const isPaid = data.paymentStatus === "paid" || data.status === "complete" || data.status === "completed";
+  const stripeSaysPaid =
+    data.paymentStatus === "paid" || data.status === "complete" || data.status === "completed";
+  const confirmed = data.webhookConfirmed && stripeSaysPaid;
+  const processing = stripeSaysPaid && !data.webhookConfirmed;
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-5 py-10">
       <div className="max-w-lg w-full space-y-6">
         <div className="text-center space-y-3">
-          <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-            <CheckCircle2 className="w-8 h-8 text-primary" />
+          <div
+            className={`mx-auto w-14 h-14 rounded-full flex items-center justify-center ${
+              confirmed ? "bg-primary/10" : "bg-muted"
+            }`}
+          >
+            {confirmed ? (
+              <CheckCircle2 className="w-8 h-8 text-primary" />
+            ) : (
+              <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
+            )}
           </div>
           <h1 className="text-2xl font-bold text-foreground">
-            {isPaid ? "Payment confirmed" : "Payment processing"}
+            {confirmed
+              ? "Payment confirmed"
+              : processing
+              ? "Confirming your payment…"
+              : "Payment processing"}
           </h1>
           <p className="text-sm text-muted-foreground">
-            {isPaid
+            {confirmed
               ? "Thank you for your purchase. A receipt has been sent to your email."
+              : processing
+              ? "Stripe accepted your payment. Waiting for our system to finalise the order — this usually takes a few seconds."
               : "Your payment is still being processed. We'll email you once it's complete."}
           </p>
         </div>
 
-        <div className="rounded-lg border border-border bg-card p-5 space-y-3">
-          <h2 className="text-sm font-semibold text-foreground">Receipt</h2>
-          <dl className="space-y-2 text-sm">
-            {data.listingTitle && (
+        <div className="rounded-lg border border-border bg-card p-5 space-y-4">
+          <h2 className="text-sm font-bold text-foreground">Order summary</h2>
+
+          {data.items.length > 0 ? (
+            <ul className="divide-y divide-border text-sm">
+              {data.items.map((item, idx) => (
+                <li key={idx} className="py-2 flex justify-between gap-4">
+                  <span className="text-foreground">
+                    {item.description}
+                    {item.quantity && item.quantity > 1 ? (
+                      <span className="text-muted-foreground"> × {item.quantity}</span>
+                    ) : null}
+                  </span>
+                  <span className="text-foreground shrink-0">
+                    {formatAmount(item.amountTotal ?? item.amountSubtotal, data.currency)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          ) : data.listingTitle ? (
+            <div className="text-sm text-foreground">{data.listingTitle}</div>
+          ) : null}
+
+          <dl className="space-y-1.5 text-sm pt-3 border-t border-border">
+            {data.amountSubtotal != null && (
               <div className="flex justify-between gap-4">
-                <dt className="text-muted-foreground">Item</dt>
-                <dd className="text-foreground text-right">{data.listingTitle}</dd>
+                <dt className="text-muted-foreground">Subtotal</dt>
+                <dd className="text-foreground">
+                  {formatAmount(data.amountSubtotal, data.currency)}
+                </dd>
               </div>
             )}
-            <div className="flex justify-between gap-4">
-              <dt className="text-muted-foreground">Amount</dt>
-              <dd className="text-foreground font-medium">
+            {data.amountTax != null && data.amountTax > 0 && (
+              <div className="flex justify-between gap-4">
+                <dt className="text-muted-foreground">Tax</dt>
+                <dd className="text-foreground">
+                  {formatAmount(data.amountTax, data.currency)}
+                </dd>
+              </div>
+            )}
+            <div className="flex justify-between gap-4 pt-1.5 border-t border-border">
+              <dt className="font-bold text-foreground">Total</dt>
+              <dd className="font-bold text-foreground">
                 {formatAmount(data.amountTotal, data.currency)}
                 {data.mode === "subscription" && (
-                  <span className="text-muted-foreground"> /mo</span>
+                  <span className="text-muted-foreground font-normal"> /mo</span>
                 )}
               </dd>
             </div>
+          </dl>
+
+          <dl className="space-y-1.5 text-xs pt-3 border-t border-border">
             {data.customerEmail && (
               <div className="flex justify-between gap-4">
                 <dt className="text-muted-foreground">Email</dt>
@@ -142,11 +199,17 @@ function CheckoutReturn() {
             )}
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Status</dt>
-              <dd className="text-foreground capitalize">{isPaid ? "Paid" : data.paymentStatus ?? data.status}</dd>
+              <dd className="text-foreground capitalize">
+                {confirmed
+                  ? "Paid · confirmed"
+                  : processing
+                  ? "Paid · awaiting confirmation"
+                  : data.paymentStatus ?? data.status ?? "—"}
+              </dd>
             </div>
             <div className="flex justify-between gap-4">
               <dt className="text-muted-foreground">Order ID</dt>
-              <dd className="text-foreground font-mono text-xs break-all">{data.sessionId}</dd>
+              <dd className="text-foreground font-mono break-all">{data.sessionId}</dd>
             </div>
           </dl>
         </div>
