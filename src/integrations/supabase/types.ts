@@ -555,7 +555,7 @@ export type Database = {
       }
       user_ai_settings: {
         Row: {
-          byok_api_key: string | null
+          byok_secret_id: string | null
           created_at: string
           id: string
           model: string | null
@@ -564,7 +564,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
-          byok_api_key?: string | null
+          byok_secret_id?: string | null
           created_at?: string
           id?: string
           model?: string | null
@@ -573,7 +573,7 @@ export type Database = {
           user_id: string
         }
         Update: {
-          byok_api_key?: string | null
+          byok_secret_id?: string | null
           created_at?: string
           id?: string
           model?: string | null
@@ -681,6 +681,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clear_user_byok_key: { Args: never; Returns: undefined }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -731,6 +732,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      set_user_byok_key: { Args: { _key: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"
