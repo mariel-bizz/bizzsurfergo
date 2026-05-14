@@ -181,9 +181,6 @@ export function HomeTab() {
 
       <TrustedPartnersSection />
 
-      <PoweredBySection />
-
-
       <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {
         game.update((s) => {
           const badges = s.badges.includes("Early Adopter") ? s.badges : [...s.badges, "Early Adopter"];
