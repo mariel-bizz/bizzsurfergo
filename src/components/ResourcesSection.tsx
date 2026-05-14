@@ -176,7 +176,7 @@ export function FollowSection() {
     <section className="px-5">
       <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
         <div className="mb-4">
-          <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Follow BizzSurfer</p>
+          <p className="uppercase tracking-widest text-muted-foreground text-center font-bold text-sm text-[#ff6f00]">Follow BizzSurfer</p>
           <h2 className="text-lg font-bold text-foreground mt-1">Stay in the loop</h2>
         </div>
         <div className="grid grid-cols-3 gap-x-3 gap-y-4 justify-items-center">
@@ -261,7 +261,7 @@ export function TrustedPartnersSection() {
   return (
     <section className="px-5">
       <div className="rounded-2xl border border-border p-5 bg-transparent">
-        <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Trusted partners</p>
+        <p className="uppercase tracking-widest text-muted-foreground text-center font-bold text-sm text-[#ff6f00]">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
             <div
