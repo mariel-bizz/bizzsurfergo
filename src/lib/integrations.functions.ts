@@ -24,7 +24,9 @@ const upsertInput = z.object({
   config: z
     .object({
       base_url: z.string().url().max(500).optional(),
-      api_key: z.string().min(1).max(500).optional(),
+      // NOTE: api_key intentionally NOT accepted here. API keys are stored in
+      // Supabase Vault via the setIntegrationApiKey serverFn / RPC.
+      api_key: z.string().min(4).max(500).optional(),
       account_id: z.string().max(200).optional(),
       workspace: z.string().max(200).optional(),
       notes: z.string().max(1000).optional(),
@@ -33,15 +35,19 @@ const upsertInput = z.object({
 });
 
 const idInput = z.object({ id: z.string().uuid() });
+const setKeyInput = z.object({ id: z.string().uuid(), api_key: z.string().min(4).max(500) });
 
-function maskConfig(config: Record<string, unknown>): Record<string, string> {
+function maskConfig(
+  config: Record<string, unknown>,
+  hasSecret: boolean,
+): Record<string, string> {
   const out: Record<string, string> = {};
   for (const [k, v] of Object.entries(config ?? {})) {
-    if (v == null) continue;
+    if (v == null || k === "api_key") continue;
     out[k] = typeof v === "string" ? v : String(v);
   }
-  if (out.api_key && out.api_key.length > 0) {
-    out.api_key = `••••${out.api_key.slice(-4)}`;
+  if (hasSecret) {
+    out.api_key = "••••••••";
   }
   return out;
 }
