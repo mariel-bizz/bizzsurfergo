@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { toast } from "sonner";
+
 import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, MessageCircle, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
