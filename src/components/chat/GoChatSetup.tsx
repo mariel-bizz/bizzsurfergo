@@ -91,7 +91,7 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-foreground">{p.name}</p>
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Free</span>
+                <span className="text-[11px] font-extrabold uppercase tracking-widest bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent drop-shadow-sm">FREE</span>
               </button>
             ))}
           </div>
