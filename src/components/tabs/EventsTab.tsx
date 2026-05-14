@@ -13,6 +13,7 @@ import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
 import event2 from "@/assets/event-chro-playbook.png";
 import event3 from "@/assets/event-boards-csuite.png";
+import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData, pastEvents } from "@/lib/events-data";
@@ -311,10 +312,14 @@ export function EventsTab() {
                     rel="noreferrer"
                     className="mt-3 group block rounded-xl overflow-hidden border border-border bg-gradient-to-br from-[#0a66c2]/10 via-card to-card hover:border-[#0a66c2]/50 transition-colors"
                   >
-                    <div className="aspect-[1.91/1] bg-[#0a66c2] relative flex items-center justify-center overflow-hidden">
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.18),transparent_60%)]" />
-                      <Linkedin className="w-14 h-14 text-white relative" strokeWidth={1.5} />
-                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={eventAgenticVsAgents}
+                        alt={e.title}
+                        className="w-full h-auto block"
+                        loading="lazy"
+                      />
+                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                         <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Replay
                       </span>
                     </div>
