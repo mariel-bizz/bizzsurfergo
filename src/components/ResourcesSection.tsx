@@ -82,7 +82,7 @@ export function ResourcesSection() {
     <section className="px-5 space-y-5">
       {/* Resources grid */}
       <div>
-        <h2 className="text-xl font-bold text-foreground mb-3">Explore & download</h2>
+        <h2 className="text-xl font-bold text-foreground mb-3 text-[#ff6f00]">Explore & download</h2>
         <div className="grid grid-cols-2 gap-3">
           {resources.map((r) => {
             const inner = (
