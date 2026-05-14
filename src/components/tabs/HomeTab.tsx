@@ -67,14 +67,14 @@ export function HomeTab() {
               <img
                 src={podcastCover}
                 alt="Agentic AI Intelligence for Business Transformation — podcast cover with Mariel Schaab"
-                className="absolute inset-0 w-full h-full object-cover"
+                className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold"
                 loading="lazy"
               />
             </div>
             <div className="flex-1 p-4 sm:p-5 min-w-0">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
-                  <Headphones className="w-3 h-3" /> Podcast
+                  <Headphones className="w-3 h-3" /> PODCAST & WEBINAR
                 </span>
               </div>
               <h2 className="mt-2 text-base sm:text-lg font-bold leading-tight">
