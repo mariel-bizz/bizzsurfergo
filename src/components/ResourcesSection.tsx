@@ -179,7 +179,7 @@ export function FollowSection() {
           <p className="text-[11px] uppercase tracking-widest text-muted-foreground font-semibold">Follow BizzSurfer</p>
           <h2 className="text-lg font-bold text-foreground mt-1">Stay in the loop</h2>
         </div>
-        <div className="flex flex-wrap items-start justify-center gap-x-5 gap-y-4 sm:justify-between">
+        <div className="grid grid-cols-3 gap-x-3 gap-y-4 justify-items-center">
           {socials.map((s) => {
             const Icon = s.icon;
             const isInternal = s.href.startsWith("/");
