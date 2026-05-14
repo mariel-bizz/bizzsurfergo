@@ -9,6 +9,14 @@ const SITE_NAME = 'bizzsurfergo'
 const SENDER_DOMAIN = 'notify.bizzsurfer.com'
 const FROM_DOMAIN = 'notify.bizzsurfer.com'
 const TEMPLATE_NAME = 'bizzsurfer-summary'
+const UPGRADE_URL = 'https://bizzsurfergo.lovable.app/pricing'
+
+const ALLOWED_ORIGIN_HOSTS = new Set([
+  'bizzsurfergo.lovable.app',
+  'go.bizzsurfer.ai',
+  'www.bizzsurfer.ai',
+  'bizzsurfer.ai',
+])
 
 const BodySchema = z.object({
   recipientEmail: z.string().email().max(254),
@@ -16,7 +24,6 @@ const BodySchema = z.object({
   modelUsed: z.string().max(120).optional(),
   question: z.string().max(4000).optional(),
   excerpt: z.string().max(4000).optional(),
-  upgradeUrl: z.string().url().max(500).optional(),
 })
 
 function redact(email: string) {
