@@ -261,16 +261,22 @@ export function EventsTab() {
         );
       })}
 
-      <section className="pt-4">
-        <div className="flex items-center gap-3 mb-3">
-          <h2 className="flex items-center gap-3 mb-3 text-[#ff6f00]">Past Events</h2>
-          <span className="h-px flex-1 bg-border" />
-        </div>
-        <p className="text-sm text-muted-foreground mb-4">
-          Replays and recaps from previous BizzSurfer Go! sessions.
-        </p>
-        <div className="space-y-3">
-          {pastEvents.map((e) => (
+      {view === "past" && (
+        <section className="pt-2">
+          <div className="flex items-center gap-3 mb-3">
+            <h2 className="flex items-center gap-3 text-[#ff6f00] font-bold">Past Events</h2>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Replays and recaps from previous BizzSurfer Go! sessions.
+          </p>
+          {filteredPast.length === 0 ? (
+            <div className="rounded-2xl border border-dashed border-border p-6 text-center text-sm text-muted-foreground">
+              No replays on this platform yet — check back soon.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredPast.map((e) => (
             <article
               key={e.id}
               className="rounded-2xl bg-card border border-border shadow-card p-4 opacity-95 py-[6px]"
