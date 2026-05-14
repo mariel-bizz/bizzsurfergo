@@ -587,6 +587,7 @@ export type Database = {
         Row: {
           category: string
           config: Json
+          config_secret_id: string | null
           created_at: string
           display_name: string | null
           health: string
@@ -601,6 +602,7 @@ export type Database = {
         Insert: {
           category: string
           config?: Json
+          config_secret_id?: string | null
           created_at?: string
           display_name?: string | null
           health?: string
@@ -615,6 +617,7 @@ export type Database = {
         Update: {
           category?: string
           config?: Json
+          config_secret_id?: string | null
           created_at?: string
           display_name?: string | null
           health?: string
@@ -726,6 +729,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clear_integration_api_key: {
+        Args: { _integration_id: string }
+        Returns: undefined
+      }
       clear_user_byok_key: { Args: never; Returns: undefined }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -776,6 +783,10 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      set_integration_api_key: {
+        Args: { _integration_id: string; _key: string }
+        Returns: undefined
       }
       set_user_byok_key: { Args: { _key: string }; Returns: undefined }
     }
