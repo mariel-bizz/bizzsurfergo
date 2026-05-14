@@ -36,6 +36,19 @@ export function EventsTab() {
   const [authed, setAuthed] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
+  const [view, setView] = useState<"upcoming" | "past">("upcoming");
+  const [platform, setPlatform] = useState<"all" | "linkedin" | "youtube" | "spotify">("all");
+
+  const detectPlatform = (href: string): "linkedin" | "youtube" | "spotify" | "other" => {
+    if (/linkedin\.com/.test(href)) return "linkedin";
+    if (/youtube\.com|youtu\.be/.test(href)) return "youtube";
+    if (/spotify\.com/.test(href)) return "spotify";
+    return "other";
+  };
+
+  const filteredPast = pastEvents.filter((e) =>
+    platform === "all" ? true : detectPlatform(e.href ?? "") === platform
+  );
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
