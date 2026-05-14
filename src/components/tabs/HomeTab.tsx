@@ -222,7 +222,7 @@ export function HomeTab() {
 
       {/* FAQs */}
       <section className="px-5">
-        <h2 className="text-xl font-bold text-foreground mb-4">Frequently asked at the C-suite</h2>
+        <h2 className="text-xl font-bold text-foreground mb-4 text-[#ff6f00]">FAQs | Frequently asked at the C-suite</h2>
         <div className="space-y-2">
           {faqs.map((f, i) => {
             const open = openFaq === i;
