@@ -237,14 +237,39 @@ export function EventsTab() {
                 <Mic className="w-4 h-4 text-primary" />
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
-              {e.href && e.href !== "#" && (
+              {(() => {
+                const m = e.href?.match(/linkedin\.com\/events\/(\d+)/);
+                if (!m) return null;
+                return (
+                  <div className="mt-3 space-y-2">
+                    <div className="rounded-xl overflow-hidden border border-border bg-muted">
+                      <iframe
+                        src={`https://www.linkedin.com/embed/events/${m[1]}`}
+                        title={`LinkedIn event preview — ${e.title}`}
+                        loading="lazy"
+                        className="w-full h-[420px] block"
+                        allow="encrypted-media"
+                      />
+                    </div>
+                    <a
+                      href={e.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" /> Rewatch on LinkedIn →
+                    </a>
+                  </div>
+                );
+              })()}
+              {e.href && e.href !== "#" && !/linkedin\.com\/events/.test(e.href) && (
                 <a
                   href={e.href}
                   target="_blank"
                   rel="noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                 >
-                  {""}
+                  {e.cta} →
                 </a>
               )}
             </article>
