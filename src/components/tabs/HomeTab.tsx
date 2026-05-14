@@ -91,6 +91,11 @@ export function HomeTab() {
         </Link>
       </section>
 
+      {/* ROI Calculator — above Reality Check */}
+      <section className="px-5">
+        <ROICalculator />
+      </section>
+
       {/* Pain points */}
       <section className="relative px-5 py-8 overflow-hidden">
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -169,12 +174,7 @@ export function HomeTab() {
         </Link>
       </section>
 
-      {/* ROI Calculator */}
-      <section className="px-5">
-        <ROICalculator />
-      </section>
-
-      {/* Social media — under ROI */}
+      {/* Social media */}
       <FollowSection />
 
       {/* Resources, partners, integrations */}
