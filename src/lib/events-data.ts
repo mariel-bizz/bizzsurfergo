@@ -16,19 +16,6 @@ export const SITE = "https://bizzsurfergo.lovable.app";
 
 export const events: FeedEvent[] = [
   {
-    id: 1,
-    badge: "LIVE EVENT",
-    title: "Agentic AI vs AI agents",
-    subtitle: "Learn how autonomous Agentic AI can be a business game-changer",
-    date: "May 14, 2026",
-    time: "17:00 CET",
-    location: "LinkedIn Live",
-    audience: "Leaders, Innovators & Business Builders",
-    speaker: "Mariel Schaab — CEO & Founder, BizzSurfer",
-    cta: "Register on LinkedIn",
-    href: "https://www.linkedin.com",
-  },
-  {
     id: 2,
     badge: "ROUNDTABLE",
     title: "The CHRO playbook for Agentic AI",
@@ -57,6 +44,19 @@ export const events: FeedEvent[] = [
 ];
 
 export const pastEvents: FeedEvent[] = [
+  {
+    id: 1,
+    badge: "LIVE EVENT",
+    title: "Agentic AI vs AI agents",
+    subtitle: "Learn how autonomous Agentic AI can be a business game-changer",
+    date: "May 14, 2026",
+    time: "17:00 CET",
+    location: "LinkedIn Live",
+    audience: "Leaders, Innovators & Business Builders",
+    speaker: "Mariel Schaab — CEO & Founder, BizzSurfer",
+    cta: "Watch replay",
+    href: "https://www.linkedin.com/events/7455288887125487616/?viewAsMember=true",
+  },
   {
     id: 101,
     badge: "WORKSHOP",
