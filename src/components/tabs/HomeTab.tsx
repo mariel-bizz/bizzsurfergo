@@ -8,7 +8,7 @@ import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
-import podcastCover from "@/assets/podcast-card-v4.png";
+import podcastCover from "@/assets/podcast-card-v5.png";
 
 const painPoints: PainItem[] = [
   { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
@@ -71,7 +71,7 @@ export function HomeTab() {
                 loading="lazy"
               />
             </div>
-            <div className="flex-1 p-4 sm:p-5 min-w-0">
+            <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold my-[10px] object-fill">
               <div className="flex items-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
                   <Headphones className="w-3 h-3" /> PODCAST & WEBINAR
