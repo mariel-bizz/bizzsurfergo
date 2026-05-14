@@ -8,7 +8,7 @@ import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
 import { PainTracker, type PainItem } from "../PainTracker";
-import podcastCover from "@/assets/podcast-card-v3.png";
+import podcastCover from "@/assets/podcast-card-v4.png";
 
 const painPoints: PainItem[] = [
   { key: "execution", icon: Target, title: "Stalled transformation execution", desc: "Strategy decks land. Execution doesn't. Initiatives drift across silos with no shared signal." },
@@ -67,7 +67,7 @@ export function HomeTab() {
               <img
                 src={podcastCover}
                 alt="Agentic AI Intelligence for Business Transformation — podcast cover with Mariel Schaab"
-                className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold"
+                className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold object-fill my-[10px]"
                 loading="lazy"
               />
             </div>
