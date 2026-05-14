@@ -133,7 +133,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
           type="button"
           onClick={handleContinue}
           aria-label="Skip the welcome screen and enter the app"
-          className="mt-3 rounded-md px-3 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          className="mt-3 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-muted-foreground hover:text-foreground transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 border border-solid shadow-sm opacity-65 rounded-full"
         >
           Skip Welcome
         </button>
