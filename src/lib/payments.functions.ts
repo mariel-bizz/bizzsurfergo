@@ -184,6 +184,13 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: {
     items: CartItemInput[];
+    /**
+     * Subtotal (sum of unit_amount * 1) the user sees in their cart UI, in
+     * the smallest currency unit. Server recomputes the same sum from
+     * `items` and rejects the request if they disagree — this catches cart
+     * tampering and price drift.
+     */
+    expectedSubtotalCents?: number;
     returnUrl: string;
     environment: StripeEnv;
   }) => {
@@ -191,48 +198,106 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
       throw new Error("Cart is empty");
     }
     if (data.items.length > 20) throw new Error("Too many items");
+    const currencies = new Set<string>();
     for (const it of data.items) {
       if (!/^[a-zA-Z0-9_-]+$/.test(it.listingId)) throw new Error("Invalid listingId");
       if (!Number.isInteger(it.amountInCents) || it.amountInCents < 50) {
         throw new Error("Amount must be at least 50 cents");
       }
       if (it.listingTitle.length > 250) throw new Error("Title too long");
+      currencies.add(it.currency);
     }
+    if (currencies.size > 1) throw new Error("All cart items must use the same currency");
     return data;
   })
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
-    const stripe = createStripeClient(data.environment);
 
-    const customerId = await resolveOrCreateCustomer(stripe, {
-      email: customerEmail,
-      userId,
-    });
+    // Server-side reconciliation: recompute the subtotal from the line
+    // items the server is about to send to Stripe and compare it against
+    // the value the cart UI displayed. If a client tampered with the
+    // amounts (or our own price parsing changed between page-load and
+    // checkout), we refuse to create the session.
+    const computedSubtotal = data.items.reduce((sum, it) => sum + it.amountInCents, 0);
+    if (
+      typeof data.expectedSubtotalCents === "number" &&
+      data.expectedSubtotalCents !== computedSubtotal
+    ) {
+      console.error(
+        "[payments] cart_subtotal_mismatch",
+        JSON.stringify({
+          event: "cart_subtotal_mismatch",
+          userId,
+          expected: data.expectedSubtotalCents,
+          computed: computedSubtotal,
+          itemCount: data.items.length,
+        }),
+      );
+      throw new Error(
+        "Your cart total changed. Please review your cart and try checkout again.",
+      );
+    }
 
-    const listingIds = data.items.map((i) => i.listingId).join(",");
-    const session = await stripe.checkout.sessions.create({
-      line_items: data.items.map((it) => ({
-        price_data: {
-          currency: it.currency,
-          product_data: {
-            name: it.listingTitle,
-            metadata: { listingId: it.listingId },
+    try {
+      const stripe = createStripeClient(data.environment);
+      const customerId = await resolveOrCreateCustomer(stripe, {
+        email: customerEmail,
+        userId,
+      });
+
+      const listingIds = data.items.map((i) => i.listingId).join(",");
+      const session = await stripe.checkout.sessions.create({
+        line_items: data.items.map((it) => ({
+          price_data: {
+            currency: it.currency,
+            product_data: {
+              name: it.listingTitle,
+              metadata: { listingId: it.listingId },
+            },
+            unit_amount: it.amountInCents,
           },
-          unit_amount: it.amountInCents,
+          quantity: 1,
+        })),
+        mode: "payment",
+        ui_mode: "embedded_page",
+        return_url: data.returnUrl,
+        automatic_tax: { enabled: true },
+        customer: customerId,
+        customer_update: { address: "auto", name: "auto" },
+        metadata: {
+          userId,
+          listingIds,
+          cartCheckout: "1",
+          expectedSubtotalCents: String(computedSubtotal),
         },
-        quantity: 1,
-      })),
-      mode: "payment",
-      ui_mode: "embedded_page",
-      return_url: data.returnUrl,
-      automatic_tax: { enabled: true },
-      customer: customerId,
-      customer_update: { address: "auto", name: "auto" },
-      metadata: { userId, listingIds, cartCheckout: "1" },
-    });
+      });
 
-    return session.client_secret;
+      console.log(
+        "[payments] cart_session_created",
+        JSON.stringify({
+          event: "cart_session_created",
+          userId,
+          sessionId: session.id,
+          itemCount: data.items.length,
+          subtotalCents: computedSubtotal,
+          environment: data.environment,
+        }),
+      );
+
+      return session.client_secret;
+    } catch (err) {
+      throw logAndMapStripeError(
+        "cart_session_create_failed",
+        {
+          userId,
+          itemCount: data.items.length,
+          subtotalCents: computedSubtotal,
+          environment: data.environment,
+        },
+        err,
+      );
+    }
   });
 
 export const createPortalSession = createServerFn({ method: "POST" })
