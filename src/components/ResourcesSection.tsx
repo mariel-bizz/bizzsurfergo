@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import podcastCover from "@/assets/podcast-card-v5.png";
+import careersTeamImg from "@/assets/careers-team.png";
 import apolloLogo from "@/assets/partners/apollo.png";
 import hubspotLogo from "@/assets/partners/hubspot.png";
 import devrevLogo from "@/assets/partners/devrev.png";
