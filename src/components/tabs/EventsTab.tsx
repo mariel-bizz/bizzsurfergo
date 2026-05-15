@@ -253,17 +253,17 @@ export function EventsTab() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild onSelect={() => game.completeOnboardingStep("events")}>
                       <a href={googleCalendarUrl(eventsData.find((x) => x.id === e.id)!)} target="_blank" rel="noreferrer">
                         Google Calendar
                       </a>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild onSelect={() => game.completeOnboardingStep("events")}>
                       <a href={outlookCalendarUrl(eventsData.find((x) => x.id === e.id)!)} target="_blank" rel="noreferrer">
                         Outlook / Teams
                       </a>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild onSelect={() => game.completeOnboardingStep("events")}>
                       <a href={icsDownloadUrl(eventsData.find((x) => x.id === e.id)!)} download>
                         Download .ics (Apple, others)
                       </a>
