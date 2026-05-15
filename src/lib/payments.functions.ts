@@ -289,12 +289,22 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
 
-    // Server-side reconciliation: recompute the subtotal from the line
-    // items the server is about to send to Stripe and compare it against
-    // the value the cart UI displayed. If a client tampered with the
-    // amounts (or our own price parsing changed between page-load and
-    // checkout), we refuse to create the session.
-    const computedSubtotal = data.items.reduce((sum, it) => sum + it.amountInCents, 0);
+    // Server-side canonical price lookup per item. The client-supplied
+    // amounts/titles/intervals are ignored — we resolve each listing
+    // against our static catalog so a tampered cart can't underpay.
+    const canonicalItems = data.items.map((it) => {
+      const c = resolveCanonicalListingPrice(it.listingId);
+      return { listingId: it.listingId, ...c };
+    });
+    const currencies = new Set(canonicalItems.map((i) => i.currency));
+    if (currencies.size > 1) {
+      throw new Error("All cart items must use the same currency");
+    }
+    const computedSubtotal = canonicalItems.reduce((sum, it) => sum + it.amountInCents, 0);
+
+    // Optional UX cross-check: if the client's displayed subtotal disagrees
+    // with our canonical total, surface a friendly "cart changed" error
+    // rather than silently charging a different amount.
     if (
       typeof data.expectedSubtotalCents === "number" &&
       data.expectedSubtotalCents !== computedSubtotal
@@ -321,14 +331,14 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
         userId,
       });
 
-      const listingIds = data.items.map((i) => i.listingId).join(",");
-      const hasRecurring = data.items.some((it) => it.interval === "month");
+      const listingIds = canonicalItems.map((i) => i.listingId).join(",");
+      const hasRecurring = canonicalItems.some((it) => it.interval === "month");
       const session = await stripe.checkout.sessions.create({
-        line_items: data.items.map((it) => ({
+        line_items: canonicalItems.map((it) => ({
           price_data: {
             currency: it.currency,
             product_data: {
-              name: it.listingTitle,
+              name: it.title,
               metadata: { listingId: it.listingId },
             },
             unit_amount: it.amountInCents,
@@ -361,7 +371,7 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
           event: "cart_session_created",
           userId,
           sessionId: session.id,
-          itemCount: data.items.length,
+          itemCount: canonicalItems.length,
           subtotalCents: computedSubtotal,
           environment: data.environment,
         }),
