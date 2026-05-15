@@ -7,6 +7,7 @@ import {
 } from "lucide-react";
 
 import podcastCover from "@/assets/podcast-card-v5.png";
+import careersTeamImg from "@/assets/careers-team.png";
 import apolloLogo from "@/assets/partners/apollo.png";
 import hubspotLogo from "@/assets/partners/hubspot.png";
 import devrevLogo from "@/assets/partners/devrev.png";
@@ -171,6 +172,12 @@ export function CareersSection() {
     <section className="px-5">
       <SectionHeader className="mb-3">Careers</SectionHeader>
       <ResourceTile r={careers} />
+      <img
+        src={careersTeamImg}
+        alt="Apply for working at BizzSurfer — diverse team"
+        className="mt-3 w-full rounded-2xl shadow-elegant"
+        loading="lazy"
+      />
     </section>
   );
 }

@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
+import careersTeamImg from "@/assets/careers-team.png";
 
 export const Route = createFileRoute("/careers")({
   component: CareersPage,
@@ -200,6 +201,13 @@ function CareersPage() {
           </a>
         </div>
       </section>
+
+      <img
+        src={careersTeamImg}
+        alt="Apply for working at BizzSurfer — diverse team"
+        className="mt-4 w-full rounded-2xl shadow-elegant"
+        loading="lazy"
+      />
 
       <noscript>
         <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4 text-sm text-foreground">
