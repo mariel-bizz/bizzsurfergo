@@ -176,8 +176,8 @@ export function OnboardingChecklist() {
                       }`}
                     >
                       <div
-                        className={`shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
-                          isDone ? "bg-primary text-primary-foreground" : "bg-muted text-foreground"
+                        className={`shrink-0 w-9 h-9 flex items-center justify-center ${
+                          isDone ? "bg-primary text-primary-foreground rounded-lg" : "bg-[#02459c] text-slate-50 rounded-full"
                         }`}
                         aria-hidden
                       >
