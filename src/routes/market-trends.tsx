@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import marketTrendsCover from "@/assets/market-trends-card.png";
+import marketTrendsBanner from "@/assets/market-trends-banner.png";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -67,132 +67,94 @@ type NewsItem = {
   href: string;
   date: string;
   category: Exclude<Category, "All">;
+  image: string;
 };
 
-const REPORT_URL = "https://www.bizzsurfer.com/reports";
 const PAGE_SIZE = 6;
 const BOOKMARKS_KEY = "bizzsurfer:market-trends:bookmarks";
 
 const NEWS: NewsItem[] = [
   {
-    id: "gartner-2029",
-    source: "Gartner",
-    title: "Agentic AI predicted to autonomously resolve 80% of common service issues by 2029",
+    id: "servicenow-ai-specialists",
+    source: "ServiceNow",
+    title: "AI agents and AI specialists: the new digital workforce",
     summary:
-      "Gartner forecasts a 30% reduction in operational costs across customer service operations driven by autonomous agents.",
-    href: "https://www.gartner.com/en/newsroom/press-releases/2025-03-05-gartner-predicts-agentic-ai-will-autonomously-resolve-80-percent-of-common-customer-service-issues",
-    date: "2025",
-    category: "Analyst",
-  },
-  {
-    id: "mck-state-of-ai",
-    source: "McKinsey",
-    title: "The state of AI: Agentic systems move from pilots to production",
-    summary:
-      "Enterprises shifting from copilots to autonomous agents are seeing measurable EBITDA impact in finance, supply chain, and CX.",
-    href: "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
-    date: "2025",
-    category: "Research",
-  },
-  {
-    id: "mit-stall",
-    source: "MIT Sloan",
-    title: "Why most agentic AI projects stall — and what the leaders do differently",
-    summary:
-      "Successful programs invest in tool orchestration, evaluation harnesses, and human-in-the-loop guardrails from day one.",
-    href: "https://sloanreview.mit.edu/topic/artificial-intelligence/",
-    date: "2025",
-    category: "Research",
-  },
-  {
-    id: "a16z-agentic-stack",
-    source: "a16z",
-    title: "The agentic stack: from LLM apps to autonomous workflows",
-    summary:
-      "Andreessen Horowitz maps the emerging agentic infrastructure layer — orchestration, memory, tools, and evaluation.",
-    href: "https://a16z.com/ai/",
-    date: "2025",
-    category: "Tools",
-  },
-  {
-    id: "forrester-contract",
-    source: "Forrester",
-    title: "Agentic AI reshapes the enterprise software contract",
-    summary:
-      "Buyers are renegotiating SaaS deals to include outcome-based pricing as agents replace seat-based usage.",
-    href: "https://www.forrester.com/blogs/category/artificial-intelligence-ai/",
-    date: "2025",
-    category: "Analyst",
-  },
-  {
-    id: "bizzsurfer-insights",
-    source: "BizzSurfer Insights",
-    title: "How transformation leaders are operationalising Agentic AI",
-    summary:
-      "Playbooks, frameworks and benchmarks from operators shipping autonomous workflows in regulated enterprises.",
-    href: "/insights",
-    date: "Weekly",
+      "How enterprises are pairing AI agents with AI specialists to automate workflows and accelerate transformation.",
+    href: "https://www.servicenow.com/workflow/ai/ai-agents-ai-specialists.html",
+    date: "2026",
     category: "Operators",
+    image: "https://logo.clearbit.com/servicenow.com",
   },
   {
-    id: "eu-ai-act",
-    source: "European Commission",
-    title: "EU AI Act: what agentic systems must disclose in 2026",
+    id: "microsoft-wti-2026",
+    source: "Microsoft WorkLab",
+    title: "Agents, human agency and the opportunity for every organization",
     summary:
-      "New transparency, logging and human-oversight obligations enter force for high-risk autonomous agents.",
-    href: "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+      "Microsoft's 2026 Work Trend Index on how agentic AI is reshaping every role and every organization.",
+    href: "https://www.microsoft.com/en-us/worklab/work-trend-index/agents-human-agency-and-the-opportunity-for-every-organization#wti2026-modular-worklab-rtitle-d1e901bd",
+    date: "2026",
+    category: "Research",
+    image:
+      "https://assets-c4akfrf5b4d3f4b7.z01.azurefd.net/assets/2026/05/2026_WorkTrendIndex_Hero_-1920x1080_69f91cd0ef419.png",
+  },
+  {
+    id: "gcloud-agentic-era",
+    source: "Google Cloud",
+    title: "What it takes to get your team ready for the agentic era",
+    summary:
+      "Google Cloud's playbook on the skills, operating model and culture leaders need to thrive in an agentic workplace.",
+    href: "https://cloud.google.com/transform/what-it-takes-to-get-your-team-ready-for-the-agentic-era",
+    date: "2026",
+    category: "Operators",
+    image:
+      "https://storage.googleapis.com/gweb-cloudblog-publish/images/GettyImages-1887444241.max-2600x2600.jpg",
+  },
+  {
+    id: "gartner-hr-survey-2026",
+    source: "Gartner",
+    title: "45% of managers report AI has lived up to their expectations",
+    summary:
+      "Gartner HR survey reveals where AI is delivering for managers — and where the expectations gap is widening.",
+    href: "https://www.gartner.com/en/newsroom/press-releases/2026-3-4-gartner-hr-survey-reveals-45-percent-of-managers-report-ai-has-lived-up-to-their-expectations",
+    date: "2026",
+    category: "Analyst",
+    image: "https://logo.clearbit.com/gartner.com",
+  },
+  {
+    id: "mit-sloan-reshaping-workflows",
+    source: "MIT Sloan",
+    title: "How AI is reshaping workflows and redefining jobs",
+    summary:
+      "MIT Sloan on how chained AI tasks are restructuring work and what leaders should redesign first.",
+    href: "https://mitsloan.mit.edu/ideas-made-to-matter/how-ai-reshaping-workflows-and-redefining-jobs",
+    date: "2026",
+    category: "Research",
+    image:
+      "https://mitsloan.mit.edu/sites/default/files/styles/og_image/public/2026-04/ai-chaining-tasks2.jpg.webp?h=9e01ee4b&itok=y4C0Q98c",
+  },
+  {
+    id: "basf-alphaevolve",
+    source: "Google Cloud",
+    title: "How BASF manages thousands of supply chain decisions with AlphaEvolve",
+    summary:
+      "Inside BASF's deployment of AlphaEvolve to orchestrate complex supply-chain decisions at industrial scale.",
+    href: "https://cloud.google.com/blog/products/ai-machine-learning/how-basf-manages-thousands-of-supply-chain-decisions-with-alphaevolve",
+    date: "2026",
+    category: "Operators",
+    image:
+      "https://storage.googleapis.com/gweb-cloudblog-publish/images/image1_BFm5ksn.max-1500x1500.jpg",
+  },
+  {
+    id: "aws-nonprofit-agentic-governance",
+    source: "AWS",
+    title: "A governance framework for nonprofit agentic AI on AWS",
+    summary:
+      "AWS lays out a governance framework for nonprofits deploying agentic AI responsibly and at scale.",
+    href: "https://aws.amazon.com/blogs/publicsector/a-governance-framework-for-nonprofit-agentic-ai-on-aws/",
     date: "2026",
     category: "Regulation",
-  },
-  {
-    id: "openai-agents-sdk",
-    source: "OpenAI",
-    title: "Agents SDK: long-running, tool-using workflows in production",
-    summary:
-      "OpenAI's agent framework adds persistent memory, structured tool calls and evaluation hooks for enterprise teams.",
-    href: "https://platform.openai.com/docs/guides/agents",
-    date: "2025",
-    category: "Tools",
-  },
-  {
-    id: "anthropic-mcp",
-    source: "Anthropic",
-    title: "Model Context Protocol becomes the de-facto agent integration layer",
-    summary:
-      "MCP adoption accelerates as vendors standardise how agents discover and call enterprise tools.",
-    href: "https://www.anthropic.com/news/model-context-protocol",
-    date: "2025",
-    category: "Tools",
-  },
-  {
-    id: "cbinsights-funding",
-    source: "CB Insights",
-    title: "Agentic AI startups raise record funding in Q1 2026",
-    summary:
-      "Vertical agent companies in finance, legal and healthcare lead the round, with median Series A above $30M.",
-    href: "https://www.cbinsights.com/research/artificial-intelligence-top-startups/",
-    date: "Q1 2026",
-    category: "Funding",
-  },
-  {
-    id: "bcg-roi",
-    source: "BCG",
-    title: "Where agentic AI actually pays back: a 200-company benchmark",
-    summary:
-      "Procurement, FP&A and tier-1 support deliver the fastest payback; sales agents take longer but lift conversion 18%.",
-    href: "https://www.bcg.com/capabilities/artificial-intelligence",
-    date: "2025",
-    category: "Research",
-  },
-  {
-    id: "operator-playbook",
-    source: "BizzSurfer Operators",
-    title: "Inside an autonomous finance close: 14 days → 3 days",
-    summary:
-      "How a mid-market CFO team rebuilt month-end with a network of specialised agents and a human reviewer.",
-    href: "/insights",
-    date: "Weekly",
-    category: "Operators",
+    image:
+      "https://d2908q01vomqb2.cloudfront.net/9e6a55b6b4563e652a23be9d623ca5055c356940/2026/05/09/A-governance-framework-for-nonprofit-agentic-AI-on-AWS.png",
   },
 ];
 
@@ -312,41 +274,14 @@ function MarketTrendsPage() {
         transformation leaders shipping Agentic AI in production.
       </p>
 
-      {/* Featured report */}
+      {/* Featured banner */}
       <section className="mt-6 overflow-hidden rounded-2xl border-2 border-[#02459c] bg-card shadow-card">
-        <div className="grid sm:grid-cols-[200px_1fr]">
-          <img
-            src={marketTrendsCover}
-            alt="Market Trends Report — Agentic AI benchmarking study"
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-          <div className="p-5">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#ff6f00]">
-              <FileText className="w-4 h-4" />
-              Featured report
-            </div>
-            <h2 className="mt-2 text-xl font-bold text-foreground">
-              Market Trends Report 2025
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Download the latest Agentic AI benchmarking study — adoption, ROI,
-              and the operating model behind enterprise wins.
-            </p>
-            <a
-              href={REPORT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() =>
-                trackEvent("market_trends_report_download", { url: REPORT_URL })
-              }
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-agentic px-4 py-2 text-sm font-bold text-white shadow-soft transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Download className="w-4 h-4" />
-              Download report
-            </a>
-          </div>
-        </div>
+        <img
+          src={marketTrendsBanner}
+          alt="Market Trends Report — Agentic AI benchmarking study"
+          className="w-full h-auto object-cover"
+          loading="lazy"
+        />
       </section>
 
       {/* News feed */}
@@ -475,16 +410,17 @@ function MarketTrendsPage() {
               const isInternal = item.href.startsWith("/");
               const saved = bookmarks.has(item.id);
               const inner = (
-                <article className="group rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
-                      <span>{item.source}</span>
-                      <span className="text-muted-foreground">·</span>
-                      <span className="text-muted-foreground">{item.date}</span>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-muted-foreground">
-                        {item.category}
-                      </span>
-                    </div>
+                <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
                     <button
                       type="button"
                       onClick={(e) => {
@@ -495,10 +431,10 @@ function MarketTrendsPage() {
                       aria-label={saved ? "Remove from saved" : "Save for later"}
                       aria-pressed={saved}
                       className={
-                        "shrink-0 rounded-full p-1.5 transition-colors " +
+                        "absolute right-2 top-2 rounded-full p-1.5 backdrop-blur transition-colors " +
                         (saved
-                          ? "bg-[#ff6f00]/10 text-[#ff6f00] hover:bg-[#ff6f00]/20"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground")
+                          ? "bg-[#ff6f00] text-white hover:bg-[#ff6f00]/90"
+                          : "bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground")
                       }
                     >
                       {saved ? (
@@ -508,20 +444,30 @@ function MarketTrendsPage() {
                       )}
                     </button>
                   </div>
-                  <h3 className="mt-2 text-sm font-bold text-foreground leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    {item.summary}
-                  </p>
-                  <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
-                    Read more
-                    {isInternal ? (
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                    ) : (
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    )}
-                  </span>
+                  <div className="p-4">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
+                      <span>{item.source}</span>
+                      <span className="text-muted-foreground">·</span>
+                      <span className="text-muted-foreground">{item.date}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-muted-foreground">
+                        {item.category}
+                      </span>
+                    </div>
+                    <h3 className="mt-2 text-sm font-bold text-foreground leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {item.summary}
+                    </p>
+                    <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      Read more
+                      {isInternal ? (
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      ) : (
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      )}
+                    </span>
+                  </div>
                 </article>
               );
               return (
