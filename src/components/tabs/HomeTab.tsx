@@ -165,7 +165,7 @@ export function HomeTab() {
           <p className="mt-2 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
         </div>
 
-        <PainTracker items={painPoints} />
+        <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
       </section>
 
       {/* Explore & download — under Reality Check */}
