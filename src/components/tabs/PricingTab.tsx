@@ -49,7 +49,7 @@ const tiers = [
     priceSuffix: "per month",
     tagline: "For transformation leaders who need depth, speed, and strategic edge.",
     features: [
-      { label: "Unlimited BizzSurfer AI Chat", included: true },
+      { label: "Unlimited BizzSurfer GO! Chats!", included: true },
       { label: "Advanced ROI Calculator & Benchmarking", included: true },
       { label: "Full Research Reports Library", included: true },
       { label: "Unlimited Event Access", included: true },
@@ -226,7 +226,7 @@ export function PricingTab() {
                       className={
                         f.included
                           ? t.highlighted
-                            ? "text-white/95"
+                            ? "text-white/95 font-extrabold"
                             : "text-foreground"
                           : t.highlighted
                             ? "text-white/85"
