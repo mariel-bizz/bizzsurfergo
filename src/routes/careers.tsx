@@ -64,7 +64,7 @@ function buildTtFilterUrl(opts: { q: string; location: string; fn: string; type:
 
 function CareersPage() {
   const navigate = useNavigate();
-  const [status, setStatus] = useState<Status>("loading");
+  const [status, setStatus] = useState<Status>("ready");
   const [reloadKey, setReloadKey] = useState(0);
   const [loadCountdown, setLoadCountdown] = useState(LOAD_TIMEOUT_S);
   const [redirectCountdown, setRedirectCountdown] = useState(REDIRECT_TIMEOUT_S);
