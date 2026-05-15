@@ -173,6 +173,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       if (q >= 15 && !badges.includes("Strategic Thinker")) badges.push("Strategic Thinker");
       return { ...s, questionsAsked: q, xp: s.xp + 15, badges };
     });
+    game.completeOnboardingStep("chat");
 
     let acc = "";
     let assistantStarted = false;
