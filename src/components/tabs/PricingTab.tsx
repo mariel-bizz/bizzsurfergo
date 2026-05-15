@@ -248,7 +248,7 @@ export function PricingTab() {
                     className={`mt-5 w-full h-11 font-bold ${
                       t.highlighted
                         ? "bg-white text-primary hover:bg-white/90"
-                        : "bg-gradient-primary text-primary-foreground"
+                        : "bg-gradient-agentic text-white"
                     }`}
                   >
                     {isCurrent ? "Current plan" : t.cta}
