@@ -678,7 +678,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 <Button
                   onClick={submitEmail}
                   disabled={sending || !!validateEmail(emailValue)}
-                  className="rounded-xl bg-gradient-primary w-full"
+                  className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2"
                 >
                   {sending ? "Saving…" : "Confirm email"}
                 </Button>
@@ -702,7 +702,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 </Button>
                 <Button
                   onClick={handleEmailMe}
-                  className="rounded-xl bg-gradient-primary"
+                  className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2"
                 >
                   <Mail className="w-4 h-4 mr-1" /> Email me
                 </Button>
