@@ -31,7 +31,7 @@ const ITEMS: Item[] = [
     icon: Bot,
     title: "Chat with BizzSurfer GO!",
     desc: "Ask questions to BizzSurfer Go! using Perplexity, Mistral AI, OpenAI, Claude Anthropic and Gemini!",
-    cta: "Time to chat",
+    cta: "TIME TO CHAT >",
     to: "/chat",
   },
   {
