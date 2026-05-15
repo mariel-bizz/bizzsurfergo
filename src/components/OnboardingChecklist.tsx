@@ -92,7 +92,7 @@ export function OnboardingChecklist() {
       if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
       return;
     }
-    navigate({ to: item.to });
+    navigate({ to: item.to as "/chat" });
   };
 
   return (
