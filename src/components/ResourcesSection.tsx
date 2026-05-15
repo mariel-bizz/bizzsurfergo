@@ -83,7 +83,7 @@ export function ResourcesSection() {
     <section className="px-5 space-y-5">
       {/* Resources grid */}
       <div>
-        <h2 className="text-xl font-bold text-foreground mb-3 text-[#ff6f00]">Explore & download</h2>
+        <SectionHeader className="mb-3">Explore & Download</SectionHeader>
         <div className="grid grid-cols-2 gap-3">
           {resources.map((r) => {
             const inner = (
@@ -176,10 +176,7 @@ export function FollowSection() {
   return (
     <section className="px-5">
       <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
-        <div className="mb-4">
-          <p className="uppercase tracking-widest text-muted-foreground text-center font-bold text-sm text-[#ff6f00]">Follow BizzSurfer</p>
-          <h2 className="text-lg font-bold text-foreground mt-1 text-center text-[#ff6f00]">Stay in the loop</h2>
-        </div>
+        <SectionHeader className="mb-4">Follow BizzSurfer</SectionHeader>
         <div className="grid grid-cols-3 gap-x-3 gap-y-4 justify-items-center">
           {socials.map((s) => {
             const Icon = s.icon;
