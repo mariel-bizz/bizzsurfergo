@@ -11,6 +11,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useGame } from "@/components/AppShell";
 
 export const Route = createFileRoute("/marketplace/$listingId")({
   validateSearch: (s: Record<string, unknown>) => ({
