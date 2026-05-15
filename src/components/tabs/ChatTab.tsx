@@ -454,7 +454,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)]">
       <div className="px-5 pt-3 pb-2">
-        <div className="rounded-2xl text-primary-foreground p-4 shadow-soft flex items-center gap-3 bg-[linear-gradient(135deg,#7c3aed_0%,#a855f7_45%,#f97316_100%)]">
+        <div className="rounded-2xl text-primary-foreground p-4 shadow-soft flex items-center gap-3 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
           <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
             {providerMeta ? (
               <img src={providerMeta.logo} alt={providerMeta.name} className="w-6 h-6 object-contain" />
