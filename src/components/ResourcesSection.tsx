@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Link } from "@tanstack/react-router";
 
 import {
