@@ -187,6 +187,9 @@ export function HomeTab() {
       {/* Explore & download — under Reality Check */}
       <ResourcesSection />
 
+      {/* Careers */}
+      <CareersSection />
+
       {/* Podcast promo */}
       <section className="px-5">
         <Link
