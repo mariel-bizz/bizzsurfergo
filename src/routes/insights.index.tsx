@@ -139,17 +139,15 @@ function InsightsPage() {
           </span>
           <span className="text-sm font-bold text-foreground group-hover:text-primary">Rewatch webinars</span>
         </Link>
-        <a
-          href="https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Link
+          to="/podcast"
           className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1db954]/10 text-[#1db954]">
             <Music2 className="h-4 w-4" />
           </span>
           <span className="text-sm font-bold text-foreground group-hover:text-primary">Spotify</span>
-        </a>
+        </Link>
         <a
           href="https://youtube.com/@bizzsurfer"
           target="_blank"
