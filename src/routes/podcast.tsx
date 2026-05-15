@@ -161,38 +161,7 @@ function PodcastPage() {
         </p>
       </div>
 
-      <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card p-3 sm:p-4">
-        <iframe
-          data-testid="embed-iframe"
-          title="BizzSurfer Spotify playlist"
-          src="https://open.spotify.com/embed/playlist/1nG8JpnKEGY9YKbtcfF14F?utm_source=generator"
-          height={352}
-          frameBorder={0}
-          allowFullScreen
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-          style={{ borderRadius: 12 }}
-          className="block w-full"
-          onLoad={() => trackEvent("podcast_embed_loaded", { title: "Hero playlist", kind: "playlist" })}
-        />
-      </div>
-
-      <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card">
-        <iframe
-          data-testid="embed-iframe"
-          title="Featured playlist"
-          src="https://open.spotify.com/embed/playlist/0IgXD871X03xf0c57UpNnS?utm_source=generator"
-          width="100%"
-          height={352}
-          frameBorder={0}
-          allowFullScreen
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-          style={{ borderRadius: 12 }}
-          className="block w-full"
-          onLoad={() => trackEvent("podcast_embed_loaded", { title: "Featured playlist (highlight)", kind: "playlist" })}
-        />
-      </div>
+      <PlaylistEmbed />
 
       <div className="space-y-4">
         <h2 className="text-base font-bold text-foreground">Featured playlist & show</h2>
