@@ -64,7 +64,7 @@ const resources = [
   { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true },
   { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true },
   { icon: Headphones, title: "Podcast", desc: "Conversations with operators behind enterprise AI.", href: "/podcast", internal: true },
-  { icon: Briefcase, title: "Careers at BizzSurfer", desc: "Join the team building autonomous workflows for enterprise transformation.", href: "/careers", internal: true },
+  { icon: Briefcase, title: "Careers at BizzSurfer", desc: "Join Our BizzSurfer Team! building autonomous workflows for enterprise transformation.", href: "/careers", internal: true },
 ];
 
 type Social = { icon: typeof Globe; label: string; href: string; color: string };
@@ -88,7 +88,7 @@ export function ResourcesSection() {
           {resources.map((r) => {
             const inner = (
               <>
-                <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
+                <div className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center shrink-0 text-inherit">
                   <r.icon className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
