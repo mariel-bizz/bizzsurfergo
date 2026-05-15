@@ -54,7 +54,7 @@ const ITEMS: Item[] = [
   {
     key: "events",
     icon: CalendarDays,
-    title: "Grab Your Seat for the next events!",
+    title: "Grab Your Seat for\nUpcoming Events!",
     desc: "RSVP or add one event to your calendar!",
     cta: "EVENTS >",
     to: "/events",
@@ -185,7 +185,7 @@ export function OnboardingChecklist() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p
-                          className={`text-sm font-semibold leading-tight ${
+                          className={`text-sm font-semibold leading-tight whitespace-pre-line ${
                             isDone ? "text-muted-foreground line-through" : "text-[#ed6a0c]"
                           }`}
                         >
