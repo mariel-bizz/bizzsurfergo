@@ -128,14 +128,6 @@
   .bg-gradient-brand { background-image: var(--gradient-brand); }
   .bg-gradient-agentic { background-image: var(--gradient-agentic); }
   .text-gradient-agentic { background-image: var(--gradient-agentic); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .bg-gradient-agentic-shift {
-    background-image: var(--gradient-agentic);
-    background-size: 200% 100%;
-    background-position: 0% 50%;
-    transition: background-position 600ms ease, transform 200ms ease, box-shadow 300ms ease;
-  }
-  .bg-gradient-agentic-shift:hover { background-position: 100% 50%; }
-  .bg-gradient-agentic-shift:active { background-position: 50% 50%; }
   .shadow-soft { box-shadow: var(--shadow-soft); }
   .shadow-elegant { box-shadow: var(--shadow-elegant); }
   .shadow-card { box-shadow: var(--shadow-card); }
