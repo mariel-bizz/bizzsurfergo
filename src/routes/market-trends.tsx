@@ -21,7 +21,7 @@ import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import marketTrendsCover from "@/assets/market-trends-card.png";
+import marketTrendsBanner from "@/assets/market-trends-banner.png";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -274,41 +274,14 @@ function MarketTrendsPage() {
         transformation leaders shipping Agentic AI in production.
       </p>
 
-      {/* Featured report */}
+      {/* Featured banner */}
       <section className="mt-6 overflow-hidden rounded-2xl border-2 border-[#02459c] bg-card shadow-card">
-        <div className="grid sm:grid-cols-[200px_1fr]">
-          <img
-            src={marketTrendsCover}
-            alt="Market Trends Report — Agentic AI benchmarking study"
-            className="h-full w-full object-cover"
-            loading="lazy"
-          />
-          <div className="p-5">
-            <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest text-[#ff6f00]">
-              <FileText className="w-4 h-4" />
-              Featured report
-            </div>
-            <h2 className="mt-2 text-xl font-bold text-foreground">
-              Market Trends Report 2025
-            </h2>
-            <p className="mt-2 text-sm text-muted-foreground">
-              Download the latest Agentic AI benchmarking study — adoption, ROI,
-              and the operating model behind enterprise wins.
-            </p>
-            <a
-              href={REPORT_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() =>
-                trackEvent("market_trends_report_download", { url: REPORT_URL })
-              }
-              className="mt-4 inline-flex items-center gap-2 rounded-full bg-gradient-agentic px-4 py-2 text-sm font-bold text-white shadow-soft transition-transform hover:scale-[1.02] active:scale-[0.98]"
-            >
-              <Download className="w-4 h-4" />
-              Download report
-            </a>
-          </div>
-        </div>
+        <img
+          src={marketTrendsBanner}
+          alt="Market Trends Report — Agentic AI benchmarking study"
+          className="w-full h-auto object-cover"
+          loading="lazy"
+        />
       </section>
 
       {/* News feed */}
