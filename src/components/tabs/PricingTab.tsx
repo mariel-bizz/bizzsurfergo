@@ -61,7 +61,7 @@ const tiers = [
     ],
     cta: "Upgrade to Hero",
     highlighted: true,
-    badge: "Most popular",
+    badge: "MOST POPULAR",
   },
   {
     id: "champion",
