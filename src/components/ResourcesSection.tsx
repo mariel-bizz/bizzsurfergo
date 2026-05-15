@@ -88,7 +88,7 @@ export function ResourcesSection() {
           {resources.map((r) => {
             const inner = (
               <>
-                <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-soft">
+                <div className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center shrink-0 text-inherit">
                   <r.icon className="w-4 h-4 text-primary-foreground" />
                 </div>
                 <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
