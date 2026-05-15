@@ -60,45 +60,7 @@ export function HomeTab() {
         </div>
       </section>
 
-      {/* Onboarding checklist */}
-      <OnboardingChecklist />
-
-      {/* Podcast promo — above Reality Check */}
-      <section className="px-5">
-        <Link
-          to="/insights"
-          className="group block rounded-3xl overflow-hidden bg-gradient-deep text-white shadow-elegant border border-white/10 hover:shadow-soft transition"
-        >
-          <div className="flex items-stretch">
-            <div className="relative w-32 sm:w-40 shrink-0 bg-black/30">
-              <img
-                src={podcastCover}
-                alt="Agentic AI Intelligence for Business Transformation — podcast cover with Mariel Schaab"
-                className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold object-fill my-[10px]"
-                loading="lazy"
-              />
-            </div>
-            <div className="flex-1 p-4 sm:p-5 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
-                  <Headphones className="w-3 h-3" /> PODCAST & WEBINAR
-                </span>
-              </div>
-              <h2 className="mt-2 text-base sm:text-lg font-bold leading-tight">
-                Changing the Status Quo with Agentic AI in Business Transformation
-              </h2>
-              <p className="mt-1 text-xs opacity-90 line-clamp-2">
-                With Mariel Schaab, CEO &amp; Founder of BizzSurfer. New episodes weekly.
-              </p>
-              <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold">
-                Listen now <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
-
-      {/* Last event — rewatch, above ROI */}
+      {/* Last event — rewatch, above onboarding */}
       {pastEvents[0] && (
         <section className="px-5">
           <SectionHeader className="mb-3">Rewatch our Last Event!</SectionHeader>
@@ -132,6 +94,44 @@ export function HomeTab() {
           </a>
         </section>
       )}
+
+      {/* Onboarding checklist */}
+      <OnboardingChecklist />
+
+      {/* Podcast promo */}
+      <section className="px-5">
+        <Link
+          to="/insights"
+          className="group block rounded-3xl overflow-hidden bg-gradient-deep text-white shadow-elegant border border-white/10 hover:shadow-soft transition"
+        >
+          <div className="flex items-stretch">
+            <div className="relative w-32 sm:w-40 shrink-0 bg-black/30">
+              <img
+                src={podcastCover}
+                alt="Agentic AI Intelligence for Business Transformation — podcast cover with Mariel Schaab"
+                className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold object-fill my-[10px]"
+                loading="lazy"
+              />
+            </div>
+            <div className="flex-1 p-4 sm:p-5 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
+                  <Headphones className="w-3 h-3" /> PODCAST & WEBINAR
+                </span>
+              </div>
+              <h2 className="mt-2 text-base sm:text-lg font-bold leading-tight">
+                Changing the Status Quo with Agentic AI in Business Transformation
+              </h2>
+              <p className="mt-1 text-xs opacity-90 line-clamp-2">
+                With Mariel Schaab, CEO &amp; Founder of BizzSurfer. New episodes weekly.
+              </p>
+              <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold">
+                Listen now <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </div>
+          </div>
+        </Link>
+      </section>
 
       {/* ROI Calculator — above Reality Check */}
       <section className="px-5">
@@ -196,31 +196,24 @@ export function HomeTab() {
         <SectionHeader className="mb-3">Go Agentic!</SectionHeader>
         <Link
           to="/marketplace"
-          className="group relative block overflow-hidden rounded-3xl p-[2px] bg-gradient-to-br from-primary via-primary/70 to-accent shadow-glow hover:shadow-soft transition-all duration-300 hover:-translate-y-0.5"
+          className="group relative block overflow-hidden rounded-3xl p-[2px] bg-gradient-to-r from-[#02459c] to-[#f49134] shadow-glow hover:shadow-soft transition-all duration-300 hover:-translate-y-0.5"
         >
           {/* animated glow halo */}
-          <span className="pointer-events-none absolute -inset-12 bg-[radial-gradient(circle_at_30%_20%,hsl(var(--primary)/0.45),transparent_60%)] blur-2xl opacity-70 group-hover:opacity-100 transition-opacity" />
+          <span className="pointer-events-none absolute -inset-12 bg-[radial-gradient(circle_at_30%_20%,#f49134_0%,transparent_60%)] blur-2xl opacity-40 group-hover:opacity-60 transition-opacity" />
           <div className="relative rounded-[22px] bg-card/95 backdrop-blur p-5 sm:p-6">
             {/* Top row: badges */}
             <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-brand px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-soft">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#02459c] to-[#f49134] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-soft">
                 <Sparkles className="w-3 h-3" />
                 Go Agentic!
               </span>
               <span className="inline-flex items-center rounded-full bg-destructive/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-destructive">
                 Hot
               </span>
-              <span className="ml-auto inline-flex items-center gap-1 text-[10px] font-semibold text-muted-foreground">
-                <span className="relative flex h-2 w-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-primary" />
-                </span>
-                Live now
-              </span>
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="relative w-16 h-16 rounded-2xl bg-gradient-brand flex items-center justify-center shrink-0 shadow-glow">
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#02459c] to-[#f49134] flex items-center justify-center shrink-0 shadow-glow">
                 <Bot className="w-8 h-8 text-white" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center shadow-soft">
                   <Sparkles className="w-3 h-3 text-accent-foreground" />
@@ -228,7 +221,7 @@ export function HomeTab() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground leading-tight tracking-tight">
-                  Agents, services & <span className="text-primary">playbooks</span>
+                  Agents, services & <span className="bg-gradient-to-r from-[#02459c] to-[#f49134] bg-clip-text text-transparent">playbooks</span>
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1 leading-snug">
                   Curated tools, expert services & 90-day playbooks to accelerate your transformation.
@@ -253,7 +246,7 @@ export function HomeTab() {
             </div>
 
             {/* CTA */}
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-gradient-brand px-4 py-3 shadow-soft group-hover:shadow-glow transition">
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-[#02459c] to-[#f49134] px-4 py-3 shadow-soft group-hover:shadow-glow transition">
               <span className="text-sm font-bold text-white">Explore the marketplace</span>
               <span className="inline-flex items-center gap-1 text-sm font-bold text-white">
                 Browse now
