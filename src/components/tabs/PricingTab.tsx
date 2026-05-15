@@ -262,7 +262,7 @@ export function PricingTab() {
         {/* Team plan — per-seat, no fixed cost */}
         <div className="relative rounded-3xl p-5 border bg-card border-border shadow-card">
           <span className="absolute -top-2.5 right-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground shadow-soft">
-            For teams
+            FOR TEAMS
           </span>
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-primary">
