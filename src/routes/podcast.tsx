@@ -161,17 +161,16 @@ function PodcastPage() {
         </p>
         <iframe
           data-testid="embed-iframe"
-          title="BizzSurfer Podcast on Spotify"
-          src="https://open.spotify.com/embed/show/033eVlORlWzlZicN049Oog?utm_source=generator"
-          width="100%"
+          style={{ borderRadius: 12 }}
+          src="https://open.spotify.com/embed/playlist/1nG8JpnKEGY9YKbtcfF14F?utm_source=generator"
+          width="90%"
           height={352}
           frameBorder={0}
           allowFullScreen
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
-          style={{ borderRadius: 12 }}
-          className="block w-full"
-          onLoad={() => trackEvent("podcast_embed_loaded", { title: "Hero show", kind: "show" })}
+          className="block"
+          onLoad={() => trackEvent("podcast_embed_loaded", { title: "Hero playlist", kind: "playlist" })}
         />
       </div>
 
