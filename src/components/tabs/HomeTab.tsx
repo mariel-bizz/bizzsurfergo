@@ -1,4 +1,5 @@
 import { useGame } from "../AppShell";
+import { SectionHeader } from "@/components/SectionHeader";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot, Headphones } from "lucide-react";
@@ -100,10 +101,7 @@ export function HomeTab() {
       {/* Last event — rewatch, above ROI */}
       {pastEvents[0] && (
         <section className="px-5">
-          <div className="flex items-center gap-3 mb-3">
-            <h2 className="flex items-center gap-3 text-[#ff6f00] font-bold">Rewatch our Last Event! </h2>
-            <span className="h-px flex-1 bg-border" />
-          </div>
+          <SectionHeader className="mb-3">Rewatch our Last Event!</SectionHeader>
           <a
             href={eventLink(pastEvents[0])}
             target="_blank"
@@ -281,7 +279,7 @@ export function HomeTab() {
 
       {/* FAQs */}
       <section className="px-5">
-        <h2 className="text-xl font-bold text-foreground mb-4 text-[#ff6f00]">FAQs | Frequently asked at the C-suite</h2>
+        <SectionHeader className="mb-4"><span className="text-xl">FAQs | Frequently asked at the C-suite</span></SectionHeader>
         <div className="space-y-2">
           {faqs.map((f, i) => {
             const open = openFaq === i;
