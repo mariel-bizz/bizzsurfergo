@@ -26,7 +26,7 @@ const tiers = [
     priceSuffix: "Forever",
     tagline: "Perfect for executives starting their AI intelligence journey.",
     features: [
-      { label: "BizzSurfer Go! AI Chat (10 sessions/month)", included: true },
+      { label: "BizzSurfer Go! AI Chat (8 sessions/month)", included: true },
       { label: "Pain Points Assessment", included: true },
       { label: "FAQ Library Access", included: true },
       { label: "2 Event Registrations / month", included: true },
