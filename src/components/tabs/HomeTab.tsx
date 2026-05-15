@@ -193,6 +193,7 @@ export function HomeTab() {
 
       {/* Go Agentic! */}
       <section className="px-5">
+        <SectionHeader className="mb-3">Go Agentic!</SectionHeader>
         <Link
           to="/marketplace"
           className="group relative block overflow-hidden rounded-3xl p-[2px] bg-gradient-to-br from-primary via-primary/70 to-accent shadow-glow hover:shadow-soft transition-all duration-300 hover:-translate-y-0.5"
