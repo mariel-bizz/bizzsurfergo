@@ -7,6 +7,7 @@ import { useState } from "react";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
+import { OnboardingChecklist } from "../OnboardingChecklist";
 import { PainTracker, type PainItem } from "../PainTracker";
 import podcastCover from "@/assets/podcast-card-v5.png";
 import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
