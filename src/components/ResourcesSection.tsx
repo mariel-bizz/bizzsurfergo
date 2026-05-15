@@ -7,6 +7,8 @@ import {
 } from "lucide-react";
 
 import podcastCover from "@/assets/podcast-card-v5.png";
+import blogResourcesCover from "@/assets/blog-resources-card.png";
+import marketTrendsCover from "@/assets/market-trends-card.png";
 import careersTeamImg from "@/assets/careers-team.png";
 import apolloLogo from "@/assets/partners/apollo.png";
 import hubspotLogo from "@/assets/partners/hubspot.png";
@@ -75,8 +77,8 @@ type Resource = {
 };
 
 const resources: Resource[] = [
-  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true, cta: "Read insights" },
-  { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true, cta: "Download report" },
+  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true, cta: "Read insights", image: blogResourcesCover, imageAlt: "Blog & Resources — playbooks, frameworks and insights for transformation leaders" },
+  { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true, cta: "Download report", image: marketTrendsCover, imageAlt: "Market Trends Report — Agentic AI benchmarking study" },
   {
     icon: Headphones,
     title: "Podcast",
