@@ -142,7 +142,7 @@ export function PricingTab() {
         </span>
         <button
           onClick={() => setYearly(!yearly)}
-          className={`relative w-12 h-6 rounded-full transition ${yearly ? "bg-primary" : "bg-muted"}`}
+          className={`relative w-12 h-6 rounded-full transition ${yearly ? "bg-primary" : "bg-muted bg-[#02459c]"}`}
           aria-label="Toggle yearly pricing"
         >
           <span
