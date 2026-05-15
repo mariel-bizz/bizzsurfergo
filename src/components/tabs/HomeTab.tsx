@@ -190,40 +190,7 @@ export function HomeTab() {
       {/* Careers */}
       <CareersSection />
 
-      {/* Podcast promo */}
-      <section className="px-5">
-        <Link
-          to="/insights"
-          className="group block rounded-3xl overflow-hidden bg-gradient-deep text-white shadow-elegant border border-white/10 hover:shadow-soft transition"
-        >
-          <div className="flex items-stretch">
-            <div className="relative w-32 sm:w-40 shrink-0 bg-black/30">
-              <img
-                src={podcastCover}
-                alt="Agentic AI Intelligence for Business Transformation — podcast cover with Mariel Schaab"
-                className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold object-fill my-[10px]"
-                loading="lazy"
-              />
-            </div>
-            <div className="flex-1 p-4 sm:p-5 min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="inline-flex items-center gap-1 rounded-full bg-white/15 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest">
-                  <Headphones className="w-3 h-3" /> PODCAST & WEBINAR
-                </span>
-              </div>
-              <h2 className="mt-2 text-base sm:text-lg font-bold leading-tight">
-                Changing the Status Quo with Agentic AI in Business Transformation
-              </h2>
-              <p className="mt-1 text-xs opacity-90 line-clamp-2">
-                With Mariel Schaab, CEO &amp; Founder of BizzSurfer. New episodes weekly.
-              </p>
-              <div className="mt-3 inline-flex items-center gap-1.5 text-xs text-white/95 group-hover:text-white font-extrabold">
-                Listen now <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </div>
-          </div>
-        </Link>
-      </section>
+
 
       {/* Gamification card */}
       <section className="px-5">
