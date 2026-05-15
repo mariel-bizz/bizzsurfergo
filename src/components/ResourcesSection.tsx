@@ -100,15 +100,22 @@ const careers: Resource = {
   cta: "See open roles",
 };
 
-type Social = { icon: typeof Globe; label: string; href: string; color: string };
+import socialLinkedin from "@/assets/social/linkedin.png";
+import socialYoutube from "@/assets/social/youtube.png";
+import socialSpotify from "@/assets/social/spotify.png";
+import socialWebsite from "@/assets/social/website.png";
+import socialWhatsapp from "@/assets/social/whatsapp.png";
+import socialTwitter from "@/assets/social/twitter.png";
+
+type Social = { image: string; label: string; href: string };
 
 const socials: Social[] = [
-  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer", color: "#0A66C2" },
-  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@bizzsurfer", color: "#FF0000" },
-  { icon: Music, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly", color: "#1DB954" },
-  { icon: Globe, label: "Website", href: "https://bizzsurfer.com", color: "#3B82F6" },
-  { icon: Headphones, label: "Podcast", href: "/podcast", color: "#8B5CF6" },
-  { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer", color: "#1DA1F2" },
+  { image: socialLinkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer" },
+  { image: socialYoutube, label: "YouTube", href: "https://youtube.com/@bizzsurfer" },
+  { image: socialSpotify, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly" },
+  { image: socialWebsite, label: "Website", href: "https://bizzsurfer.com" },
+  { image: socialWhatsapp, label: "WhatsApp", href: "https://wa.me/" },
+  { image: socialTwitter, label: "Twitter", href: "https://twitter.com/bizzsurfer" },
 ];
 
 import { ArrowRight } from "lucide-react";
@@ -238,15 +245,16 @@ export function FollowSection() {
       <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
         <div className="grid grid-cols-3 gap-x-3 gap-y-4 justify-items-center">
           {socials.map((s) => {
-            const Icon = s.icon;
             const isInternal = s.href.startsWith("/");
             const content = (
               <>
-                <span
-                  className="w-12 h-12 sm:w-14 sm:h-14 rounded-full flex items-center justify-center shadow-card transition-transform group-hover:scale-105 group-active:scale-95"
-                  style={{ backgroundColor: s.color }}
-                >
-                  <Icon className="w-6 h-6 sm:w-7 sm:h-7 text-white" strokeWidth={2.25} />
+                <span className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-transform group-hover:scale-105 group-active:scale-95">
+                  <img
+                    src={s.image}
+                    alt={`${s.label} logo`}
+                    loading="lazy"
+                    className="w-full h-full object-contain"
+                  />
                 </span>
                 <span className="text-[10px] font-semibold text-muted-foreground">{s.label}</span>
               </>
