@@ -97,8 +97,8 @@ export function OnboardingChecklist() {
   };
 
   return (
-    <section className="px-5">
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card shadow-card">
+    <section className="relative overflow-hidden border border-border bg-card shadow-card border-[#f49134] rounded-2xl shadow-xl">
+      <div className="relative overflow-hidden">
         {/* gradient halo */}
         <span className="pointer-events-none absolute -inset-12 bg-[radial-gradient(circle_at_20%_0%,hsl(var(--primary)/0.15),transparent_60%)] blur-2xl" />
 
