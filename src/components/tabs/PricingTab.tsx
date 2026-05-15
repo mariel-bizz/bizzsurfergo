@@ -73,7 +73,7 @@ const tiers = [
     priceSuffix: "per month",
     tagline: "Full-suite Agentic AI experience for senior transformation champions.",
     features: [
-      { label: "Everything in Hero", included: true },
+      { label: "Everything in BizzSurferHero", included: true },
       { label: "Custom Agentic AI Agents", included: true },
       { label: "Enterprise API & Tool Integrations", included: true },
       { label: "Dedicated AI Transformation Advisor", included: true },
