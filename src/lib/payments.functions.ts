@@ -1,6 +1,30 @@
 import { createServerFn } from "@tanstack/react-start";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { type StripeEnv, createStripeClient } from "@/lib/stripe.server";
+import { getListing, parseListingPrice } from "@/lib/marketplace-data";
+
+/**
+ * Resolve the canonical price for a listing on the server. Throws if the
+ * listing is unknown or not directly payable. This is the single source of
+ * truth for marketplace pricing — never trust amounts coming from the client.
+ */
+function resolveCanonicalListingPrice(listingId: string): {
+  amountInCents: number;
+  currency: "eur";
+  interval: "month" | null;
+  title: string;
+} {
+  const listing = getListing(listingId);
+  if (!listing) throw new Error("Listing not found");
+  const parsed = parseListingPrice(listing.price);
+  if (!parsed) throw new Error("Listing is not directly payable");
+  return {
+    amountInCents: parsed.amountInCents,
+    currency: parsed.currency,
+    interval: parsed.interval,
+    title: listing.title,
+  };
+}
 
 /**
  * Map any error from Stripe / our handlers into a short, user-safe message.
