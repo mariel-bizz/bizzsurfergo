@@ -139,58 +139,6 @@ export function HomeTab() {
         <ROICalculator />
       </section>
 
-      {/* Powered by — compact, under ROI */}
-      <PoweredBySection />
-
-      {/* Pain points */}
-      <section id="reality-check" className="relative px-5 py-8 overflow-hidden scroll-mt-20">
-        <div className="pointer-events-none absolute inset-0 -z-10">
-          <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-primary/15 blur-3xl animate-pulse" />
-          <div className="absolute bottom-0 -right-10 w-56 h-56 rounded-full bg-accent/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
-        </div>
-
-        <SectionHeader className="mb-3">Pain Points Checker</SectionHeader>
-        <p className="mb-4 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
-
-        <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
-      </section>
-
-      {/* Explore & download — under Reality Check */}
-      <ResourcesSection />
-
-      {/* Gamification card */}
-      <section className="px-5">
-        <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
-          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
-          <div className="relative flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center">
-              <Trophy className="w-6 h-6" />
-            </div>
-            <div className="flex-1">
-              <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Executive Surfer</p>
-              <p className="text-lg font-bold">Level {Math.floor(game.state.xp / 100) + 1}</p>
-            </div>
-            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => navigate({ to: "/profile" })}>
-              View
-            </Button>
-          </div>
-          <div className="relative mt-4 grid grid-cols-3 gap-2 text-center">
-            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
-              <p className="text-lg font-bold">{game.state.xp}</p>
-              <p className="text-[10px] opacity-80 uppercase tracking-wider">XP</p>
-            </div>
-            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
-              <p className="text-lg font-bold">{game.state.streak}🔥</p>
-              <p className="text-[10px] opacity-80 uppercase tracking-wider">Streak</p>
-            </div>
-            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
-              <p className="text-lg font-bold">{game.state.badges.length}</p>
-              <p className="text-[10px] opacity-80 uppercase tracking-wider">Badges</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Go Agentic! */}
       <section className="px-5">
         <SectionHeader className="mb-3">Go Agentic!</SectionHeader>
@@ -253,6 +201,58 @@ export function HomeTab() {
             </div>
           </div>
         </Link>
+      </section>
+
+      {/* Powered by — compact, under ROI */}
+      <PoweredBySection />
+
+      {/* Pain points */}
+      <section id="reality-check" className="relative px-5 py-8 overflow-hidden scroll-mt-20">
+        <div className="pointer-events-none absolute inset-0 -z-10">
+          <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-primary/15 blur-3xl animate-pulse" />
+          <div className="absolute bottom-0 -right-10 w-56 h-56 rounded-full bg-accent/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
+        </div>
+
+        <SectionHeader className="mb-3">Pain Points Checker</SectionHeader>
+        <p className="mb-4 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
+
+        <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
+      </section>
+
+      {/* Explore & download — under Reality Check */}
+      <ResourcesSection />
+
+      {/* Gamification card */}
+      <section className="px-5">
+        <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
+          <div className="absolute -right-8 -top-8 w-32 h-32 rounded-full bg-white/10 blur-2xl" />
+          <div className="relative flex items-center gap-3">
+            <div className="w-12 h-12 rounded-xl bg-white/15 backdrop-blur flex items-center justify-center">
+              <Trophy className="w-6 h-6" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[11px] uppercase tracking-widest opacity-80 font-semibold">Executive Surfer</p>
+              <p className="text-lg font-bold">Level {Math.floor(game.state.xp / 100) + 1}</p>
+            </div>
+            <Button size="sm" variant="secondary" className="bg-white/20 hover:bg-white/30 text-white border-0 backdrop-blur" onClick={() => navigate({ to: "/profile" })}>
+              View
+            </Button>
+          </div>
+          <div className="relative mt-4 grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
+              <p className="text-lg font-bold">{game.state.xp}</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-wider">XP</p>
+            </div>
+            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
+              <p className="text-lg font-bold">{game.state.streak}🔥</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-wider">Streak</p>
+            </div>
+            <div className="rounded-xl bg-white/10 backdrop-blur py-2">
+              <p className="text-lg font-bold">{game.state.badges.length}</p>
+              <p className="text-[10px] opacity-80 uppercase tracking-wider">Badges</p>
+            </div>
+          </div>
+        </div>
       </section>
 
       {/* Social media */}
