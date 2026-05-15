@@ -39,7 +39,7 @@ const ITEMS: Item[] = [
     icon: Flame,
     title: "Run the Reality Check",
     desc: "60 seconds to score your top transformation pains.",
-    cta: "Pain point",
+    cta: "PAIN POINT >",
     to: "#reality-check",
   },
   {
