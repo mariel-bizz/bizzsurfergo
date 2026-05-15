@@ -187,11 +187,6 @@ export function HomeTab() {
       {/* Explore & download — under Reality Check */}
       <ResourcesSection />
 
-      {/* Careers */}
-      <CareersSection />
-
-
-
       {/* Gamification card */}
       <section className="px-5">
         <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
@@ -224,6 +219,9 @@ export function HomeTab() {
           </div>
         </div>
       </section>
+
+      {/* Careers */}
+      <CareersSection />
 
       {/* FAQs */}
       <section className="px-5">
