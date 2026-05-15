@@ -104,7 +104,7 @@ export function ROICalculator() {
           <Calculator className="w-4 h-4 text-primary-foreground" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="text-base font-bold text-foreground leading-tight">Business Transformation ROI Calculator</h3>
+          <h3 className="text-base font-bold text-foreground leading-tight whitespace-pre-line">Business Transformation{"\n"}ROI Calculator</h3>
           <p className="text-xs text-muted-foreground mt-1 leading-snug">Calculate the impact of not implementing Agentic AI in your organisation.</p>
         </div>
       </div>
