@@ -54,7 +54,7 @@ const ITEMS: Item[] = [
   {
     key: "events",
     icon: CalendarDays,
-    title: "Grab Your Seat for the next events!",
+    title: "Grab Your Seat for\nUpcoming Events!",
     desc: "RSVP or add one event to your calendar!",
     cta: "EVENTS >",
     to: "/events",
