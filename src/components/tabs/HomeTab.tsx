@@ -59,6 +59,9 @@ export function HomeTab() {
         </div>
       </section>
 
+      {/* Onboarding checklist */}
+      <OnboardingChecklist />
+
       {/* Podcast promo — above Reality Check */}
       <section className="px-5">
         <Link
