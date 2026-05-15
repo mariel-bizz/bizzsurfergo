@@ -75,6 +75,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "theme-color", content: "#ff6f00" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "default" },
+      { name: "apple-mobile-web-app-title", content: "BizzSurfer" },
       { name: "google-site-verification", content: "jtrIX3RxGE1mKrODQ9U7jA_cA956mCZrFMXbd1KJWqk" },
       { title: "BizzSurfer Go! Agentic AI & Business Transformation" },
       { name: "description", content: "BizzSurfer Go! Agentic AI for transformation leaders. Connect enterprise systems and let AI agents orchestrate change and accelerate ROI." },
@@ -95,7 +100,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/favicon.png" },
-      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/icon-192.png" },
+      { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "preconnect", href: "https://cdn.gpteng.co", crossOrigin: "anonymous" },
       { rel: "dns-prefetch", href: "https://cdn.gpteng.co" },
       { rel: "preload", as: "image", href: splashLogoUrl, fetchPriority: "high" },
