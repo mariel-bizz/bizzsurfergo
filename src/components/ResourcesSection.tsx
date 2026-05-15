@@ -6,6 +6,7 @@ import {
   BookOpen, Briefcase, Download, FileText, Globe, Headphones, Linkedin, Music, Plug, Twitter, Youtube,
 } from "lucide-react";
 
+import podcastCover from "@/assets/podcast-card-v5.png";
 import apolloLogo from "@/assets/partners/apollo.png";
 import hubspotLogo from "@/assets/partners/hubspot.png";
 import devrevLogo from "@/assets/partners/devrev.png";
