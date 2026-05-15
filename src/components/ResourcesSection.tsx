@@ -69,12 +69,23 @@ type Resource = {
   internal?: boolean;
   download?: boolean;
   cta: string;
+  image?: string;
+  imageAlt?: string;
 };
 
 const resources: Resource[] = [
   { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true, cta: "Read insights" },
   { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true, cta: "Download report" },
-  { icon: Headphones, title: "Podcast", desc: "Conversations with operators behind enterprise AI.", href: "/podcast", internal: true, cta: "Listen now" },
+  {
+    icon: Headphones,
+    title: "Podcast",
+    desc: "Changing the Status Quo with Agentic AI — with Mariel Schaab, CEO & Founder of BizzSurfer.",
+    href: "/podcast",
+    internal: true,
+    cta: "Listen now",
+    image: podcastCover,
+    imageAlt: "Agentic AI Intelligence for Business Transformation — podcast cover with Mariel Schaab",
+  },
 ];
 
 const careers: Resource = {
