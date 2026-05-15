@@ -86,63 +86,8 @@ function CareersPage() {
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    loadStartRef.current = performance.now();
-    trackEvent("careers_widget_load_attempt", { attempt: reloadKey + 1 });
-
-    // Reset any prior widget instance so re-injecting actually reruns
-    delete (window as any).teamtailor;
-    (window as any).teamtailorSettings = {
-      ...((window as any).teamtailorSettings || {}),
-      widgetPosition: "bottom-right",
-      color: "#f28328",
-      locale: "",
-      company: TT_HOST,
-    };
-
-    const settings = (window as any).teamtailorSettings;
-    const s = document.createElement("script");
-    s.type = "text/javascript";
-    s.async = true;
-    s.src = `https://${settings.company}/widget${settings.locale}`;
-    s.onload = () => {
-      const duration_ms = Math.round(performance.now() - loadStartRef.current);
-      setStatus("ready");
-      trackEvent("careers_widget_loaded", { duration_ms, attempt: reloadKey + 1 });
-    };
-    s.onerror = () => {
-      const duration_ms = Math.round(performance.now() - loadStartRef.current);
-      setStatus("failed");
-      trackEvent("careers_widget_failed", {
-        reason: "script_error",
-        duration_ms,
-        attempt: reloadKey + 1,
-      });
-    };
-    document.body.appendChild(s);
-
-    const timeout = window.setTimeout(() => {
-      if (!(window as any).teamtailor) {
-        const duration_ms = Math.round(performance.now() - loadStartRef.current);
-        setStatus((prev) => {
-          if (prev !== "ready") {
-            trackEvent("careers_widget_failed", {
-              reason: "timeout",
-              duration_ms,
-              attempt: reloadKey + 1,
-            });
-            return "failed";
-          }
-          return prev;
-        });
-      }
-    }, 6000);
-
-    return () => {
-      window.clearTimeout(timeout);
-      s.parentNode?.removeChild(s);
-    };
+    // Floating Teamtailor widget removed by request — mark as ready so the page renders normally.
+    setStatus("ready");
   }, [reloadKey]);
 
   // Loading countdown — ticks while we wait for the widget script
@@ -204,8 +149,7 @@ function CareersPage() {
     <div className="min-h-[60vh] px-5 py-10 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold text-foreground text-[#ff6f00]">Careers at BizzSurfer</h1>
       <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-        Help us build the agentic future. Browse open roles below — the widget
-        appears at the bottom-right of this page.
+        Help us build the agentic future. Browse open roles on our careers site.
       </p>
 
       {/* CTA + benefits */}
