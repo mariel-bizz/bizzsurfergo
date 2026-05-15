@@ -7,6 +7,7 @@ import { useState } from "react";
 import { WaitlistDialog } from "../WaitlistDialog";
 import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection } from "../ResourcesSection";
+import { OnboardingChecklist } from "../OnboardingChecklist";
 import { PainTracker, type PainItem } from "../PainTracker";
 import podcastCover from "@/assets/podcast-card-v5.png";
 import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
@@ -57,6 +58,9 @@ export function HomeTab() {
           </div>
         </div>
       </section>
+
+      {/* Onboarding checklist */}
+      <OnboardingChecklist />
 
       {/* Podcast promo — above Reality Check */}
       <section className="px-5">
@@ -140,7 +144,7 @@ export function HomeTab() {
       <PoweredBySection />
 
       {/* Pain points */}
-      <section className="relative px-5 py-8 overflow-hidden">
+      <section id="reality-check" className="relative px-5 py-8 overflow-hidden scroll-mt-20">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-primary/15 blur-3xl animate-pulse" />
           <div className="absolute bottom-0 -right-10 w-56 h-56 rounded-full bg-accent/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
@@ -161,7 +165,7 @@ export function HomeTab() {
           <p className="mt-2 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
         </div>
 
-        <PainTracker items={painPoints} />
+        <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
       </section>
 
       {/* Explore & download — under Reality Check */}

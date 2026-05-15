@@ -205,6 +205,9 @@ function SignedInProfile() {
         },
       });
       toast.success("Preferences saved");
+      if (displayName.trim() && jobTitle.trim() && company.trim()) {
+        game.completeOnboardingStep("profile");
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not save");
     } finally {
@@ -740,6 +743,17 @@ function SignedInProfile() {
             className="w-full"
           >
             <Sparkles className="w-4 h-4 mr-2" aria-hidden /> Show welcome screen
+          </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              game.reopenOnboarding();
+              navigate({ to: "/" });
+            }}
+            aria-label="Show the onboarding checklist on Home"
+            className="w-full"
+          >
+            <Sparkles className="w-4 h-4 mr-2" aria-hidden /> Show onboarding checklist
           </Button>
         </CardContent>
       </Card>

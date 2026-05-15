@@ -17,7 +17,7 @@ type State = { active: boolean; intensity: number };
 const SEVERITY = (n: number) =>
   n >= 8 ? "Critical" : n >= 6 ? "High" : n >= 4 ? "Moderate" : n > 0 ? "Low" : "—";
 
-export function PainTracker({ items }: { items: PainItem[] }) {
+export function PainTracker({ items, onSubmit }: { items: PainItem[]; onSubmit?: () => void }) {
   const [state, setState] = useState<Record<string, State>>(() =>
     Object.fromEntries(items.map((p) => [p.key, { active: true, intensity: 5 }]))
   );
@@ -182,7 +182,7 @@ export function PainTracker({ items }: { items: PainItem[] }) {
             size="sm"
             className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95"
           >
-            <Link to="/chat" search={{ q: promptText }}>
+            <Link to="/chat" search={{ q: promptText }} onClick={() => onSubmit?.()}>
               Get a plan <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </Button>

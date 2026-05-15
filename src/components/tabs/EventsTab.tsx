@@ -102,6 +102,7 @@ export function EventsTab() {
         const badges = s.badges.includes("Event Insider") ? s.badges : [...s.badges, "Event Insider"];
         return { ...s, xp: s.xp + 25, badges };
       });
+      game.completeOnboardingStep("events");
       const ev = eventsData.find((x) => x.id === id);
       if (ev) setConfirmation({ event: ev, meetLink: meet });
       toast.success("You're in! +25 XP");
@@ -252,17 +253,17 @@ export function EventsTab() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end">
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild onSelect={() => game.completeOnboardingStep("events")}>
                       <a href={googleCalendarUrl(eventsData.find((x) => x.id === e.id)!)} target="_blank" rel="noreferrer">
                         Google Calendar
                       </a>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild onSelect={() => game.completeOnboardingStep("events")}>
                       <a href={outlookCalendarUrl(eventsData.find((x) => x.id === e.id)!)} target="_blank" rel="noreferrer">
                         Outlook / Teams
                       </a>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild onSelect={() => game.completeOnboardingStep("events")}>
                       <a href={icsDownloadUrl(eventsData.find((x) => x.id === e.id)!)} download>
                         Download .ics (Apple, others)
                       </a>
