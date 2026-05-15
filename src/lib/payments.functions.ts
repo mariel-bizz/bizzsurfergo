@@ -180,6 +180,11 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
   .handler(async ({ data, context }) => {
     const { userId, claims } = context;
     const customerEmail = (claims?.email as string | undefined) ?? undefined;
+
+    // Server-side canonical price lookup. We ignore client-supplied
+    // amount/currency/interval/title and use the server's source of truth
+    // to prevent price tampering.
+    const canonical = resolveCanonicalListingPrice(data.listingId);
     try {
       const stripe = createStripeClient(data.environment);
 
@@ -188,16 +193,16 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
         userId,
       });
 
-      const isRecurring = data.interval === "month";
+      const isRecurring = canonical.interval === "month";
       const session = await stripe.checkout.sessions.create({
         line_items: [{
           price_data: {
-            currency: data.currency,
+            currency: canonical.currency,
             product_data: {
-              name: data.listingTitle,
+              name: canonical.title,
               metadata: { listingId: data.listingId },
             },
-            unit_amount: data.amountInCents,
+            unit_amount: canonical.amountInCents,
             ...(isRecurring && { recurring: { interval: "month" } }),
           },
           quantity: 1,
@@ -208,9 +213,9 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
         automatic_tax: { enabled: true },
         customer: customerId,
         customer_update: { address: "auto", name: "auto" },
-        metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle },
+        metadata: { userId, listingId: data.listingId, listingTitle: canonical.title },
         ...(isRecurring && {
-          subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: data.listingTitle } },
+          subscription_data: { metadata: { userId, listingId: data.listingId, listingTitle: canonical.title } },
         }),
       });
 
@@ -221,8 +226,8 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
           userId,
           sessionId: session.id,
           listingId: data.listingId,
-          amountCents: data.amountInCents,
-          interval: data.interval,
+          amountCents: canonical.amountInCents,
+          interval: canonical.interval,
           environment: data.environment,
         }),
       );
@@ -234,7 +239,7 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
         {
           userId,
           listingId: data.listingId,
-          amountCents: data.amountInCents,
+          amountCents: canonical.amountInCents,
           environment: data.environment,
         },
         err,
