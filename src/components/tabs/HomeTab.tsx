@@ -50,7 +50,7 @@ export function HomeTab() {
             Don't fall behind! Let's create a 90-day plan to implement Agentic AI and orchestrate your enterprise systems!
           </p>
           <div className="mt-5 flex flex-col gap-2.5">
-            <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 font-bold text-lg" onClick={() => navigate({ to: "/chat" })}>
+            <Button size="lg" className="bg-gradient-agentic text-white shadow-soft hover:opacity-95 h-12 font-bold text-lg" onClick={() => navigate({ to: "/chat" })}>
               Chat to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
             <Button size="lg" variant="outline" className="h-12 text-sm font-bold" onClick={() => setWaitOpen(true)}>
