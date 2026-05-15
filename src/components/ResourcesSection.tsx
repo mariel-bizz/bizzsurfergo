@@ -172,6 +172,12 @@ export function CareersSection() {
     <section className="px-5">
       <SectionHeader className="mb-3">Careers</SectionHeader>
       <ResourceTile r={careers} />
+      <img
+        src={careersTeamImg}
+        alt="Apply for working at BizzSurfer — diverse team"
+        className="mt-3 w-full rounded-2xl shadow-elegant"
+        loading="lazy"
+      />
     </section>
   );
 }
