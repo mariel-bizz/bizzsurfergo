@@ -100,15 +100,22 @@ const careers: Resource = {
   cta: "See open roles",
 };
 
-type Social = { icon: typeof Globe; label: string; href: string; color: string };
+import socialLinkedin from "@/assets/social/linkedin.png";
+import socialYoutube from "@/assets/social/youtube.png";
+import socialSpotify from "@/assets/social/spotify.png";
+import socialWebsite from "@/assets/social/website.png";
+import socialWhatsapp from "@/assets/social/whatsapp.png";
+import socialTwitter from "@/assets/social/twitter.png";
+
+type Social = { image: string; label: string; href: string };
 
 const socials: Social[] = [
-  { icon: Linkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer", color: "#0A66C2" },
-  { icon: Youtube, label: "YouTube", href: "https://youtube.com/@bizzsurfer", color: "#FF0000" },
-  { icon: Music, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly", color: "#1DB954" },
-  { icon: Globe, label: "Website", href: "https://bizzsurfer.com", color: "#3B82F6" },
-  { icon: Headphones, label: "Podcast", href: "/podcast", color: "#8B5CF6" },
-  { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer", color: "#1DA1F2" },
+  { image: socialLinkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer" },
+  { image: socialYoutube, label: "YouTube", href: "https://youtube.com/@bizzsurfer" },
+  { image: socialSpotify, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly" },
+  { image: socialWebsite, label: "Website", href: "https://bizzsurfer.com" },
+  { image: socialWhatsapp, label: "WhatsApp", href: "https://wa.me/" },
+  { image: socialTwitter, label: "Twitter", href: "https://twitter.com/bizzsurfer" },
 ];
 
 import { ArrowRight } from "lucide-react";
