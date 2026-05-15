@@ -3,10 +3,13 @@ import {
   ArrowRight,
   Bookmark,
   BookmarkCheck,
+  CheckCircle2,
   Download,
   ExternalLink,
   FileText,
   Filter,
+  Loader2,
+  Mail,
   Newspaper,
   Search,
   TrendingUp,
@@ -16,7 +19,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import marketTrendsCover from "@/assets/market-trends-card.png";
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export const Route = createFileRoute("/market-trends")({
   head: () => ({
