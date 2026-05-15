@@ -198,6 +198,68 @@ function useBookmarks() {
   return { ids, toggle };
 }
 
+function getHostname(href: string): string {
+  try {
+    return new URL(href).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+function NewsThumbnail({
+  href,
+  source,
+  title,
+}: {
+  href: string;
+  source: string;
+  title: string;
+}) {
+  const host = getHostname(href);
+  const sources = useMemo(
+    () =>
+      [
+        `https://api.microlink.io/?url=${encodeURIComponent(href)}&embed=image.url`,
+        `https://image.thum.io/get/width/800/crop/450/${href}`,
+        host ? `https://logo.clearbit.com/${host}?size=256` : "",
+        host ? `https://www.google.com/s2/favicons?domain=${host}&sz=256` : "",
+      ].filter(Boolean),
+    [href, host],
+  );
+  const [idx, setIdx] = useState(0);
+  const [failed, setFailed] = useState(false);
+
+  if (failed || sources.length === 0) {
+    const initial = (source || host || "?").charAt(0).toUpperCase();
+    return (
+      <div className="absolute inset-0 flex items-center justify-center bg-gradient-agentic">
+        <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/95 text-3xl font-black text-[#02459c] shadow-lg">
+          {initial}
+        </div>
+      </div>
+    );
+  }
+
+  const isLogoStage = idx >= 2; // clearbit/favicon = render contained, not cover
+  return (
+    <img
+      key={sources[idx]}
+      src={sources[idx]}
+      alt={title}
+      loading="lazy"
+      className={
+        isLogoStage
+          ? "absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/95 object-contain p-3 shadow-lg"
+          : "absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+      }
+      onError={() => {
+        if (idx + 1 < sources.length) setIdx(idx + 1);
+        else setFailed(true);
+      }}
+    />
+  );
+}
+
 function MarketTrendsPage() {
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<Category>("All");
