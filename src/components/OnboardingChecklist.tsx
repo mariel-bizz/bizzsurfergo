@@ -63,7 +63,7 @@ const ITEMS: Item[] = [
     icon: UserCircle2,
     title: "Complete Your Profile",
     desc: "Name, role and company unlock personalised picks!",
-    cta: "Chat NOW with BizzSurfer GO!",
+    cta: "PROFILE >",
     to: "/profile",
   },
 ];
