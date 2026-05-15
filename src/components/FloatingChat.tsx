@@ -24,7 +24,7 @@ export function FloatingChat() {
       <SheetTrigger asChild>
         <button
           aria-label="Open BizzSurfer Go! chat"
-          className="fixed z-40 right-4 bottom-24 w-14 h-14 rounded-full bg-gradient-agentic shadow-elegant flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shadow-2xl"
+          className="fixed z-40 right-4 bottom-24 w-14 h-14 rounded-full bg-gradient-primary shadow-elegant flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shadow-2xl"
         >
           <MessageCircle className="w-6 h-6 text-primary-foreground" strokeWidth={2.4} />
           <span className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[9px] font-bold uppercase tracking-wider shadow-soft">
