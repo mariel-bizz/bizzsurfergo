@@ -53,7 +53,7 @@ export function HomeTab() {
             <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 font-bold text-lg" onClick={() => navigate({ to: "/chat" })}>
               Chat to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4" />
             </Button>
-            <Button size="lg" variant="outline" className="h-12 text-sm font-semibold" onClick={() => setWaitOpen(true)}>
+            <Button size="lg" variant="outline" className="h-12 text-sm font-bold" onClick={() => setWaitOpen(true)}>
               Join the Agentic AI launch waitlist
             </Button>
           </div>
