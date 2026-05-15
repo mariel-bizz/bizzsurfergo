@@ -288,7 +288,7 @@ export function PricingTab() {
 
           <div className="mt-4 space-y-2">
             <Label htmlFor="team-seats" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Number of seats
+              NUMBER OF SEATS
             </Label>
             <div className="flex items-center gap-2">
               <Button
