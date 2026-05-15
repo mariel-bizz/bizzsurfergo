@@ -95,7 +95,7 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
               </button>
             ))}
           </div>
-          <Button disabled={!provider} onClick={() => setStep(2)} className="w-full rounded-2xl bg-gradient-primary">
+          <Button disabled={!provider} onClick={() => setStep(2)} className="w-full rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2">
             Continue
           </Button>
         </section>
