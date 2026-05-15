@@ -63,7 +63,7 @@ const ITEMS: Item[] = [
     icon: UserCircle2,
     title: "Complete Your Profile",
     desc: "Name, role and company unlock personalised picks!",
-    cta: "Profile",
+    cta: "Chat NOW with BizzSurfer GO!",
     to: "/profile",
   },
 ];
@@ -190,7 +190,7 @@ export function OnboardingChecklist() {
                         >
                           {item.title}
                         </p>
-                        <p className="text-[11px] text-muted-foreground leading-snug mt-0.5">
+                        <p className="text-[11px] text-muted-foreground leading-snug mt-0.5 font-semibold">
                           {item.desc}
                         </p>
                       </div>
