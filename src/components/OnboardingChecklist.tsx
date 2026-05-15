@@ -172,7 +172,7 @@ export function OnboardingChecklist() {
                       className={`w-full flex items-center gap-3 p-3 text-left transition relative overflow-hidden rounded-2xl border border-double ${
                         isDone
                           ? "border-primary/30 bg-primary/5 shadow-none"
-                          : "border-border bg-card shadow-card hover:bg-muted/50"
+                          : "border-border bg-card shadow-xl hover:bg-muted/50 border-[#ffad1f]"
                       }`}
                     >
                       <div
