@@ -4,6 +4,8 @@ import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
 import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
+import { trackEvent } from "@/lib/analytics";
 import logo from "@/assets/bizzsurfer-logo.png";
 import headerLogo from "@/assets/bizzsurfer-go-logo-horizontal.png";
 
@@ -11,20 +13,53 @@ export type TabKey = "home" | "chat" | "events" | "marketplace" | "pricing" | "p
 
 const STORAGE = "bizzsurfer_state";
 
+export type OnboardingStep = "chat" | "reality" | "marketplace" | "events" | "profile";
+
+export type OnboardingState = {
+  steps: Record<OnboardingStep, boolean>;
+  dismissed: boolean;
+  completedAt: string | null;
+};
+
 export type GameState = {
   xp: number;
   streak: number;
   badges: string[];
   questionsAsked: number;
   lastVisit: string | null;
+  onboarding: OnboardingState;
 };
 
-const defaultState: GameState = { xp: 0, streak: 0, badges: [], questionsAsked: 0, lastVisit: null };
+const defaultOnboarding: OnboardingState = {
+  steps: { chat: false, reality: false, marketplace: false, events: false, profile: false },
+  dismissed: false,
+  completedAt: null,
+};
+
+const defaultState: GameState = {
+  xp: 0,
+  streak: 0,
+  badges: [],
+  questionsAsked: 0,
+  lastVisit: null,
+  onboarding: defaultOnboarding,
+};
 
 export type Game = {
   state: GameState;
   update: (p: Partial<GameState> | ((s: GameState) => GameState)) => void;
+  completeOnboardingStep: (step: OnboardingStep) => void;
+  dismissOnboarding: () => void;
+  reopenOnboarding: () => void;
 };
+
+function normalizeOnboarding(o: Partial<OnboardingState> | undefined): OnboardingState {
+  return {
+    steps: { ...defaultOnboarding.steps, ...(o?.steps ?? {}) },
+    dismissed: o?.dismissed ?? false,
+    completedAt: o?.completedAt ?? null,
+  };
+}
 
 export function useGameStateInternal(): Game {
   const [state, setState] = useState<GameState>(defaultState);
@@ -33,7 +68,10 @@ export function useGameStateInternal(): Game {
     if (typeof window === "undefined") return;
     try {
       const raw = localStorage.getItem(STORAGE);
-      const parsed: GameState = raw ? JSON.parse(raw) : defaultState;
+      const parsed: GameState = raw
+        ? { ...defaultState, ...JSON.parse(raw) }
+        : defaultState;
+      parsed.onboarding = normalizeOnboarding(parsed.onboarding);
       const today = new Date().toDateString();
       if (parsed.lastVisit !== today) {
         const yesterday = new Date(Date.now() - 86400000).toDateString();
@@ -56,8 +94,45 @@ export function useGameStateInternal(): Game {
     });
   };
 
-  return { state, update };
+  const completeOnboardingStep = (step: OnboardingStep) => {
+    setState((prev) => {
+      if (prev.onboarding.steps[step]) return prev;
+      const steps = { ...prev.onboarding.steps, [step]: true };
+      const allDone = Object.values(steps).every(Boolean);
+      const wasAllDone = !!prev.onboarding.completedAt;
+      const badges = [...prev.badges];
+      let xp = prev.xp + 25;
+      if (allDone && !wasAllDone) {
+        xp += 100;
+        if (!badges.includes("Launch Crew")) badges.push("Launch Crew");
+        trackEvent("onboarding_completed", {});
+        // Defer toast so it doesn't fire during render
+        setTimeout(() => toast.success("Onboarding complete! +100 XP · Launch Crew badge unlocked"), 0);
+      } else {
+        setTimeout(() => toast.success("+25 XP · Step complete"), 0);
+      }
+      trackEvent("onboarding_step_completed", { step });
+      const next: GameState = {
+        ...prev,
+        xp,
+        badges,
+        onboarding: {
+          ...prev.onboarding,
+          steps,
+          completedAt: allDone ? (prev.onboarding.completedAt ?? new Date().toISOString()) : prev.onboarding.completedAt,
+        },
+      };
+      if (typeof window !== "undefined") localStorage.setItem(STORAGE, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const dismissOnboarding = () => update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: true } }));
+  const reopenOnboarding = () => update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: false } }));
+
+  return { state, update, completeOnboardingStep, dismissOnboarding, reopenOnboarding };
 }
+
 
 const GameContext = createContext<Game | null>(null);
 
