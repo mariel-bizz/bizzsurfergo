@@ -88,8 +88,8 @@ export function ResourcesSection() {
           {resources.map((r) => {
             const inner = (
               <>
-                <div className="w-11 h-11 rounded-xl bg-primary/15 flex items-center justify-center shrink-0 text-inherit">
-                  <r.icon className="w-4 h-4 text-primary-foreground" />
+                <div className="w-11 h-11 rounded-2xl bg-gradient-agentic flex items-center justify-center shrink-0 shadow-soft">
+                  <r.icon className="w-5 h-5 text-white" strokeWidth={2.25} />
                 </div>
                 <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
                 <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
@@ -101,7 +101,7 @@ export function ResourcesSection() {
               </>
             );
             const className =
-              "rounded-2xl bg-card border border-border p-4 shadow-card flex flex-col gap-2 active:scale-[0.98] transition-transform";
+              "rounded-3xl bg-card border-2 border-[#02459c] p-4 shadow-card flex flex-col gap-2 active:scale-[0.98] hover:shadow-elegant transition-all";
             return r.internal ? (
               <Link key={r.title} to={r.href} className={className}>
                 {inner}
