@@ -51,7 +51,7 @@ export function HomeTab() {
           </p>
           <div className="mt-5 flex flex-col gap-2.5">
             <Button size="lg" className="group bg-gradient-agentic bg-[length:200%_200%] bg-[position:0%_50%] text-white shadow-soft h-12 font-bold text-lg transition-[background-position,transform,box-shadow] duration-500 ease-out hover:bg-[position:100%_50%] hover:shadow-elegant hover:-translate-y-0.5 active:translate-y-0 will-change-transform" onClick={() => navigate({ to: "/chat" })}>
-              Chat to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4" />
+              Chat to BizzSurfer Go! <ArrowRight className="ml-1 w-4 h-4 transition-transform duration-300 ease-out group-hover:translate-x-1" />
             </Button>
             <Button size="lg" variant="outline" className="h-12 text-sm font-bold" onClick={() => setWaitOpen(true)}>
               Join the Agentic AI launch waitlist
