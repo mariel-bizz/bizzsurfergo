@@ -205,6 +205,9 @@ function SignedInProfile() {
         },
       });
       toast.success("Preferences saved");
+      if (displayName.trim() && jobTitle.trim() && company.trim()) {
+        game.completeOnboardingStep("profile");
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Could not save");
     } finally {
