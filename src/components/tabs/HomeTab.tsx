@@ -135,6 +135,7 @@ export function HomeTab() {
 
       {/* ROI Calculator — above Reality Check */}
       <section className="px-5">
+        <SectionHeader className="mb-3">ROI Calculator</SectionHeader>
         <ROICalculator />
       </section>
 
@@ -148,20 +149,8 @@ export function HomeTab() {
           <div className="absolute bottom-0 -right-10 w-56 h-56 rounded-full bg-accent/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
         </div>
 
-        <div className="mb-5">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-destructive">
-            <AlertTriangle className="w-3 h-3" /> Reality check
-          </span>
-          <h2 className="mt-3 text-2xl font-bold text-foreground leading-tight">
-            Your pain points you <span className="italic text-primary relative">
-              feel
-              <svg className="absolute left-0 -bottom-1 w-full" height="6" viewBox="0 0 120 6" preserveAspectRatio="none" aria-hidden="true">
-                <path d="M2 4 Q 30 0, 60 3 T 118 2" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" />
-              </svg>
-            </span> !
-          </h2>
-          <p className="mt-2 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
-        </div>
+        <SectionHeader className="mb-3">Pain Points Checker</SectionHeader>
+        <p className="mb-4 text-xs text-muted-foreground">Toggle what hurts and slide the intensity — we'll surface your top pain and prep a chat prompt.</p>
 
         <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
       </section>
@@ -204,6 +193,7 @@ export function HomeTab() {
 
       {/* Go Agentic! */}
       <section className="px-5">
+        <SectionHeader className="mb-3">Go Agentic!</SectionHeader>
         <Link
           to="/marketplace"
           className="group relative block overflow-hidden rounded-3xl p-[2px] bg-gradient-to-br from-primary via-primary/70 to-accent shadow-glow hover:shadow-soft transition-all duration-300 hover:-translate-y-0.5"
