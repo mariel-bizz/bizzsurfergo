@@ -9,7 +9,7 @@ type Props = {
 export function SectionHeader({ children, className = "", as: Tag = "h2" }: Props) {
   return (
     <div className={`flex items-center gap-3 ${className}`}>
-      <Tag className="text-[#ff6f00] font-bold whitespace-nowrap">{children}</Tag>
+      <Tag className="font-bold whitespace-nowrap text-[#d05825]">{children}</Tag>
       <span className="flex-1 h-px bg-[#ff6f00]/40" />
     </div>
   );
