@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
+import careersTeamImg from "@/assets/careers-team.png";
 
 export const Route = createFileRoute("/careers")({
   component: CareersPage,
