@@ -412,16 +412,24 @@ function MarketTrendsPage() {
               const inner = (
                 <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-agentic">
-                    <div className="absolute inset-0 flex flex-col justify-between p-4 text-white">
-                      <img
-                        src={`https://www.google.com/s2/favicons?domain=${new URL(item.href, "https://x").hostname}&sz=64`}
-                        alt=""
-                        loading="lazy"
-                        className="w-8 h-8 rounded-md bg-white/90 p-1 shadow-sm"
-                      />
-                      <div className="text-xs font-bold uppercase tracking-widest opacity-90 drop-shadow">
+                    <img
+                      src={`https://api.microlink.io/?url=${encodeURIComponent(item.href)}&embed=image.url`}
+                      alt={item.title}
+                      loading="lazy"
+                      className="absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      onError={(e) => {
+                        const img = e.currentTarget as HTMLImageElement;
+                        const fallback = `https://www.google.com/s2/favicons?domain=${new URL(item.href, "https://x").hostname}&sz=128`;
+                        if (img.src !== fallback) {
+                          img.src = fallback;
+                          img.className = "absolute left-1/2 top-1/2 w-16 h-16 -translate-x-1/2 -translate-y-1/2 rounded-xl bg-white/90 p-2 shadow-lg";
+                        }
+                      }}
+                    />
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/50 to-transparent p-3">
+                      <span className="text-xs font-bold uppercase tracking-widest text-white drop-shadow">
                         {item.source}
-                      </div>
+                      </span>
                     </div>
                     <button
                       type="button"
