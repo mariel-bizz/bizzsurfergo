@@ -159,21 +159,20 @@ function PodcastPage() {
         <p className="text-sm opacity-95">
           Real talk with builders, founders, and transformation leaders shipping Agentic AI in production.
         </p>
-        <Button
-          asChild
-          size="lg"
-          className="w-full bg-white text-primary hover:bg-white/90 font-bold"
-        >
-          <a
-            href={SPOTIFY_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={() => trackOutbound("open_in_spotify_cta", SPOTIFY_URL)}
-            onAuxClick={() => trackOutbound("open_in_spotify_cta_aux", SPOTIFY_URL)}
-          >
-            Open in Spotify <ExternalLink className="ml-2 w-4 h-4" />
-          </a>
-        </Button>
+        <iframe
+          data-testid="embed-iframe"
+          title="BizzSurfer Podcast on Spotify"
+          src="https://open.spotify.com/embed/show/033eVlORlWzlZicN049Oog?utm_source=generator"
+          width="100%"
+          height={352}
+          frameBorder={0}
+          allowFullScreen
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          style={{ borderRadius: 12 }}
+          className="block w-full"
+          onLoad={() => trackEvent("podcast_embed_loaded", { title: "Hero show", kind: "show" })}
+        />
       </div>
 
       <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card">
