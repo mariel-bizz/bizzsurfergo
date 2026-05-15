@@ -112,7 +112,7 @@ type Social = { image: string; label: string; href: string };
 const socials: Social[] = [
   { image: socialLinkedin, label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer" },
   { image: socialYoutube, label: "YouTube", href: "https://youtube.com/@bizzsurfer" },
-  { image: socialSpotify, label: "Spotify", href: "https://open.spotify.com/user/31l6phq64rtvbtqbgeyozhlbpyly" },
+  { image: socialSpotify, label: "Spotify", href: "https://open.spotify.com/playlist/1nG8JpnKEGY9YKbtcfF14F?si=sGlb0pfcRWaJS3EF1UpUbQ&pi=KtRoQwN1SLGVc" },
   { image: socialWebsite, label: "Website", href: "https://bizzsurfer.com" },
   { image: socialWhatsapp, label: "WhatsApp", href: "https://wa.me/" },
   { image: socialTwitter, label: "Twitter", href: "https://twitter.com/bizzsurfer" },
