@@ -78,7 +78,7 @@ type Resource = {
 
 const resources: Resource[] = [
   { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true, cta: "Read insights", image: blogResourcesCover, imageAlt: "Blog & Resources — playbooks, frameworks and insights for transformation leaders" },
-  { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true, cta: "Download report", image: marketTrendsCover, imageAlt: "Market Trends Report — Agentic AI benchmarking study" },
+  { icon: FileText, title: "Market Trends Report", desc: "Latest Agentic AI news, trends & benchmarks for transformation leaders.", href: "/market-trends", internal: true, cta: "See the news", image: marketTrendsCover, imageAlt: "Market Trends Report — Agentic AI benchmarking study" },
   {
     icon: Headphones,
     title: "Podcast",
