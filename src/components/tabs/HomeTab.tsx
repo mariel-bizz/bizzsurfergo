@@ -144,7 +144,7 @@ export function HomeTab() {
       <PoweredBySection />
 
       {/* Pain points */}
-      <section className="relative px-5 py-8 overflow-hidden">
+      <section id="reality-check" className="relative px-5 py-8 overflow-hidden scroll-mt-20">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="absolute -top-16 -left-10 w-56 h-56 rounded-full bg-primary/15 blur-3xl animate-pulse" />
           <div className="absolute bottom-0 -right-10 w-56 h-56 rounded-full bg-accent/30 blur-3xl animate-pulse [animation-delay:1.5s]" />
