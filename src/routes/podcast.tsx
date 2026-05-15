@@ -204,7 +204,7 @@ function PlaylistEmbed() {
   const src = "https://open.spotify.com/embed/playlist/1nG8JpnKEGY9YKbtcfF14F?utm_source=generator";
 
   return (
-    <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card p-3 sm:p-4">
+    <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card p-3 sm:p-4 py-[8px] shadow-2xl opacity-95">
       <div className="relative w-full h-[480px] sm:h-[600px] lg:h-[720px]">
         {!loaded && (
           <div
