@@ -29,9 +29,9 @@ const ITEMS: Item[] = [
   {
     key: "chat",
     icon: Bot,
-    title: "Meet your AI co-pilot",
-    desc: "Send your first question to BizzSurfer Go!",
-    cta: "Open chat",
+    title: "Chat with BizzSurfer GO!",
+    desc: "Ask questions to BizzSurfer Go! using Perplexity, Mistral AI, OpenAI, Claude Anthropic and Gemini!",
+    cta: "Time to chat",
     to: "/chat",
   },
   {
@@ -39,31 +39,31 @@ const ITEMS: Item[] = [
     icon: Flame,
     title: "Run the Reality Check",
     desc: "60 seconds to score your top transformation pains.",
-    cta: "Start",
+    cta: "Pain point",
     to: "#reality-check",
   },
   {
     key: "marketplace",
     icon: Store,
-    title: "Explore an Agentic playbook",
-    desc: "Browse a marketplace listing to see what ships.",
-    cta: "Browse",
+    title: "Explore Agentic AI tools!",
+    desc: "Browse our offers to boost your transformation!",
+    cta: "Go agentic",
     to: "/marketplace",
   },
   {
     key: "events",
     icon: CalendarDays,
-    title: "Save a next event",
-    desc: "RSVP or add one event to your calendar.",
-    cta: "See events",
+    title: "Grab Your Seat for the next events!",
+    desc: "RSVP or add one event to your calendar!",
+    cta: "Events",
     to: "/events",
   },
   {
     key: "profile",
     icon: UserCircle2,
-    title: "Complete your profile",
-    desc: "Name, role and company unlock personalised picks.",
-    cta: "Edit profile",
+    title: "Complete Your Profile",
+    desc: "Name, role and company unlock personalised picks!",
+    cta: "Profile",
     to: "/profile",
   },
 ];
@@ -147,14 +147,8 @@ export function OnboardingChecklist() {
               </span>
               <span className="text-[11px] font-semibold text-muted-foreground">+25 XP per step</span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1 leading-snug font-semibold">
-              {allDone ? "You're all set — Launch Crew unlocked!" : (
-                <>
-                  Business Transformation
-                  <br />
-                  ROI Calculator
-                </>
-              )}
+            <p className="text-sm text-primary font-bold mt-1 leading-snug">
+              {allDone ? "You're all set — Launch Crew unlocked!" : `${done} of ${total} done — Let's get started!`}
             </p>
           </div>
 
