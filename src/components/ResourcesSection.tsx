@@ -60,12 +60,30 @@ const partners: { name: string; src: string }[] = [
   { name: "Notion", src: notionLogo },
 ];
 
-const resources = [
-  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true },
-  { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true },
-  { icon: Headphones, title: "Podcast", desc: "Conversations with operators behind enterprise AI.", href: "/podcast", internal: true },
-  { icon: Briefcase, title: "Careers at BizzSurfer", desc: "Join Our BizzSurfer Team! building autonomous workflows for enterprise transformation.", href: "/careers", internal: true },
+type Resource = {
+  icon: typeof BookOpen;
+  title: string;
+  desc: string;
+  href: string;
+  internal?: boolean;
+  download?: boolean;
+  cta: string;
+};
+
+const resources: Resource[] = [
+  { icon: BookOpen, title: "Blog & Resources", desc: "Playbooks, frameworks & insights for transformation leaders.", href: "/insights", internal: true, cta: "Read insights" },
+  { icon: FileText, title: "Market Trends Report", desc: "Download the latest Agentic AI benchmarking study.", href: "https://www.bizzsurfer.com/reports", download: true, cta: "Download report" },
+  { icon: Headphones, title: "Podcast", desc: "Conversations with operators behind enterprise AI.", href: "/podcast", internal: true, cta: "Listen now" },
 ];
+
+const careers: Resource = {
+  icon: Briefcase,
+  title: "Careers at BizzSurfer",
+  desc: "Join Our BizzSurfer Team! building autonomous workflows for enterprise transformation.",
+  href: "/careers",
+  internal: true,
+  cta: "See open roles",
+};
 
 type Social = { icon: typeof Globe; label: string; href: string; color: string };
 
