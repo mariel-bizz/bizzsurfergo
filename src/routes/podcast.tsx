@@ -159,17 +159,20 @@ function PodcastPage() {
         <p className="text-sm opacity-95">
           Real talk with builders, founders, and transformation leaders shipping Agentic AI in production.
         </p>
+      </div>
+
+      <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card p-3 sm:p-4">
         <iframe
           data-testid="embed-iframe"
-          style={{ borderRadius: 12 }}
+          title="BizzSurfer Spotify playlist"
           src="https://open.spotify.com/embed/playlist/1nG8JpnKEGY9YKbtcfF14F?utm_source=generator"
-          width="90%"
           height={352}
           frameBorder={0}
           allowFullScreen
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
           loading="lazy"
-          className="block"
+          style={{ borderRadius: 12 }}
+          className="block w-full"
           onLoad={() => trackEvent("podcast_embed_loaded", { title: "Hero playlist", kind: "playlist" })}
         />
       </div>
