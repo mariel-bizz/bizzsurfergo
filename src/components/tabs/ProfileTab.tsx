@@ -744,6 +744,17 @@ function SignedInProfile() {
           >
             <Sparkles className="w-4 h-4 mr-2" aria-hidden /> Show welcome screen
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              game.reopenOnboarding();
+              navigate({ to: "/" });
+            }}
+            aria-label="Show the onboarding checklist on Home"
+            className="w-full"
+          >
+            <Sparkles className="w-4 h-4 mr-2" aria-hidden /> Show onboarding checklist
+          </Button>
         </CardContent>
       </Card>
 
