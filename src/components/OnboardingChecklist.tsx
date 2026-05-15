@@ -55,7 +55,7 @@ const ITEMS: Item[] = [
     icon: CalendarDays,
     title: "Grab Your Seat for the next events!",
     desc: "RSVP or add one event to your calendar!",
-    cta: "Events",
+    cta: "EVENTS >",
     to: "/events",
   },
   {
