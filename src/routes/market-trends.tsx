@@ -3,10 +3,13 @@ import {
   ArrowRight,
   Bookmark,
   BookmarkCheck,
+  CheckCircle2,
   Download,
   ExternalLink,
   FileText,
   Filter,
+  Loader2,
+  Mail,
   Newspaper,
   Search,
   TrendingUp,
@@ -16,7 +19,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { trackEvent } from "@/lib/analytics";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 import marketTrendsCover from "@/assets/market-trends-card.png";
+
+const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 export const Route = createFileRoute("/market-trends")({
   head: () => ({
@@ -583,22 +590,108 @@ function MarketTrendsPage() {
         )}
       </section>
 
-      <section className="mt-10 rounded-2xl bg-gradient-primary p-6 text-primary-foreground shadow-elegant">
-        <h2 className="text-lg font-bold">Want this in your inbox?</h2>
-        <p className="mt-1 text-sm opacity-95">
-          Get the BizzSurfer weekly digest — Agentic AI news, benchmarks and
-          operator playbooks.
-        </p>
-        <Link
-          to="/insights"
-          className="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-bold text-primary hover:bg-white/90"
-        >
-          Explore insights <ArrowRight className="w-4 h-4" />
-        </Link>
-      </section>
+      <DigestSignup />
     </div>
   );
 }
+
+function DigestSignup() {
+  const [email, setEmail] = useState("");
+  const [status, setStatus] = useState<"idle" | "loading" | "success">("idle");
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const value = email.trim().toLowerCase();
+    if (!EMAIL_RE.test(value) || value.length > 320) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    setStatus("loading");
+    const { error } = await supabase
+      .from("digest_subscribers")
+      .insert({ email: value, source: "market-trends" });
+
+    if (error && !/duplicate key|unique/i.test(error.message)) {
+      setStatus("idle");
+      toast.error("Couldn't subscribe right now. Please try again.");
+      trackEvent("market_trends_digest_signup_error", { message: error.message });
+      return;
+    }
+
+    setStatus("success");
+    trackEvent("market_trends_digest_signup", { email: value });
+    toast.success("You're in — check your inbox for the next digest.");
+  };
+
+  return (
+    <section className="mt-10 rounded-2xl bg-gradient-primary p-6 text-primary-foreground shadow-elegant">
+      <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-widest opacity-90">
+        <Mail className="w-4 h-4" />
+        Weekly digest
+      </div>
+      <h2 className="mt-2 text-lg font-bold">Want this in your inbox?</h2>
+      <p className="mt-1 text-sm opacity-95">
+        Get the BizzSurfer weekly digest — Agentic AI news, benchmarks and
+        operator playbooks.
+      </p>
+
+      {status === "success" ? (
+        <div className="mt-4 inline-flex items-center gap-2 rounded-full bg-white/15 px-4 py-2 text-sm font-semibold backdrop-blur">
+          <CheckCircle2 className="w-4 h-4" />
+          Subscribed — see you next week.
+        </div>
+      ) : (
+        <form
+          onSubmit={handleSubmit}
+          className="mt-4 flex flex-col gap-2 sm:flex-row"
+        >
+          <label className="sr-only" htmlFor="digest-email">
+            Email address
+          </label>
+          <Input
+            id="digest-email"
+            type="email"
+            required
+            autoComplete="email"
+            inputMode="email"
+            maxLength={320}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@company.com"
+            disabled={status === "loading"}
+            className="flex-1 bg-white text-foreground placeholder:text-muted-foreground"
+          />
+          <Button
+            type="submit"
+            disabled={status === "loading"}
+            className="bg-white text-primary hover:bg-white/90"
+          >
+            {status === "loading" ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Subscribing…
+              </>
+            ) : (
+              <>
+                Subscribe
+                <ArrowRight className="w-4 h-4" />
+              </>
+            )}
+          </Button>
+        </form>
+      )}
+
+      <p className="mt-3 text-xs opacity-80">
+        No spam. Unsubscribe any time. Or{" "}
+        <Link to="/insights" className="underline hover:opacity-100">
+          explore all insights
+        </Link>
+        .
+      </p>
+    </section>
+  );
+}
+
 
 function NewsSkeleton() {
   return (
