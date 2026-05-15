@@ -255,9 +255,6 @@ export function HomeTab() {
         </div>
       </section>
 
-      {/* Social media */}
-      <FollowSection />
-
       {/* FAQs */}
       <section className="px-5">
         <SectionHeader className="mb-4"><span className="text-xl">FAQs | Frequently asked at the C-suite</span></SectionHeader>
@@ -280,6 +277,9 @@ export function HomeTab() {
           })}
         </div>
       </section>
+
+      {/* Social media */}
+      <FollowSection />
 
       {/* CTA waitlist */}
       <section className="px-5">
