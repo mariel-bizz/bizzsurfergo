@@ -182,7 +182,7 @@ export function PainTracker({ items, onSubmit }: { items: PainItem[]; onSubmit?:
             size="sm"
             className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95"
           >
-            <Link to="/chat" search={{ q: promptText }}>
+            <Link to="/chat" search={{ q: promptText }} onClick={() => onSubmit?.()}>
               Get a plan <ArrowRight className="ml-1 w-4 h-4" />
             </Link>
           </Button>
