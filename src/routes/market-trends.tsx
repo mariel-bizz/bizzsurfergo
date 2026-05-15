@@ -411,16 +411,18 @@ function MarketTrendsPage() {
               const saved = bookmarks.has(item.id);
               const inner = (
                 <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
-                    <img
-                      src={item.image}
-                      alt={item.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).style.display = "none";
-                      }}
-                    />
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-agentic">
+                    <div className="absolute inset-0 flex flex-col justify-between p-4 text-white">
+                      <img
+                        src={`https://www.google.com/s2/favicons?domain=${new URL(item.href, "https://x").hostname}&sz=64`}
+                        alt=""
+                        loading="lazy"
+                        className="w-8 h-8 rounded-md bg-white/90 p-1 shadow-sm"
+                      />
+                      <div className="text-xs font-bold uppercase tracking-widest opacity-90 drop-shadow">
+                        {item.source}
+                      </div>
+                    </div>
                     <button
                       type="button"
                       onClick={(e) => {
