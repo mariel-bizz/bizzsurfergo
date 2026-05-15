@@ -10,7 +10,7 @@ import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection, CareersSection } from "../ResourcesSection";
 import { OnboardingChecklist } from "../OnboardingChecklist";
 import { PainTracker, type PainItem } from "../PainTracker";
-import podcastCover from "@/assets/podcast-card-v5.png";
+
 import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
 import { pastEvents, eventLink } from "@/lib/events-data";
 
