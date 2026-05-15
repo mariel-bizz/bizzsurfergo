@@ -137,7 +137,7 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
             <Button
               disabled={departments.length === 0 && !otherDept.trim()}
               onClick={() => setStep(3)}
-              className="rounded-2xl flex-1 bg-gradient-primary"
+              className="rounded-md flex-1 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2"
             >
               Continue
             </Button>
