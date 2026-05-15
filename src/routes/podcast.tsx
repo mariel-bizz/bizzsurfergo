@@ -200,3 +200,46 @@ function PodcastPage() {
     </section>
   );
 }
+
+function PlaylistEmbed() {
+  const isMobile = typeof window !== "undefined" && window.matchMedia("(max-width: 640px)").matches;
+  const [autoplay, setAutoplay] = useState(!isMobile);
+  const [loaded, setLoaded] = useState(false);
+  const src = `https://open.spotify.com/embed/playlist/1nG8JpnKEGY9YKbtcfF14F?utm_source=generator${autoplay ? "&autoplay=1" : ""}`;
+
+  return (
+    <div className="rounded-3xl overflow-hidden shadow-card border border-border bg-card p-3 sm:p-4 space-y-3">
+      <div className="flex items-center justify-between gap-3 px-1">
+        <Label htmlFor="podcast-autoplay" className="text-sm font-medium text-foreground cursor-pointer">
+          Autoplay
+        </Label>
+        <Switch
+          id="podcast-autoplay"
+          checked={autoplay}
+          onCheckedChange={(v) => {
+            setAutoplay(v);
+            trackEvent("podcast_autoplay_toggled", { enabled: v });
+          }}
+        />
+      </div>
+      <iframe
+        key={src}
+        data-testid="embed-iframe"
+        title="BizzSurfer Spotify playlist"
+        src={src}
+        frameBorder={0}
+        allowFullScreen
+        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+        loading="lazy"
+        style={{ borderRadius: 12 }}
+        className="block w-full h-[232px] sm:h-[352px] lg:h-[420px]"
+        onLoad={() => {
+          if (!loaded) {
+            setLoaded(true);
+            trackEvent("podcast_embed_loaded", { title: "Hero playlist", kind: "playlist" });
+          }
+        }}
+      />
+    </div>
+  );
+}
