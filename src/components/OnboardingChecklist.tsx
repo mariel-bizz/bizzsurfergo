@@ -186,7 +186,7 @@ export function OnboardingChecklist() {
                       <div className="flex-1 min-w-0">
                         <p
                           className={`text-sm font-semibold leading-tight ${
-                            isDone ? "text-muted-foreground line-through" : "text-foreground"
+                            isDone ? "text-muted-foreground line-through" : "text-[#ed6a0c]"
                           }`}
                         >
                           {item.title}
