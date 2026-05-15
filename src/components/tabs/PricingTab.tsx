@@ -61,7 +61,7 @@ const tiers = [
     ],
     cta: "Upgrade to Hero",
     highlighted: true,
-    badge: "Most popular",
+    badge: "MOST POPULAR",
   },
   {
     id: "champion",
@@ -73,7 +73,7 @@ const tiers = [
     priceSuffix: "per month",
     tagline: "Full-suite Agentic AI experience for senior transformation champions.",
     features: [
-      { label: "Everything in Hero", included: true },
+      { label: "Everything in BizzSurferHero", included: true },
       { label: "Custom Agentic AI Agents", included: true },
       { label: "Enterprise API & Tool Integrations", included: true },
       { label: "Dedicated AI Transformation Advisor", included: true },
@@ -262,7 +262,7 @@ export function PricingTab() {
         {/* Team plan — per-seat, no fixed cost */}
         <div className="relative rounded-3xl p-5 border bg-card border-border shadow-card">
           <span className="absolute -top-2.5 right-5 rounded-full bg-accent px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent-foreground shadow-soft">
-            For teams
+            FOR TEAMS
           </span>
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-xl flex items-center justify-center bg-gradient-primary">
@@ -288,7 +288,7 @@ export function PricingTab() {
 
           <div className="mt-4 space-y-2">
             <Label htmlFor="team-seats" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-              Number of seats
+              NUMBER OF SEATS
             </Label>
             <div className="flex items-center gap-2">
               <Button
