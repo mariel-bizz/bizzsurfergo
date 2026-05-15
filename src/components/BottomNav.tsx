@@ -25,8 +25,11 @@ export function BottomNav({ active }: { active: TabKey }) {
               className="relative flex flex-col items-center justify-center py-2.5 gap-0.5 transition-colors"
             >
               {isChat ? (
-                <div className={`-mt-7 w-14 h-14 rounded-full flex items-center justify-center bg-gradient-agentic-shift shadow-elegant shadow-xl ${isActive ? "animate-pulse-ring" : ""}`}>
+                <div className={`relative -mt-7 w-14 h-14 rounded-full flex items-center justify-center bg-gradient-agentic-shift shadow-elegant shadow-xl ${isActive ? "animate-pulse-ring" : ""}`}>
                   <Icon className="w-7 h-7 text-primary-foreground" strokeWidth={2.4} />
+                  <span className="absolute -top-1 -right-1 px-1.5 py-0.5 rounded-full bg-accent text-accent-foreground text-[9px] font-bold uppercase tracking-wider shadow-soft">
+                    Go!
+                  </span>
                 </div>
               ) : (
                 <Icon className={`w-5 h-5 ${isActive ? "text-primary" : "text-muted-foreground"}`} strokeWidth={isActive ? 2.4 : 2} />
