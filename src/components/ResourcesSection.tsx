@@ -259,7 +259,7 @@ export function TrustedPartnersSection() {
   return (
     <section className="px-5">
       <div className="rounded-2xl border border-border p-5 bg-transparent">
-        <p className="uppercase tracking-widest text-muted-foreground text-center font-bold text-sm text-[#ff6f00]">Trusted partners</p>
+        <p className="font-bold whitespace-nowrap text-[#f33939] uppercase tracking-widest text-center text-sm">Trusted partners</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-4">
           {partners.map((p) => (
             <div
