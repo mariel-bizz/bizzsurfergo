@@ -147,7 +147,7 @@ export function HomeTab() {
         </div>
 
         <div className="mb-5">
-          <span className="relative px-5 overflow-hidden py-[3px]">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-destructive/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-destructive">
             <AlertTriangle className="w-3 h-3" /> Reality check
           </span>
           <h2 className="mt-3 text-2xl font-bold text-foreground leading-tight">
