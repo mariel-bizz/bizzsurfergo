@@ -2,7 +2,7 @@ import { useGame } from "../AppShell";
 import { SectionHeader } from "@/components/SectionHeader";
 import { Link, useNavigate } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot, Headphones } from "lucide-react";
+import { ArrowRight, Sparkles, Network, Users, Target, AlertTriangle, ChevronDown, Trophy, Rocket, Bot } from "lucide-react";
 import { useState } from "react";
 
 import { WaitlistDialog } from "../WaitlistDialog";
