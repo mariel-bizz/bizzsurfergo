@@ -410,16 +410,17 @@ function MarketTrendsPage() {
               const isInternal = item.href.startsWith("/");
               const saved = bookmarks.has(item.id);
               const inner = (
-                <article className="group rounded-2xl border border-border bg-card p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
-                      <span>{item.source}</span>
-                      <span className="text-muted-foreground">·</span>
-                      <span className="text-muted-foreground">{item.date}</span>
-                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-muted-foreground">
-                        {item.category}
-                      </span>
-                    </div>
+                <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
+                  <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).style.display = "none";
+                      }}
+                    />
                     <button
                       type="button"
                       onClick={(e) => {
@@ -430,10 +431,10 @@ function MarketTrendsPage() {
                       aria-label={saved ? "Remove from saved" : "Save for later"}
                       aria-pressed={saved}
                       className={
-                        "shrink-0 rounded-full p-1.5 transition-colors " +
+                        "absolute right-2 top-2 rounded-full p-1.5 backdrop-blur transition-colors " +
                         (saved
-                          ? "bg-[#ff6f00]/10 text-[#ff6f00] hover:bg-[#ff6f00]/20"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground")
+                          ? "bg-[#ff6f00] text-white hover:bg-[#ff6f00]/90"
+                          : "bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground")
                       }
                     >
                       {saved ? (
@@ -443,20 +444,30 @@ function MarketTrendsPage() {
                       )}
                     </button>
                   </div>
-                  <h3 className="mt-2 text-sm font-bold text-foreground leading-snug">
-                    {item.title}
-                  </h3>
-                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-                    {item.summary}
-                  </p>
-                  <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
-                    Read more
-                    {isInternal ? (
-                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                    ) : (
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    )}
-                  </span>
+                  <div className="p-4">
+                    <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
+                      <span>{item.source}</span>
+                      <span className="text-muted-foreground">·</span>
+                      <span className="text-muted-foreground">{item.date}</span>
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-[10px] font-bold normal-case tracking-normal text-muted-foreground">
+                        {item.category}
+                      </span>
+                    </div>
+                    <h3 className="mt-2 text-sm font-bold text-foreground leading-snug">
+                      {item.title}
+                    </h3>
+                    <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+                      {item.summary}
+                    </p>
+                    <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
+                      Read more
+                      {isInternal ? (
+                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+                      ) : (
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      )}
+                    </span>
+                  </div>
                 </article>
               );
               return (
