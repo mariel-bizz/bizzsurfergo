@@ -40,6 +40,7 @@ import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
+import { Route as AdminDigestSubscribersRouteImport } from './routes/admin.digest-subscribers'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
@@ -208,6 +209,11 @@ const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   path: '/admin/insights-comments',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminDigestSubscribersRoute = AdminDigestSubscribersRouteImport.update({
+  id: '/admin/digest-subscribers',
+  path: '/admin/digest-subscribers',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/admin/analytics',
   path: '/admin/analytics',
@@ -297,6 +303,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -342,6 +349,7 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -388,6 +396,7 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -435,6 +444,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/digest-subscribers'
     | '/admin/insights-comments'
     | '/admin/sales'
     | '/admin/seo'
@@ -480,6 +490,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/digest-subscribers'
     | '/admin/insights-comments'
     | '/admin/sales'
     | '/admin/seo'
@@ -525,6 +536,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/admin/alerts'
     | '/admin/analytics'
+    | '/admin/digest-subscribers'
     | '/admin/insights-comments'
     | '/admin/sales'
     | '/admin/seo'
@@ -571,6 +583,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminDigestSubscribersRoute: typeof AdminDigestSubscribersRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
   AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
@@ -815,6 +828,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminInsightsCommentsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/digest-subscribers': {
+      id: '/admin/digest-subscribers'
+      path: '/admin/digest-subscribers'
+      fullPath: '/admin/digest-subscribers'
+      preLoaderRoute: typeof AdminDigestSubscribersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/admin/analytics'
@@ -923,6 +943,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminDigestSubscribersRoute: AdminDigestSubscribersRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
   AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
