@@ -96,49 +96,56 @@ const socials: Social[] = [
   { icon: Twitter, label: "Twitter", href: "https://twitter.com/bizzsurfer", color: "#1DA1F2" },
 ];
 
+import { ArrowRight } from "lucide-react";
+
+function ResourceTile({ r }: { r: Resource }) {
+  const inner = (
+    <>
+      <div className="w-11 h-11 rounded-2xl bg-gradient-agentic flex items-center justify-center shrink-0 shadow-soft">
+        <r.icon className="w-5 h-5 text-white" strokeWidth={2.25} />
+      </div>
+      <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
+      <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
+      <span className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-agentic text-white text-[11px] font-bold px-3 py-2 shadow-soft transition-transform group-hover:scale-[1.02] group-active:scale-[0.98]">
+        {r.download ? <Download className="w-3 h-3" /> : null}
+        {r.cta}
+        {!r.download ? <ArrowRight className="w-3 h-3" /> : null}
+      </span>
+    </>
+  );
+  const className =
+    "group rounded-3xl bg-card border-2 border-[#02459c] p-4 shadow-card flex flex-col gap-2 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elegant hover:border-[#0357c2] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:shadow-elegant focus-visible:ring-2 focus-visible:ring-[#02459c]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
+  return r.internal ? (
+    <Link to={r.href} className={className}>
+      {inner}
+    </Link>
+  ) : (
+    <a href={r.href} target="_blank" rel="noopener noreferrer" className={className}>
+      {inner}
+    </a>
+  );
+}
+
 export function ResourcesSection() {
   return (
     <section className="px-5 space-y-5">
-      {/* Resources grid */}
       <div>
         <SectionHeader className="mb-3">Explore & Download</SectionHeader>
         <div className="grid grid-cols-2 gap-3">
-          {resources.map((r) => {
-            const inner = (
-              <>
-                <div className="w-11 h-11 rounded-2xl bg-gradient-agentic flex items-center justify-center shrink-0 shadow-soft">
-                  <r.icon className="w-5 h-5 text-white" strokeWidth={2.25} />
-                </div>
-                <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
-                <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
-                {r.download && (
-                  <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-primary mt-auto">
-                    <Download className="w-3 h-3" /> Download
-                  </span>
-                )}
-              </>
-            );
-            const className =
-              "rounded-3xl bg-card border-2 border-[#02459c] p-4 shadow-card flex flex-col gap-2 active:scale-[0.98] hover:shadow-elegant transition-all";
-            return r.internal ? (
-              <Link key={r.title} to={r.href} className={className}>
-                {inner}
-              </Link>
-            ) : (
-              <a
-                key={r.title}
-                href={r.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={className}
-              >
-                {inner}
-              </a>
-            );
-          })}
+          {resources.map((r) => (
+            <ResourceTile key={r.title} r={r} />
+          ))}
         </div>
       </div>
+    </section>
+  );
+}
 
+export function CareersSection() {
+  return (
+    <section className="px-5">
+      <SectionHeader className="mb-3">Careers</SectionHeader>
+      <ResourceTile r={careers} />
     </section>
   );
 }
