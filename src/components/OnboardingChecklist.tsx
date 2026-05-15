@@ -211,7 +211,7 @@ export function OnboardingChecklist() {
                 variant="ghost"
                 size="sm"
                 onClick={() => game.dismissOnboarding()}
-                className="text-xs text-muted-foreground hover:text-foreground"
+                className="border-[#02459c] text-xs font-extrabold text-[#02459c] shadow-lg"
               >
                 <X className="w-3.5 h-3.5 mr-1" /> Hide checklist
               </Button>
