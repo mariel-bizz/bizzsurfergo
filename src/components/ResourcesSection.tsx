@@ -114,7 +114,7 @@ function ResourceTile({ r }: { r: Resource }) {
   const inner = (
     <>
       {r.image ? (
-        <div className="-mx-4 -mt-4 mb-1 h-28 overflow-hidden rounded-t-[1.25rem] bg-black/30">
+        <div className="-ml-4 -my-4 mr-1 w-28 shrink-0 overflow-hidden rounded-l-[1.25rem] bg-black/30">
           <img
             src={r.image}
             alt={r.imageAlt ?? ""}
@@ -123,21 +123,23 @@ function ResourceTile({ r }: { r: Resource }) {
           />
         </div>
       ) : (
-        <div className="w-11 h-11 rounded-2xl bg-gradient-agentic flex items-center justify-center shrink-0 shadow-soft">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-agentic flex items-center justify-center shrink-0 shadow-soft">
           <r.icon className="w-5 h-5 text-white" strokeWidth={2.25} />
         </div>
       )}
-      <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
-      <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
-      <span className="mt-auto inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-agentic text-white text-[11px] font-bold px-3 py-2 shadow-soft transition-transform group-hover:scale-[1.02] group-active:scale-[0.98]">
-        {r.download ? <Download className="w-3 h-3" /> : null}
-        {r.cta}
-        {!r.download ? <ArrowRight className="w-3 h-3" /> : null}
-      </span>
+      <div className="flex flex-col gap-1.5 flex-1 min-w-0">
+        <h3 className="text-sm font-bold text-foreground leading-tight">{r.title}</h3>
+        <p className="text-[11px] text-muted-foreground leading-snug">{r.desc}</p>
+        <span className="mt-1 self-start inline-flex items-center justify-center gap-1.5 rounded-full bg-gradient-agentic text-white text-[11px] font-bold px-3 py-1.5 shadow-soft transition-transform group-hover:scale-[1.02] group-active:scale-[0.98]">
+          {r.download ? <Download className="w-3 h-3" /> : null}
+          {r.cta}
+          {!r.download ? <ArrowRight className="w-3 h-3" /> : null}
+        </span>
+      </div>
     </>
   );
   const className =
-    "group rounded-3xl bg-card border-2 border-[#02459c] p-4 shadow-card flex flex-col gap-2 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elegant hover:border-[#0357c2] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:shadow-elegant focus-visible:ring-2 focus-visible:ring-[#02459c]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
+    "group rounded-3xl bg-card border-2 border-[#02459c] p-4 shadow-card flex flex-row items-center gap-3 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elegant hover:border-[#0357c2] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:shadow-elegant focus-visible:ring-2 focus-visible:ring-[#02459c]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
   return r.internal ? (
     <Link to={r.href} className={className}>
       {inner}
