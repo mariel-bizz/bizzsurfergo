@@ -691,9 +691,7 @@ function DigestSignup() {
     </section>
   );
 }
-    </div>
-  );
-}
+
 
 function NewsSkeleton() {
   return (
