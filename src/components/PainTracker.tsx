@@ -17,7 +17,7 @@ type State = { active: boolean; intensity: number };
 const SEVERITY = (n: number) =>
   n >= 8 ? "Critical" : n >= 6 ? "High" : n >= 4 ? "Moderate" : n > 0 ? "Low" : "—";
 
-export function PainTracker({ items }: { items: PainItem[] }) {
+export function PainTracker({ items, onSubmit }: { items: PainItem[]; onSubmit?: () => void }) {
   const [state, setState] = useState<Record<string, State>>(() =>
     Object.fromEntries(items.map((p) => [p.key, { active: true, intensity: 5 }]))
   );
