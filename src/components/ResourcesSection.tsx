@@ -156,7 +156,7 @@ export function ResourcesSection() {
     <section className="px-5 space-y-5">
       <div>
         <SectionHeader className="mb-3">Explore & Download</SectionHeader>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3">
           {resources.map((r) => (
             <ResourceTile key={r.title} r={r} />
           ))}
