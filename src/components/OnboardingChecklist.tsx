@@ -142,7 +142,7 @@ export function OnboardingChecklist() {
 
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-brand px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-soft">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#02459c] to-[#f49134] px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-soft">
                 <Sparkles className="w-3 h-3" />
                 Get started
               </span>
@@ -196,7 +196,7 @@ export function OnboardingChecklist() {
                         </p>
                       </div>
                       {!isDone && (
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-primary shrink-0">
+                        <span className="text-[11px] font-extrabold uppercase tracking-wider shrink-0 bg-gradient-to-r from-[#02459c] to-[#f49134] bg-clip-text text-transparent">
                           {item.cta}
                         </span>
                       )}
