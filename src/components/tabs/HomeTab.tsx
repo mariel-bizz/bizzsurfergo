@@ -47,7 +47,7 @@ export function HomeTab() {
             Agentic AI Intelligence for <span className="text-primary italic">Business Transformation</span>
           </h1>
           <p className="mt-3 text-sm text-muted-foreground leading-relaxed font-semibold">
-            Don't fall behind! Let's create a 90-day plan to implement Agentic AI and orchestrate your enterprise systems! Let's work together in AI adoption and transformation execution!
+            Don't fall behind! Let's create a 90-day plan to implement Agentic AI and orchestrate your enterprise systems!
           </p>
           <div className="mt-5 flex flex-col gap-2.5">
             <Button size="lg" className="bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-sm font-bold" onClick={() => navigate({ to: "/chat" })}>
