@@ -202,6 +202,13 @@ function CareersPage() {
         </div>
       </section>
 
+      <img
+        src={careersTeamImg}
+        alt="Apply for working at BizzSurfer — diverse team"
+        className="mt-4 w-full rounded-2xl shadow-elegant"
+        loading="lazy"
+      />
+
       <noscript>
         <div className="mt-6 rounded-lg border border-border bg-muted/40 p-4 text-sm text-foreground">
           Please enable JavaScript to view our open roles. You can also visit
