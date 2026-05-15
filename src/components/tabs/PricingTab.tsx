@@ -150,7 +150,7 @@ export function PricingTab() {
           />
         </button>
         <span className={`text-xs font-semibold ${yearly ? "text-foreground" : "text-muted-foreground"}`}>
-          Yearly <span className="text-primary">−2 mo free</span>
+          Yearly <span className="text-primary font-bold text-[#f49134]">2 months FREE!</span>
         </span>
       </div>
 
