@@ -310,7 +310,7 @@ export function CtaBlock() {
             See how BizzSurfer accelerates Agentic AI transformation.
           </p>
           <Button asChild variant="secondary" size="sm" className="mt-auto">
-            <a href="https://bizzsurfer.com/contact" target="_blank" rel="noopener noreferrer">
+            <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer">
               Book a demo <ArrowRight className="ml-1 h-4 w-4" />
             </a>
           </Button>
