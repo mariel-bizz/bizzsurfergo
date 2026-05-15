@@ -2,6 +2,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import {
   Bot,
+  MessageCircle,
   Flame,
   Store,
   CalendarDays,
@@ -28,7 +29,7 @@ type Item = {
 const ITEMS: Item[] = [
   {
     key: "chat",
-    icon: Bot,
+    icon: MessageCircle,
     title: "Chat with BizzSurfer GO!",
     desc: "Ask questions to BizzSurfer Go! using Perplexity, Mistral AI, OpenAI, Claude Anthropic and Gemini!",
     cta: "TIME TO CHAT >",
@@ -44,7 +45,7 @@ const ITEMS: Item[] = [
   },
   {
     key: "marketplace",
-    icon: Store,
+    icon: Bot,
     title: "Explore Agentic AI tools!",
     desc: "Browse our offers to boost your transformation!",
     cta: "GO AGENTIC >",
