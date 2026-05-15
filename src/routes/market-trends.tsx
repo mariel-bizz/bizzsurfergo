@@ -67,132 +67,94 @@ type NewsItem = {
   href: string;
   date: string;
   category: Exclude<Category, "All">;
+  image: string;
 };
 
-const REPORT_URL = "https://www.bizzsurfer.com/reports";
 const PAGE_SIZE = 6;
 const BOOKMARKS_KEY = "bizzsurfer:market-trends:bookmarks";
 
 const NEWS: NewsItem[] = [
   {
-    id: "gartner-2029",
-    source: "Gartner",
-    title: "Agentic AI predicted to autonomously resolve 80% of common service issues by 2029",
+    id: "servicenow-ai-specialists",
+    source: "ServiceNow",
+    title: "AI agents and AI specialists: the new digital workforce",
     summary:
-      "Gartner forecasts a 30% reduction in operational costs across customer service operations driven by autonomous agents.",
-    href: "https://www.gartner.com/en/newsroom/press-releases/2025-03-05-gartner-predicts-agentic-ai-will-autonomously-resolve-80-percent-of-common-customer-service-issues",
-    date: "2025",
-    category: "Analyst",
-  },
-  {
-    id: "mck-state-of-ai",
-    source: "McKinsey",
-    title: "The state of AI: Agentic systems move from pilots to production",
-    summary:
-      "Enterprises shifting from copilots to autonomous agents are seeing measurable EBITDA impact in finance, supply chain, and CX.",
-    href: "https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai",
-    date: "2025",
-    category: "Research",
-  },
-  {
-    id: "mit-stall",
-    source: "MIT Sloan",
-    title: "Why most agentic AI projects stall — and what the leaders do differently",
-    summary:
-      "Successful programs invest in tool orchestration, evaluation harnesses, and human-in-the-loop guardrails from day one.",
-    href: "https://sloanreview.mit.edu/topic/artificial-intelligence/",
-    date: "2025",
-    category: "Research",
-  },
-  {
-    id: "a16z-agentic-stack",
-    source: "a16z",
-    title: "The agentic stack: from LLM apps to autonomous workflows",
-    summary:
-      "Andreessen Horowitz maps the emerging agentic infrastructure layer — orchestration, memory, tools, and evaluation.",
-    href: "https://a16z.com/ai/",
-    date: "2025",
-    category: "Tools",
-  },
-  {
-    id: "forrester-contract",
-    source: "Forrester",
-    title: "Agentic AI reshapes the enterprise software contract",
-    summary:
-      "Buyers are renegotiating SaaS deals to include outcome-based pricing as agents replace seat-based usage.",
-    href: "https://www.forrester.com/blogs/category/artificial-intelligence-ai/",
-    date: "2025",
-    category: "Analyst",
-  },
-  {
-    id: "bizzsurfer-insights",
-    source: "BizzSurfer Insights",
-    title: "How transformation leaders are operationalising Agentic AI",
-    summary:
-      "Playbooks, frameworks and benchmarks from operators shipping autonomous workflows in regulated enterprises.",
-    href: "/insights",
-    date: "Weekly",
+      "How enterprises are pairing AI agents with AI specialists to automate workflows and accelerate transformation.",
+    href: "https://www.servicenow.com/workflow/ai/ai-agents-ai-specialists.html",
+    date: "2026",
     category: "Operators",
+    image: "https://logo.clearbit.com/servicenow.com",
   },
   {
-    id: "eu-ai-act",
-    source: "European Commission",
-    title: "EU AI Act: what agentic systems must disclose in 2026",
+    id: "microsoft-wti-2026",
+    source: "Microsoft WorkLab",
+    title: "Agents, human agency and the opportunity for every organization",
     summary:
-      "New transparency, logging and human-oversight obligations enter force for high-risk autonomous agents.",
-    href: "https://digital-strategy.ec.europa.eu/en/policies/regulatory-framework-ai",
+      "Microsoft's 2026 Work Trend Index on how agentic AI is reshaping every role and every organization.",
+    href: "https://www.microsoft.com/en-us/worklab/work-trend-index/agents-human-agency-and-the-opportunity-for-every-organization#wti2026-modular-worklab-rtitle-d1e901bd",
+    date: "2026",
+    category: "Research",
+    image:
+      "https://assets-c4akfrf5b4d3f4b7.z01.azurefd.net/assets/2026/05/2026_WorkTrendIndex_Hero_-1920x1080_69f91cd0ef419.png",
+  },
+  {
+    id: "gcloud-agentic-era",
+    source: "Google Cloud",
+    title: "What it takes to get your team ready for the agentic era",
+    summary:
+      "Google Cloud's playbook on the skills, operating model and culture leaders need to thrive in an agentic workplace.",
+    href: "https://cloud.google.com/transform/what-it-takes-to-get-your-team-ready-for-the-agentic-era",
+    date: "2026",
+    category: "Operators",
+    image:
+      "https://storage.googleapis.com/gweb-cloudblog-publish/images/GettyImages-1887444241.max-2600x2600.jpg",
+  },
+  {
+    id: "gartner-hr-survey-2026",
+    source: "Gartner",
+    title: "45% of managers report AI has lived up to their expectations",
+    summary:
+      "Gartner HR survey reveals where AI is delivering for managers — and where the expectations gap is widening.",
+    href: "https://www.gartner.com/en/newsroom/press-releases/2026-3-4-gartner-hr-survey-reveals-45-percent-of-managers-report-ai-has-lived-up-to-their-expectations",
+    date: "2026",
+    category: "Analyst",
+    image: "https://logo.clearbit.com/gartner.com",
+  },
+  {
+    id: "mit-sloan-reshaping-workflows",
+    source: "MIT Sloan",
+    title: "How AI is reshaping workflows and redefining jobs",
+    summary:
+      "MIT Sloan on how chained AI tasks are restructuring work and what leaders should redesign first.",
+    href: "https://mitsloan.mit.edu/ideas-made-to-matter/how-ai-reshaping-workflows-and-redefining-jobs",
+    date: "2026",
+    category: "Research",
+    image:
+      "https://mitsloan.mit.edu/sites/default/files/styles/og_image/public/2026-04/ai-chaining-tasks2.jpg.webp?h=9e01ee4b&itok=y4C0Q98c",
+  },
+  {
+    id: "basf-alphaevolve",
+    source: "Google Cloud",
+    title: "How BASF manages thousands of supply chain decisions with AlphaEvolve",
+    summary:
+      "Inside BASF's deployment of AlphaEvolve to orchestrate complex supply-chain decisions at industrial scale.",
+    href: "https://cloud.google.com/blog/products/ai-machine-learning/how-basf-manages-thousands-of-supply-chain-decisions-with-alphaevolve",
+    date: "2026",
+    category: "Operators",
+    image:
+      "https://storage.googleapis.com/gweb-cloudblog-publish/images/image1_BFm5ksn.max-1500x1500.jpg",
+  },
+  {
+    id: "aws-nonprofit-agentic-governance",
+    source: "AWS",
+    title: "A governance framework for nonprofit agentic AI on AWS",
+    summary:
+      "AWS lays out a governance framework for nonprofits deploying agentic AI responsibly and at scale.",
+    href: "https://aws.amazon.com/blogs/publicsector/a-governance-framework-for-nonprofit-agentic-ai-on-aws/",
     date: "2026",
     category: "Regulation",
-  },
-  {
-    id: "openai-agents-sdk",
-    source: "OpenAI",
-    title: "Agents SDK: long-running, tool-using workflows in production",
-    summary:
-      "OpenAI's agent framework adds persistent memory, structured tool calls and evaluation hooks for enterprise teams.",
-    href: "https://platform.openai.com/docs/guides/agents",
-    date: "2025",
-    category: "Tools",
-  },
-  {
-    id: "anthropic-mcp",
-    source: "Anthropic",
-    title: "Model Context Protocol becomes the de-facto agent integration layer",
-    summary:
-      "MCP adoption accelerates as vendors standardise how agents discover and call enterprise tools.",
-    href: "https://www.anthropic.com/news/model-context-protocol",
-    date: "2025",
-    category: "Tools",
-  },
-  {
-    id: "cbinsights-funding",
-    source: "CB Insights",
-    title: "Agentic AI startups raise record funding in Q1 2026",
-    summary:
-      "Vertical agent companies in finance, legal and healthcare lead the round, with median Series A above $30M.",
-    href: "https://www.cbinsights.com/research/artificial-intelligence-top-startups/",
-    date: "Q1 2026",
-    category: "Funding",
-  },
-  {
-    id: "bcg-roi",
-    source: "BCG",
-    title: "Where agentic AI actually pays back: a 200-company benchmark",
-    summary:
-      "Procurement, FP&A and tier-1 support deliver the fastest payback; sales agents take longer but lift conversion 18%.",
-    href: "https://www.bcg.com/capabilities/artificial-intelligence",
-    date: "2025",
-    category: "Research",
-  },
-  {
-    id: "operator-playbook",
-    source: "BizzSurfer Operators",
-    title: "Inside an autonomous finance close: 14 days → 3 days",
-    summary:
-      "How a mid-market CFO team rebuilt month-end with a network of specialised agents and a human reviewer.",
-    href: "/insights",
-    date: "Weekly",
-    category: "Operators",
+    image:
+      "https://d2908q01vomqb2.cloudfront.net/9e6a55b6b4563e652a23be9d623ca5055c356940/2026/05/09/A-governance-framework-for-nonprofit-agentic-AI-on-AWS.png",
   },
 ];
 
