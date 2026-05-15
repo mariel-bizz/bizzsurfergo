@@ -47,7 +47,7 @@ const ITEMS: Item[] = [
     icon: Store,
     title: "Explore Agentic AI tools!",
     desc: "Browse our offers to boost your transformation!",
-    cta: "Go agentic",
+    cta: "GO AGENTIC >",
     to: "/marketplace",
   },
   {
