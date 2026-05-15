@@ -149,8 +149,7 @@ function CareersPage() {
     <div className="min-h-[60vh] px-5 py-10 max-w-5xl mx-auto">
       <h1 className="text-3xl font-bold text-foreground text-[#ff6f00]">Careers at BizzSurfer</h1>
       <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-        Help us build the agentic future. Browse open roles below — the widget
-        appears at the bottom-right of this page.
+        Help us build the agentic future. Browse open roles on our careers site.
       </p>
 
       {/* CTA + benefits */}
