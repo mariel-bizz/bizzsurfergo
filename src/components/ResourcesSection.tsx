@@ -229,7 +229,10 @@ const poweredBy: { name: string; src: string }[] = [
 export function PoweredBySection() {
   return (
     <section className="px-5">
-      <div className="rounded-xl border-border p-3 bg-transparent border-4 border-[#ffad1f]">
+      <div
+        tabIndex={0}
+        className="rounded-xl border-border p-3 bg-transparent border-4 border-[#ffad1f] transition-all duration-300 hover:shadow-[0_0_0_4px_rgba(255,173,31,0.18),0_8px_24px_-8px_rgba(255,173,31,0.45)] hover:border-[#ff8c00] focus-visible:outline-none focus-visible:shadow-[0_0_0_4px_rgba(255,173,31,0.25),0_8px_24px_-8px_rgba(255,173,31,0.5)] focus-visible:border-[#ff8c00]"
+      >
         <p className="uppercase tracking-widest text-muted-foreground font-semibold text-center text-sm text-[#02459c]">
           BizzSurfer GO! is powered by
         </p>
