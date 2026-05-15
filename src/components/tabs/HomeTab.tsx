@@ -196,14 +196,14 @@ export function HomeTab() {
         <SectionHeader className="mb-3">Go Agentic!</SectionHeader>
         <Link
           to="/marketplace"
-          className="group relative block overflow-hidden rounded-3xl border-2 border-[#7c3aed] bg-card shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+          className="group relative block overflow-hidden rounded-3xl border-2 border-[#4a5fb8] bg-card shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
         >
           {/* animated glow halo */}
-          <span className="pointer-events-none absolute -inset-12 bg-[radial-gradient(circle_at_30%_20%,#7c3aed_0%,transparent_55%),radial-gradient(circle_at_80%_90%,#f49134_0%,transparent_55%)] blur-2xl opacity-30 group-hover:opacity-50 transition-opacity" />
+          <span className="pointer-events-none absolute -inset-12 bg-[radial-gradient(circle_at_20%_20%,#4a5fb8_0%,transparent_55%),radial-gradient(circle_at_85%_85%,#e8853a_0%,transparent_55%)] blur-2xl opacity-30 group-hover:opacity-50 transition-opacity" />
           <div className="relative rounded-[20px] bg-card/95 backdrop-blur p-5 sm:p-6">
             {/* Top row: badges */}
             <div className="flex items-center gap-2 mb-3">
-              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#7c3aed] to-[#f49134] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-soft">
+              <span className="inline-flex items-center gap-1 rounded-full bg-gradient-to-r from-[#4a5fb8] via-[#9b6f9e] to-[#e8853a] px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-widest text-white shadow-soft">
                 <Sparkles className="w-3 h-3" />
                 Go Agentic!
               </span>
@@ -213,7 +213,7 @@ export function HomeTab() {
             </div>
 
             <div className="flex items-center gap-4">
-              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#f49134] flex items-center justify-center shrink-0 shadow-glow ring-2 ring-white/40">
+              <div className="relative w-16 h-16 rounded-2xl bg-gradient-to-br from-[#4a5fb8] via-[#9b6f9e] to-[#e8853a] flex items-center justify-center shrink-0 shadow-glow ring-2 ring-white/40">
                 <Bot className="w-8 h-8 text-white" />
                 <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-accent flex items-center justify-center shadow-soft">
                   <Sparkles className="w-3 h-3 text-accent-foreground" />
@@ -221,7 +221,7 @@ export function HomeTab() {
               </div>
               <div className="flex-1 min-w-0">
                 <h3 className="text-xl sm:text-2xl font-extrabold text-foreground leading-tight tracking-tight">
-                  Agents, services & <span className="bg-gradient-to-r from-[#7c3aed] to-[#f49134] bg-clip-text text-transparent">playbooks</span>
+                  Agents, services & <span className="bg-gradient-to-r from-[#4a5fb8] via-[#9b6f9e] to-[#e8853a] bg-clip-text text-transparent">playbooks</span>
                 </h3>
                 <p className="text-sm text-muted-foreground mt-1 leading-snug">
                   Curated tools, expert services & 90-day playbooks to accelerate your transformation.
@@ -236,15 +236,15 @@ export function HomeTab() {
                 { n: "20+", l: "Services" },
                 { n: "10+", l: "Playbooks" },
               ].map((s) => (
-                <div key={s.l} className="rounded-xl border border-[#7c3aed]/20 bg-gradient-to-br from-[#7c3aed]/5 to-[#f49134]/5 py-2">
-                  <p className="text-sm font-extrabold bg-gradient-to-r from-[#7c3aed] to-[#f49134] bg-clip-text text-transparent">{s.n}</p>
+                <div key={s.l} className="rounded-xl border border-[#4a5fb8]/25 bg-gradient-to-br from-[#4a5fb8]/10 to-[#e8853a]/10 py-2">
+                  <p className="text-sm font-extrabold bg-gradient-to-r from-[#4a5fb8] via-[#9b6f9e] to-[#e8853a] bg-clip-text text-transparent">{s.n}</p>
                   <p className="text-[9px] uppercase tracking-wider text-muted-foreground">{s.l}</p>
                 </div>
               ))}
             </div>
 
             {/* CTA */}
-            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-[#7c3aed] to-[#f49134] px-4 py-3 shadow-soft group-hover:shadow-glow transition">
+            <div className="mt-4 flex items-center justify-between gap-3 rounded-2xl bg-gradient-to-r from-[#4a5fb8] via-[#9b6f9e] to-[#e8853a] px-4 py-3 shadow-soft group-hover:shadow-glow transition">
               <span className="text-sm font-bold text-white">Explore the marketplace</span>
               <span className="inline-flex items-center gap-1 text-sm font-bold text-white">
                 Browse now
