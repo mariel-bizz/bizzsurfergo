@@ -147,8 +147,14 @@ export function OnboardingChecklist() {
               </span>
               <span className="text-[11px] font-semibold text-muted-foreground">+25 XP per step</span>
             </div>
-            <p className="mt-1 text-sm font-bold text-foreground">
-              {allDone ? "You're all set — Launch Crew unlocked!" : `${done} of ${total} done — keep going`}
+            <p className="text-xs text-muted-foreground mt-1 leading-snug font-semibold">
+              {allDone ? "You're all set — Launch Crew unlocked!" : (
+                <>
+                  Business Transformation
+                  <br />
+                  ROI Calculator
+                </>
+              )}
             </p>
           </div>
 
