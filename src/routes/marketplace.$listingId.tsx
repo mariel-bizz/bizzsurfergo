@@ -99,6 +99,8 @@ function ListingDetail() {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [authChecked, setAuthChecked] = useState(false);
   const [isAuthed, setIsAuthed] = useState(false);
+  const game = useGame();
+  useEffect(() => { game.completeOnboardingStep("marketplace"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-prepare an order: as soon as we know the listing is payable and the
   // user is signed in, the checkout dialog can be opened with a single tap
