@@ -18,6 +18,7 @@ import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as PodcastRouteImport } from './routes/podcast'
 import { Route as OrdersRouteImport } from './routes/orders'
+import { Route as MarketTrendsRouteImport } from './routes/market-trends'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
@@ -95,6 +96,11 @@ const PodcastRoute = PodcastRouteImport.update({
 const OrdersRoute = OrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketTrendsRoute = MarketTrendsRouteImport.update({
+  id: '/market-trends',
+  path: '/market-trends',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
@@ -279,6 +285,7 @@ export interface FileRoutesByFullPath {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/market-trends': typeof MarketTrendsRoute
   '/orders': typeof OrdersRoute
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
@@ -323,6 +330,7 @@ export interface FileRoutesByTo {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/market-trends': typeof MarketTrendsRoute
   '/orders': typeof OrdersRoute
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
@@ -368,6 +376,7 @@ export interface FileRoutesById {
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
   '/login': typeof LoginRoute
+  '/market-trends': typeof MarketTrendsRoute
   '/orders': typeof OrdersRoute
   '/podcast': typeof PodcastRoute
   '/pricing': typeof PricingRoute
@@ -414,6 +423,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
+    | '/market-trends'
     | '/orders'
     | '/podcast'
     | '/pricing'
@@ -458,6 +468,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
+    | '/market-trends'
     | '/orders'
     | '/podcast'
     | '/pricing'
@@ -502,6 +513,7 @@ export interface FileRouteTypes {
     | '/feed.xml'
     | '/integrations'
     | '/login'
+    | '/market-trends'
     | '/orders'
     | '/podcast'
     | '/pricing'
@@ -547,6 +559,7 @@ export interface RootRouteChildren {
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IntegrationsRoute: typeof IntegrationsRoute
   LoginRoute: typeof LoginRoute
+  MarketTrendsRoute: typeof MarketTrendsRoute
   OrdersRoute: typeof OrdersRoute
   PodcastRoute: typeof PodcastRoute
   PricingRoute: typeof PricingRoute
@@ -646,6 +659,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/orders'
       preLoaderRoute: typeof OrdersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/market-trends': {
+      id: '/market-trends'
+      path: '/market-trends'
+      fullPath: '/market-trends'
+      preLoaderRoute: typeof MarketTrendsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -891,6 +911,7 @@ const rootRouteChildren: RootRouteChildren = {
   FeedDotxmlRoute: FeedDotxmlRoute,
   IntegrationsRoute: IntegrationsRoute,
   LoginRoute: LoginRoute,
+  MarketTrendsRoute: MarketTrendsRoute,
   OrdersRoute: OrdersRoute,
   PodcastRoute: PodcastRoute,
   PricingRoute: PricingRoute,
