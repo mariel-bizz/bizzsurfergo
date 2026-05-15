@@ -1,8 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { ExternalLink, Headphones } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { trackEvent } from "@/lib/analytics";
