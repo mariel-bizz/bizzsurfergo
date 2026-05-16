@@ -21,7 +21,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
 } from "lucide-react";
-import { listings, categoryMeta, getPriceType, type Category, type PriceType } from "@/lib/marketplace-data";
+import { listings, categoryMeta, type Category } from "@/lib/marketplace-data";
 import { addToCart, useCart } from "@/lib/marketplace-cart";
 import { MarketplaceCartSheet } from "@/components/marketplace/MarketplaceCartSheet";
 import {
@@ -62,21 +62,10 @@ type SortKey = PresetState["sort"];
 const sortOptions: { value: SortKey; label: string }[] = [
   { value: "recommended", label: "Recommended" },
   { value: "rating", label: "Top rated" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
   { value: "title", label: "Name (A–Z)" },
 ];
 
 const presetGroups: Preset["group"][] = ["Role", "Department", "Transformation", "Custom"];
-
-// Extract a numeric price from strings like "€39 / mo", "Free", "Included with Hero".
-function priceValue(price: string): number {
-  const lower = price.toLowerCase();
-  if (lower.includes("free") || lower.includes("included")) return 0;
-  const match = price.match(/(\d[\d,.]*)/);
-  if (!match) return Number.POSITIVE_INFINITY;
-  return parseFloat(match[1].replace(/,/g, ""));
-}
 
 export function MarketplaceTab() {
   const [active, setActive] = useState<Category | "all">("all");
