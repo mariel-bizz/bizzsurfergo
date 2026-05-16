@@ -21,7 +21,7 @@ import {
   SlidersHorizontal,
   ChevronDown,
 } from "lucide-react";
-import { listings, categoryMeta, getPriceType, type Category, type PriceType } from "@/lib/marketplace-data";
+import { listings, categoryMeta, type Category } from "@/lib/marketplace-data";
 import { addToCart, useCart } from "@/lib/marketplace-cart";
 import { MarketplaceCartSheet } from "@/components/marketplace/MarketplaceCartSheet";
 import {
@@ -62,21 +62,10 @@ type SortKey = PresetState["sort"];
 const sortOptions: { value: SortKey; label: string }[] = [
   { value: "recommended", label: "Recommended" },
   { value: "rating", label: "Top rated" },
-  { value: "price-asc", label: "Price: low to high" },
-  { value: "price-desc", label: "Price: high to low" },
   { value: "title", label: "Name (A–Z)" },
 ];
 
 const presetGroups: Preset["group"][] = ["Role", "Department", "Transformation", "Custom"];
-
-// Extract a numeric price from strings like "€39 / mo", "Free", "Included with Hero".
-function priceValue(price: string): number {
-  const lower = price.toLowerCase();
-  if (lower.includes("free") || lower.includes("included")) return 0;
-  const match = price.match(/(\d[\d,.]*)/);
-  if (!match) return Number.POSITIVE_INFINITY;
-  return parseFloat(match[1].replace(/,/g, ""));
-}
 
 export function MarketplaceTab() {
   const [active, setActive] = useState<Category | "all">("all");
@@ -85,7 +74,6 @@ export function MarketplaceTab() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [freeOnly, setFreeOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
-  const [priceType, setPriceType] = useState<PriceType | "all">("all");
   const [cartOpen, setCartOpen] = useState(false);
   const { listings: cartListings } = useCart();
 
@@ -216,8 +204,6 @@ export function MarketplaceTab() {
         return false;
       if (selectedTags.length && !selectedTags.every((t) => l.tags.includes(t)))
         return false;
-      if (freeOnly && priceValue(l.price) > 0) return false;
-      if (priceType !== "all" && getPriceType(l.price) !== priceType) return false;
       if (l.rating < minRating) return false;
       return true;
     });
@@ -227,12 +213,6 @@ export function MarketplaceTab() {
       case "rating":
         sorted.sort((a, b) => b.rating - a.rating);
         break;
-      case "price-asc":
-        sorted.sort((a, b) => priceValue(a.price) - priceValue(b.price));
-        break;
-      case "price-desc":
-        sorted.sort((a, b) => priceValue(b.price) - priceValue(a.price));
-        break;
       case "title":
         sorted.sort((a, b) => a.title.localeCompare(b.title));
         break;
@@ -240,7 +220,7 @@ export function MarketplaceTab() {
         break;
     }
     return sorted;
-  }, [active, query, selectedTags, freeOnly, priceType, minRating, sort]);
+  }, [active, query, selectedTags, minRating, sort]);
 
   const toggleTag = (tag: string) =>
     setSelectedTags((prev) =>
@@ -445,18 +425,6 @@ export function MarketplaceTab() {
           </select>
         </label>
 
-        <button
-          onClick={() => setFreeOnly((v) => !v)}
-          className={`inline-flex items-center gap-1.5 rounded-full h-9 px-3 text-xs font-bold border transition ${
-            freeOnly
-              ? "bg-primary text-primary-foreground border-transparent"
-              : "bg-card text-foreground border-border"
-          }`}
-          aria-pressed={freeOnly}
-        >
-          Free only
-        </button>
-
         <label className="inline-flex items-center gap-2 rounded-full bg-card border border-border h-9 pl-3 pr-2 text-xs font-bold text-foreground">
           <Star className="w-3.5 h-3.5 text-amber-500 fill-current" />
           <select
@@ -481,35 +449,6 @@ export function MarketplaceTab() {
             Clear ({activeFilterCount})
           </button>
         )}
-      </div>
-
-      <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label="Pricing type">
-        <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mr-1">
-          Pricing
-        </span>
-        {([
-          { key: "all", label: "All prices" },
-          { key: "fixed", label: "Fixed price" },
-          { key: "from", label: "From €X" },
-          { key: "quote", label: "Custom / quote" },
-          { key: "free", label: "Free / included" },
-        ] as { key: PriceType | "all"; label: string }[]).map((opt) => {
-          const isOn = priceType === opt.key;
-          return (
-            <button
-              key={opt.key}
-              onClick={() => setPriceType(opt.key)}
-              className={`rounded-full px-3 h-8 text-[11px] font-bold border transition ${
-                isOn
-                  ? "bg-primary text-primary-foreground border-transparent shadow-soft"
-                  : "bg-card text-foreground border-border hover:border-primary/40"
-              }`}
-              aria-pressed={isOn}
-            >
-              {opt.label}
-            </button>
-          );
-        })}
       </div>
 
       <div className="flex flex-wrap gap-1.5">
@@ -547,8 +486,6 @@ export function MarketplaceTab() {
           {filtered.map((l) => {
             const meta = categoryMeta[l.category];
             const Icon = meta.icon;
-            const pType = getPriceType(l.price);
-            const cartable = pType === "fixed" || pType === "from";
             const inCart = cartListings.some((c) => c.id === l.id);
             return (
               <div
@@ -595,41 +532,38 @@ export function MarketplaceTab() {
                   </div>
                 </Link>
 
-                <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60">
-                  <span className="text-sm font-bold text-foreground break-words">{l.price}</span>
+                <div className="mt-auto pt-4 flex flex-wrap items-center justify-end gap-2 border-t border-border/60">
                   <div className="flex items-center gap-1.5">
-                    {cartable && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (inCart) return;
-                          if (addToCart(l.id)) {
-                            toast.success(`Added “${l.title}” to cart`);
-                          }
-                        }}
-                        disabled={inCart}
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold border transition whitespace-nowrap ${
-                          inCart
-                            ? "bg-muted text-muted-foreground border-transparent cursor-default"
-                            : "bg-card text-foreground border-border hover:border-primary/40"
-                        }`}
-                        aria-label={inCart ? "In cart" : `Add ${l.title} to cart`}
-                      >
-                        {inCart ? (
-                          <>
-                            <CheckIcon className="w-3.5 h-3.5" />
-                            In cart
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-3.5 h-3.5" />
-                            Add to cart
-                          </>
-                        )}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (inCart) return;
+                        if (addToCart(l.id)) {
+                          toast.success(`Added “${l.title}” to cart`);
+                        }
+                      }}
+                      disabled={inCart}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold border transition whitespace-nowrap ${
+                        inCart
+                          ? "bg-muted text-muted-foreground border-transparent cursor-default"
+                          : "bg-card text-foreground border-border hover:border-primary/40"
+                      }`}
+                      aria-label={inCart ? "In cart" : `Add ${l.title} to cart`}
+                    >
+                      {inCart ? (
+                        <>
+                          <CheckIcon className="w-3.5 h-3.5" />
+                          In cart
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3.5 h-3.5" />
+                          Add to cart
+                        </>
+                      )}
+                    </button>
                     <Link
                       to="/marketplace/$listingId"
                       params={{ listingId: l.id }}
