@@ -242,7 +242,7 @@ export function FollowSection() {
   return (
     <section className="px-5">
       <SectionHeader className="mb-4">Follow BizzSurfer</SectionHeader>
-      <div className="rounded-3xl bg-card border border-border p-5 shadow-card">
+      <div className="rounded-3xl bg-card border border-border p-5 shadow-card shadow-xl border-[#02459c]">
         <div className="grid grid-cols-3 gap-x-3 gap-y-4 justify-items-center">
           {socials.map((s) => {
             const isInternal = s.href.startsWith("/");
