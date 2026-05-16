@@ -3,6 +3,7 @@ import { Outlet, useLocation } from "@tanstack/react-router";
 import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
+import { NewsletterDialog } from "./NewsletterDialog";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
@@ -203,6 +204,7 @@ export function AppShell() {
         </main>
 
         <FloatingChat />
+        <NewsletterDialog />
         <BottomNav active={activeTab} />
         <Toaster position="top-center" />
       </div>
