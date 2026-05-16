@@ -121,7 +121,7 @@ export function NewsletterDialog() {
         {done ? (
           <div className="flex flex-col items-center gap-2 py-4">
             <CheckCircle2 className="w-10 h-10 text-primary" />
-            <p className="text-sm text-muted-foreground text-center">
+            <p className="text-sm text-muted-foreground text-center font-medium">
               You're on the list. Welcome aboard!
             </p>
           </div>
@@ -150,7 +150,7 @@ export function NewsletterDialog() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="nl-name">First name (optional)</Label>
+              <Label htmlFor="nl-name">Join the BizzSurfer newsletter!</Label>
               <Input
                 id="nl-name"
                 placeholder="Alex"
