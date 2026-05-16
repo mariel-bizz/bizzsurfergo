@@ -28,6 +28,7 @@ import {
   MarketplaceOnboarding,
   hasCompletedMarketplaceOnboarding,
 } from "@/components/marketplace/MarketplaceOnboarding";
+import { ListYourOfferingDialog } from "@/components/marketplace/ListYourOfferingDialog";
 import {
   builtInPresets,
   defaultState,
@@ -95,6 +96,7 @@ export function MarketplaceTab() {
   const [manageOpen, setManageOpen] = useState(false);
   const [onboardingOpen, setOnboardingOpen] = useState(false);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [listOfferingOpen, setListOfferingOpen] = useState(false);
 
   const allTags = useMemo(() => {
     const set = new Set<string>();
@@ -654,10 +656,18 @@ export function MarketplaceTab() {
         <p className="mt-1 text-sm text-white/85">
           Submit your agent, service, or playbook for review by the BizzSurfer team.
         </p>
-        <Button className="mt-4 w-full h-11 bg-white text-primary hover:bg-white/90 font-bold">
+        <Button
+          onClick={() => setListOfferingOpen(true)}
+          className="mt-4 w-full h-11 bg-white text-primary hover:bg-white/90 font-bold"
+        >
           Apply to be listed
         </Button>
       </div>
+
+      <ListYourOfferingDialog
+        open={listOfferingOpen}
+        onOpenChange={setListOfferingOpen}
+      />
 
       {/* Save preset dialog */}
       <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
