@@ -4,10 +4,10 @@ on:
   push:
     branches: [main]
   pull_request:
-    branches: [main]
   schedule:
     # Weekly full scan, Mondays 06:00 UTC
     - cron: "0 6 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -69,22 +69,36 @@ jobs:
   migrations:
     name: Migration safety
     runs-on: ubuntu-latest
-    if: hashFiles('supabase/migrations/**/*.sql') != ''
     steps:
       - uses: actions/checkout@v4
 
+      - name: Detect migrations
+        id: check
+        shell: bash
+        run: |
+          if ls supabase/migrations/*.sql >/dev/null 2>&1; then
+            echo "has_migrations=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_migrations=false" >> "$GITHUB_OUTPUT"
+            echo "No migrations found — skipping lint and risky-pattern checks."
+          fi
+
       - name: Set up Python
+        if: steps.check.outputs.has_migrations == 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install sqlfluff
+        if: steps.check.outputs.has_migrations == 'true'
         run: pip install sqlfluff==3.2.5
 
       - name: Lint migrations (PostgreSQL dialect)
+        if: steps.check.outputs.has_migrations == 'true'
         run: sqlfluff lint --dialect postgres supabase/migrations || true
 
       - name: Risky migration patterns
+        if: steps.check.outputs.has_migrations == 'true'
         shell: bash
         run: |
           set -euo pipefail

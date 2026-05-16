@@ -1,65 +1,65 @@
+## What's happening
 
-# Recommended onboarding checklist
+GitHub posts "No jobs were run" against a commit / PR whenever a workflow file matches the event, but every job inside ends up either skipped or filtered out. In our `security.yml` this happens in two realistic scenarios:
 
-## Why this shape
+1. **Lovable pushes to a branch other than `main`** (preview / sync branches). The workflow has `branches: [main]` on both `push` and `pull_request`, so GitHub still shows the workflow file as "triggered" against the commit checks UI but runs zero jobs.
+2. **A PR has no changes under `supabase/migrations/**`**, so the `migrations` job is skipped via `if: hashFiles(...)`. That alone shouldn't produce the message (other jobs still run) — but combined with branch mismatches, every job ends up skipped.
 
-The app is already gamified — XP, streak, badges in `AppShell` — but the only first-run surface is `SplashScreen`. New users land on Home with no clear "what do I do first?" path. A short, persistent checklist on Home that ties into the existing XP system converts curiosity into activation without feeling like a tutorial.
+The cleanest fix is to make sure the workflow either runs real jobs or doesn't get registered as a run at all.
 
-Keep it short (5 items max), mobile-first, dismissible, and progress-tracked across sessions. Each completed step awards XP so it reinforces the existing game loop instead of competing with it.
+## Plan
 
-## Recommended checklist (5 steps)
+Edit `.github/workflows/security.yml` with three small changes:
 
-1. **Meet your AI co-pilot** — open the Chat tab and send the first message. Highest-value "aha" moment in the product.
-2. **Run the Reality Check** — take the 60-second pain/ROI assessment on Home. Personalises everything that follows.
-3. **Explore an Agentic playbook** — visit the Marketplace and open one listing. Surfaces the catalogue.
-4. **Save a next event** — RSVP or add one event to calendar from the Events tab. Drives recurring engagement.
-5. **Complete your profile** — name + role + company size on Profile tab. Unlocks personalised recommendations and email value.
+1. **Add `workflow_dispatch`** so the workflow can always be run manually without a trigger surprise.
+2. **Broaden the push/PR triggers** so syncs from Lovable still produce real runs:
+   - Keep `push.branches: [main]` (production scans).
+   - Add `pull_request:` without a `branches` filter so any PR targeting any branch runs the scans.
+3. **Move the `migrations` skip from job-level `if:` to a step-level guard.** The job itself always runs (so GitHub never reports "no jobs"), but the risky-pattern check no-ops when there are no migration files. Update the `gate` job's `needs` accordingly (it already tolerates `skipped`, but with this change `migrations` will always be `success`).
 
-Optional 6th (only if signed in): **Connect one integration** — but gate behind auth so it doesn't block anonymous first-run.
+Optionally (only if the user wants belt-and-braces):
 
-Each step rewards +25 XP. Finishing all 5 awards a "Launch Crew" badge and a one-time +100 XP bonus — fits the existing badge model (`Consistency` is already there).
+4. **Add a tiny `noop` job** with `runs-on: ubuntu-latest` and a single `echo` step that has no `if:`. This guarantees at least one job runs on every trigger, killing the "No jobs were run" message permanently regardless of future edits.
 
-## UX placement
+## Technical details
 
-- **Home tab, top of page**, directly under the streak/XP header, above "Reality check".
-- Collapsible card titled "Get started — 1 of 5 done". Progress ring on the left.
-- Each row: icon, label, short helper text, status (todo / done / locked).
-- Tapping a row deep-links to the relevant tab/route and auto-marks done when the action fires.
-- "Dismiss" turns it into a small `Show checklist` chip on Profile so users can re-open it (mirrors the existing `Show welcome screen` pattern).
-- Auto-hides permanently once all 5 are done (or after explicit dismiss).
+Concrete YAML changes:
 
-## Tracking model
+```text
+on:
+  push:
+    branches: [main]
+  pull_request:        # remove "branches: [main]" so all PRs run
+  schedule:
+    - cron: "0 6 * * 1"
+  workflow_dispatch:   # new
 
-Extend the existing localStorage `bizzsurfer_state` (in `AppShell.tsx`) with:
-
-```ts
-onboarding: {
-  steps: { chat: boolean; reality: boolean; marketplace: boolean; events: boolean; profile: boolean };
-  dismissed: boolean;
-  completedAt: string | null;
-}
+jobs:
+  migrations:
+    name: Migration safety
+    runs-on: ubuntu-latest
+    # remove: if: hashFiles('supabase/migrations/**/*.sql') != ''
+    steps:
+      - uses: actions/checkout@v4
+      - name: Skip if no migrations
+        id: check
+        run: |
+          if ls supabase/migrations/*.sql >/dev/null 2>&1; then
+            echo "has_migrations=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_migrations=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Set up Python
+        if: steps.check.outputs.has_migrations == 'true'
+        uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      # …existing sqlfluff + risky-pattern steps gated by the same if
 ```
 
-Mark steps from the relevant components:
-- `chat` → on first message send in `ChatTab` / `FloatingChat`.
-- `reality` → on `PainTracker` submit.
-- `marketplace` → on first listing route visit (`/marketplace/$listingId`).
-- `events` → on RSVP confirm or "Add to calendar" click.
-- `profile` → when name + role + company size are all set.
+Everything else (dependencies, codeql, secrets, sbom, gate) stays the same.
 
-Fire `trackEvent("onboarding_step_completed", { step })` on each so we can measure activation funnel. Fire `onboarding_completed` when all 5 are true.
+## Outcome
 
-## What I'd skip
-
-- **Modal walkthroughs / tooltip tours.** They block the UI and have low completion on mobile.
-- **Auth gating the whole checklist.** Anonymous users should be able to finish 4 of 5 steps; only "complete profile" requires sign-in.
-- **A separate `/onboarding` route.** It fragments the experience — Home is already where the Reality Check and tiles live.
-
-## Files this would touch (when implemented)
-
-- `src/components/AppShell.tsx` — extend `GameState` with `onboarding`.
-- `src/components/tabs/HomeTab.tsx` — render the checklist card.
-- `src/components/tabs/ChatTab.tsx`, `PainTracker.tsx`, `MarketplaceTab.tsx`, `EventsTab.tsx`, `ProfileTab.tsx` — fire step-completion calls.
-- `src/lib/analytics.ts` — no change, reuse `trackEvent`.
-
-Want me to build this as proposed, or adjust the steps / XP rewards / placement first?
+- Lovable sync commits to non-main branches no longer create empty workflow runs (PRs against any branch trigger the real jobs; pushes to non-main are simply not registered as runs at all).
+- The `migrations` job always reports `success`, so the "No jobs were run" notification stops.
+- You can still run the full scan manually from the Actions tab via `workflow_dispatch`.
