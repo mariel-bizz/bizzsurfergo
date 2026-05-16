@@ -367,6 +367,66 @@ export type Database = {
         }
         Relationships: []
       }
+      marketplace_listing_applications: {
+        Row: {
+          company: string | null
+          created_at: string
+          description: string
+          email: string
+          id: string
+          name: string
+          offering_type: string
+          public_token: string
+          review_notes: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          source: string | null
+          status: string
+          title: string
+          updated_at: string
+          user_agent: string | null
+          website: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          description: string
+          email: string
+          id?: string
+          name: string
+          offering_type: string
+          public_token?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_agent?: string | null
+          website?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          description?: string
+          email?: string
+          id?: string
+          name?: string
+          offering_type?: string
+          public_token?: string
+          review_notes?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          source?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_agent?: string | null
+          website?: string | null
+        }
+        Relationships: []
+      }
       orders: {
         Row: {
           amount_total: number | null
@@ -764,6 +824,18 @@ export type Database = {
         Returns: number
       }
       get_insights_like_count: { Args: { _slug: string }; Returns: number }
+      get_listing_application_status: {
+        Args: { _token: string }
+        Returns: {
+          created_at: string
+          offering_type: string
+          review_notes: string
+          reviewed_at: string
+          status: string
+          title: string
+          updated_at: string
+        }[]
+      }
       get_team_invite: {
         Args: { _token: string }
         Returns: {
