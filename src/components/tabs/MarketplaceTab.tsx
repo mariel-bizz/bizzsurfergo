@@ -74,7 +74,6 @@ export function MarketplaceTab() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [freeOnly, setFreeOnly] = useState(false);
   const [minRating, setMinRating] = useState(0);
-  const [priceType, setPriceType] = useState<PriceType | "all">("all");
   const [cartOpen, setCartOpen] = useState(false);
   const { listings: cartListings } = useCart();
 
@@ -205,8 +204,6 @@ export function MarketplaceTab() {
         return false;
       if (selectedTags.length && !selectedTags.every((t) => l.tags.includes(t)))
         return false;
-      if (freeOnly && priceValue(l.price) > 0) return false;
-      if (priceType !== "all" && getPriceType(l.price) !== priceType) return false;
       if (l.rating < minRating) return false;
       return true;
     });
@@ -216,12 +213,6 @@ export function MarketplaceTab() {
       case "rating":
         sorted.sort((a, b) => b.rating - a.rating);
         break;
-      case "price-asc":
-        sorted.sort((a, b) => priceValue(a.price) - priceValue(b.price));
-        break;
-      case "price-desc":
-        sorted.sort((a, b) => priceValue(b.price) - priceValue(a.price));
-        break;
       case "title":
         sorted.sort((a, b) => a.title.localeCompare(b.title));
         break;
@@ -229,7 +220,7 @@ export function MarketplaceTab() {
         break;
     }
     return sorted;
-  }, [active, query, selectedTags, freeOnly, priceType, minRating, sort]);
+  }, [active, query, selectedTags, minRating, sort]);
 
   const toggleTag = (tag: string) =>
     setSelectedTags((prev) =>
