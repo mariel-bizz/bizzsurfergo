@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,9 +18,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useServerFn } from "@tanstack/react-start";
+import { Link } from "@tanstack/react-router";
 import { submitListingApplication } from "@/lib/marketplace-listing.functions";
 import { toast } from "sonner";
-import { CheckCircle2, Sparkles } from "lucide-react";
+import { CheckCircle2, Sparkles, ExternalLink } from "lucide-react";
 
 type OfferingType = "Agent" | "Service" | "Playbook" | "Template" | "Other";
 
@@ -39,10 +40,18 @@ export function ListYourOfferingDialog({
     title: "",
     description: "",
     website: "",
+    honeypot: "",
   });
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
+  const [resultToken, setResultToken] = useState<string | null>(null);
+  const openedAtRef = useRef<number>(0);
   const submitFn = useServerFn(submitListingApplication);
+
+  // Reset opened-at timer when dialog opens
+  if (open && openedAtRef.current === 0) {
+    openedAtRef.current = Date.now();
+  }
 
   const reset = () => {
     setForm({
@@ -53,8 +62,11 @@ export function ListYourOfferingDialog({
       title: "",
       description: "",
       website: "",
+      honeypot: "",
     });
     setDone(false);
+    setResultToken(null);
+    openedAtRef.current = 0;
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -63,9 +75,17 @@ export function ListYourOfferingDialog({
       toast.error("Please fill in all required fields.");
       return;
     }
+    const elapsedMs = openedAtRef.current
+      ? Date.now() - openedAtRef.current
+      : 0;
+    if (elapsedMs > 0 && elapsedMs < 2000) {
+      toast.error("Please take a moment to review your submission.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await submitFn({
+      const result = await submitFn({
         data: {
           name: form.name,
           email: form.email,
@@ -74,14 +94,17 @@ export function ListYourOfferingDialog({
           title: form.title,
           description: form.description,
           website: form.website || null,
+          honeypot: form.honeypot,
+          elapsedMs,
+          userAgent:
+            typeof navigator !== "undefined"
+              ? navigator.userAgent.slice(0, 1024)
+              : null,
         },
       });
       setDone(true);
-      toast.success("Application sent! We'll be in touch.");
-      setTimeout(() => {
-        onOpenChange(false);
-        reset();
-      }, 1800);
+      setResultToken(result.token);
+      toast.success("Application sent — check your inbox!");
     } catch {
       toast.error("Something went wrong. Try again.");
     } finally {
@@ -97,30 +120,65 @@ export function ListYourOfferingDialog({
         if (!v) reset();
       }}
     >
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        className="
+          w-[calc(100vw-1rem)] sm:max-w-lg
+          max-h-[calc(100dvh-2rem)] sm:max-h-[90vh]
+          overflow-y-auto p-4 sm:p-6 rounded-2xl
+        "
+      >
         {done ? (
-          <div className="py-8 text-center space-y-3">
+          <div className="py-6 text-center space-y-3">
             <CheckCircle2 className="w-12 h-12 mx-auto text-primary" />
             <h3 className="text-lg font-bold text-foreground">Application sent</h3>
             <p className="text-sm text-muted-foreground">
-              Thanks! The BizzSurfer team will review your offering and reach out at{" "}
+              Thanks! We've emailed a receipt to{" "}
               <span className="font-semibold text-foreground">{form.email}</span>.
+              Our team will review your submission within 3–5 business days.
             </p>
+            {resultToken ? (
+              <Button asChild variant="outline" className="w-full mt-2">
+                <Link
+                  to="/marketplace/application/$token"
+                  params={{ token: resultToken }}
+                  onClick={() => {
+                    onOpenChange(false);
+                    reset();
+                  }}
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Track application status
+                </Link>
+              </Button>
+            ) : null}
           </div>
         ) : (
           <>
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
+            <DialogHeader className="text-left">
+              <DialogTitle className="flex items-center gap-2 text-base sm:text-lg">
                 <Sparkles className="w-5 h-5 text-primary" />
                 List your offering
               </DialogTitle>
-              <DialogDescription>
-                Submit your agent, service, or playbook for review by the BizzSurfer
-                team. We'll respond to <span className="font-semibold">info@bizzsurfer.com</span>.
+              <DialogDescription className="text-xs sm:text-sm">
+                Submit your agent, service, or playbook for review. We'll reach out
+                from <span className="font-semibold">info@bizzsurfer.com</span>.
               </DialogDescription>
             </DialogHeader>
-            <form onSubmit={submit} className="space-y-3 mt-2">
-              <div className="grid grid-cols-2 gap-3">
+            <form onSubmit={submit} className="space-y-3 mt-3">
+              {/* Honeypot — must stay empty. Hidden from real users + bots that auto-fill */}
+              <div aria-hidden="true" className="absolute left-[-9999px] top-[-9999px] h-0 w-0 overflow-hidden">
+                <label htmlFor="lyo-hp">Leave this field empty</label>
+                <input
+                  id="lyo-hp"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={form.honeypot}
+                  onChange={(e) => setForm({ ...form, honeypot: e.target.value })}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="lyo-name">Name *</Label>
                   <Input
@@ -129,6 +187,7 @@ export function ListYourOfferingDialog({
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
                     required
                     maxLength={200}
+                    autoComplete="name"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -136,10 +195,12 @@ export function ListYourOfferingDialog({
                   <Input
                     id="lyo-email"
                     type="email"
+                    inputMode="email"
                     value={form.email}
                     onChange={(e) => setForm({ ...form, email: e.target.value })}
                     required
                     maxLength={320}
+                    autoComplete="email"
                   />
                 </div>
               </div>
@@ -150,9 +211,10 @@ export function ListYourOfferingDialog({
                   value={form.company}
                   onChange={(e) => setForm({ ...form, company: e.target.value })}
                   maxLength={200}
+                  autoComplete="organization"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="lyo-type">Offering type *</Label>
                   <Select
@@ -190,10 +252,12 @@ export function ListYourOfferingDialog({
                 <Input
                   id="lyo-website"
                   type="url"
+                  inputMode="url"
                   value={form.website}
                   onChange={(e) => setForm({ ...form, website: e.target.value })}
                   placeholder="https://"
                   maxLength={500}
+                  autoComplete="url"
                 />
               </div>
               <div className="space-y-1.5">
@@ -214,10 +278,13 @@ export function ListYourOfferingDialog({
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full h-11 font-bold"
+                className="w-full h-11 font-bold mt-1"
               >
                 {loading ? "Sending…" : "Send application"}
               </Button>
+              <p className="text-[11px] text-muted-foreground text-center">
+                By submitting you agree to be contacted at the email above.
+              </p>
             </form>
           </>
         )}
