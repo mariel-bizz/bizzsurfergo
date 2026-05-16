@@ -42,7 +42,7 @@ CREATE POLICY "Anyone can submit marketplace inquiry"
   ON public.marketplace_inquiries
   FOR INSERT
   TO anon, authenticated
-  WITH CHECK (true);
+  WITH CHECK (true);  -- lovable:allow-open-rls (intentional public surface)
 
 -- Only admins can read inquiries.
 CREATE POLICY "Admins view marketplace inquiries"

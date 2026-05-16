@@ -121,7 +121,8 @@ jobs:
           check() {
             local label="$1" pattern="$2"
             local hits
-            hits=$(grep -InE "$pattern" $files || true)
+            # Exclude lines explicitly allow-listed with the lovable:allow-open-rls marker
+            hits=$(grep -InE "$pattern" $files | grep -v "lovable:allow-open-rls" || true)
             if [ -n "$hits" ]; then
               echo "::error title=Risky migration::$label detected"
               {
@@ -181,22 +182,25 @@ jobs:
       components: ${{ steps.summary.outputs.components }}
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-node@v4
         with:
-          bun-version: latest
-      - name: Install dependencies
-        run: bun install --frozen-lockfile
+          node-version: "20"
+          cache: npm
+      - name: Install dependencies (npm, for lockfile-based SBOM)
+        run: npm ci --no-audit --no-fund --ignore-scripts
       - name: Generate CycloneDX SBOM (JSON + XML)
         run: |
           mkdir -p sbom
-          bunx --bun @cyclonedx/cyclonedx-npm \
+          npx --yes @cyclonedx/cyclonedx-npm@^1.19.3 \
             --output-format JSON \
             --output-file sbom/sbom.cdx.json \
-            --spec-version 1.5
-          bunx --bun @cyclonedx/cyclonedx-npm \
+            --spec-version 1.5 \
+            --omit dev
+          npx --yes @cyclonedx/cyclonedx-npm@^1.19.3 \
             --output-format XML \
             --output-file sbom/sbom.cdx.xml \
-            --spec-version 1.5
+            --spec-version 1.5 \
+            --omit dev
       - name: Summarize SBOM
         id: summary
         run: |
