@@ -15,7 +15,7 @@ ALTER TABLE public.event_meet_links ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Authenticated can view meet links"
   ON public.event_meet_links FOR SELECT
   TO authenticated
-  USING (true);
+  USING (true);  -- lovable:allow-open-rls (intentional public surface)
 
 CREATE POLICY "Admins manage meet links"
   ON public.event_meet_links FOR ALL

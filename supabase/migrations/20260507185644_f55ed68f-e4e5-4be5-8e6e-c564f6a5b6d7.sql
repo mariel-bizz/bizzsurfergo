@@ -7,4 +7,4 @@ CREATE TABLE public.waitlist (
   created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 ALTER TABLE public.waitlist ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Anyone can join waitlist" ON public.waitlist FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Anyone can join waitlist" ON public.waitlist FOR INSERT TO anon, authenticated WITH CHECK (true);  -- lovable:allow-open-rls (intentional public surface)

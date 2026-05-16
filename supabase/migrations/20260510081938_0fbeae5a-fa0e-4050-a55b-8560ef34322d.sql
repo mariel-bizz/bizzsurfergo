@@ -15,7 +15,7 @@ ALTER TABLE public.insights_likes ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Anyone can view likes"
   ON public.insights_likes FOR SELECT
   TO anon, authenticated
-  USING (true);
+  USING (true);  -- lovable:allow-open-rls (intentional public surface)
 
 CREATE POLICY "Users can like as themselves"
   ON public.insights_likes FOR INSERT

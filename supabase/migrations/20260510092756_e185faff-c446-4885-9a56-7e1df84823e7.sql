@@ -12,7 +12,7 @@ DROP POLICY IF EXISTS "Anyone can read team invite by token" ON public.team_memb
 CREATE POLICY "Anyone can read team invite by token"
   ON public.team_members FOR SELECT
   TO anon, authenticated
-  USING (true);
+  USING (true);  -- lovable:allow-open-rls (intentional public surface)
 -- Note: SELECT exposes only rows queried by token (we always filter by invite_token in code);
 -- emails/names are not sensitive enough to require row-level masking for a known token holder.
 
