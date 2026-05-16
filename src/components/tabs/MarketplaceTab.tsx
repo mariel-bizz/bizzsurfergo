@@ -486,8 +486,6 @@ export function MarketplaceTab() {
           {filtered.map((l) => {
             const meta = categoryMeta[l.category];
             const Icon = meta.icon;
-            const pType = getPriceType(l.price);
-            const cartable = pType === "fixed" || pType === "from";
             const inCart = cartListings.some((c) => c.id === l.id);
             return (
               <div
@@ -534,41 +532,38 @@ export function MarketplaceTab() {
                   </div>
                 </Link>
 
-                <div className="mt-auto pt-4 flex flex-wrap items-center justify-between gap-2 border-t border-border/60">
-                  <span className="text-sm font-bold text-foreground break-words">{l.price}</span>
+                <div className="mt-auto pt-4 flex flex-wrap items-center justify-end gap-2 border-t border-border/60">
                   <div className="flex items-center gap-1.5">
-                    {cartable && (
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          if (inCart) return;
-                          if (addToCart(l.id)) {
-                            toast.success(`Added “${l.title}” to cart`);
-                          }
-                        }}
-                        disabled={inCart}
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold border transition whitespace-nowrap ${
-                          inCart
-                            ? "bg-muted text-muted-foreground border-transparent cursor-default"
-                            : "bg-card text-foreground border-border hover:border-primary/40"
-                        }`}
-                        aria-label={inCart ? "In cart" : `Add ${l.title} to cart`}
-                      >
-                        {inCart ? (
-                          <>
-                            <CheckIcon className="w-3.5 h-3.5" />
-                            In cart
-                          </>
-                        ) : (
-                          <>
-                            <Plus className="w-3.5 h-3.5" />
-                            Add to cart
-                          </>
-                        )}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (inCart) return;
+                        if (addToCart(l.id)) {
+                          toast.success(`Added “${l.title}” to cart`);
+                        }
+                      }}
+                      disabled={inCart}
+                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1.5 text-[11px] font-bold border transition whitespace-nowrap ${
+                        inCart
+                          ? "bg-muted text-muted-foreground border-transparent cursor-default"
+                          : "bg-card text-foreground border-border hover:border-primary/40"
+                      }`}
+                      aria-label={inCart ? "In cart" : `Add ${l.title} to cart`}
+                    >
+                      {inCart ? (
+                        <>
+                          <CheckIcon className="w-3.5 h-3.5" />
+                          In cart
+                        </>
+                      ) : (
+                        <>
+                          <Plus className="w-3.5 h-3.5" />
+                          Add to cart
+                        </>
+                      )}
+                    </button>
                     <Link
                       to="/marketplace/$listingId"
                       params={{ listingId: l.id }}
