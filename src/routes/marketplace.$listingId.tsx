@@ -87,6 +87,7 @@ function ListingDetail() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
   const meta = categoryMeta[listing.category];
   const Icon = meta.icon;
+  const isDownload = listing.category === "templates";
   const { listings: cartListings } = useCart();
   const inCart = cartListings.some((c) => c.id === listing.id);
 
@@ -101,18 +102,10 @@ function ListingDetail() {
     }
   };
 
-  const handlePrimaryAction = () => {
-    setDialogOpen(true);
-  };
-
   const ActionIcon = isDownload ? Download : ArrowRight;
-  const ctaLabel = listing.cta;
-  const isDownload = listing.category === "templates";
 
   return (
     <div className="px-5 py-5 space-y-5">
-      {isPayable && <PaymentTestModeBanner />}
-
       <Link
         to="/marketplace"
         className="inline-flex items-center gap-1 text-xs font-bold uppercase tracking-widest text-muted-foreground hover:text-foreground"
@@ -179,33 +172,23 @@ function ListingDetail() {
         </ul>
       </section>
 
-      <div className="sticky bottom-4 rounded-3xl bg-gradient-deep p-4 text-primary-foreground shadow-elegant flex items-center justify-between gap-3">
-        <div className="min-w-0">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-white/70">
-            {isPayable ? (parsedPrice.interval === "month" ? "Monthly" : "Price") : "Price"}
-          </p>
-          <p className="text-base font-bold text-white truncate">{listing.price}</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          {cartable && (
-            <Button
-              onClick={handleAddToCart}
-              disabled={inCart}
-              variant="outline"
-              className="h-11 px-3 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white font-bold disabled:opacity-70"
-            >
-              {inCart ? <ShoppingCart className="w-4 h-4 mr-1.5" /> : <Plus className="w-4 h-4 mr-1.5" />}
-              {inCart ? "In cart" : "Add to cart"}
-            </Button>
-          )}
-          <Button
-            onClick={handlePrimaryAction}
-            className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
-          >
-            <ActionIcon className="w-4 h-4 mr-1.5" />
-            {ctaLabel}
-          </Button>
-        </div>
+      <div className="sticky bottom-4 rounded-3xl bg-gradient-deep p-4 text-primary-foreground shadow-elegant flex items-center justify-end gap-3">
+        <Button
+          onClick={handleAddToCart}
+          disabled={inCart}
+          variant="outline"
+          className="h-11 px-3 bg-white/10 border-white/30 text-white hover:bg-white/20 hover:text-white font-bold disabled:opacity-70"
+        >
+          {inCart ? <ShoppingCart className="w-4 h-4 mr-1.5" /> : <Plus className="w-4 h-4 mr-1.5" />}
+          {inCart ? "In cart" : "Add to cart"}
+        </Button>
+        <Button
+          onClick={() => setDialogOpen(true)}
+          className="h-11 px-5 bg-white text-primary hover:bg-white/90 font-bold"
+        >
+          <ActionIcon className="w-4 h-4 mr-1.5" />
+          {listing.cta}
+        </Button>
       </div>
 
       <ListingActionDialog
@@ -213,31 +196,6 @@ function ListingDetail() {
         open={dialogOpen}
         onOpenChange={setDialogOpen}
       />
-
-      {isPayable && (
-        <Dialog open={checkoutOpen} onOpenChange={setCheckoutOpen}>
-          <DialogContent className="max-w-lg p-0 overflow-hidden">
-            <DialogHeader className="px-5 pt-5">
-              <DialogTitle>Complete your order</DialogTitle>
-              <DialogDescription>
-                {listing.title} — {parsedPrice.display}
-              </DialogDescription>
-            </DialogHeader>
-            <div className="p-2 min-h-[500px]">
-              {checkoutOpen ? (
-                <MarketplaceCheckout
-                  listing={listing}
-                  returnUrl={`${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`}
-                />
-              ) : (
-                <div className="flex items-center justify-center h-[500px]">
-                  <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-                </div>
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 }
