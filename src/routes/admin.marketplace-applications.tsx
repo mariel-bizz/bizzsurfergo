@@ -189,7 +189,12 @@ function MarketplaceApplicationsPage() {
     patch: { status?: Application["status"]; review_notes?: string | null },
   ) => {
     const { data: { user } } = await supabase.auth.getUser();
-    const update: Record<string, any> = { ...patch };
+    const update: {
+      status?: Application["status"];
+      review_notes?: string | null;
+      reviewed_at?: string;
+      reviewed_by?: string | null;
+    } = { ...patch };
     if (patch.status) {
       update.reviewed_at = new Date().toISOString();
       update.reviewed_by = user?.id ?? null;

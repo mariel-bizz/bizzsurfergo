@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, Clock, CheckCircle2, XCircle, Loader2 } from "lucide-react";
-import { pageHead } from "@/lib/page-head";
 
 type StatusRow = {
   status: "pending" | "approved" | "rejected";
@@ -18,14 +17,13 @@ type StatusRow = {
 };
 
 export const Route = createFileRoute("/marketplace/application/$token")({
-  head: () =>
-    pageHead({
-      path: "/marketplace/application",
-      title: "Application status — BizzSurfer Go!",
-      description: "Track the status of your marketplace listing application.",
-      breadcrumbName: "Application status",
-      robots: "noindex, nofollow",
-    }),
+  head: () => ({
+    meta: [
+      { title: "Application status — BizzSurfer Go!" },
+      { name: "description", content: "Track the status of your marketplace listing application." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: ApplicationStatusPage,
 });
 
