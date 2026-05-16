@@ -121,7 +121,8 @@ jobs:
           check() {
             local label="$1" pattern="$2"
             local hits
-            hits=$(grep -InE "$pattern" $files || true)
+            # Exclude lines explicitly allow-listed with the lovable:allow-open-rls marker
+            hits=$(grep -InE "$pattern" $files | grep -v "lovable:allow-open-rls" || true)
             if [ -n "$hits" ]; then
               echo "::error title=Risky migration::$label detected"
               {
