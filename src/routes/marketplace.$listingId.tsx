@@ -85,48 +85,14 @@ export const Route = createFileRoute("/marketplace/$listingId")({
 
 function ListingDetail() {
   const { listing } = Route.useLoaderData() as { listing: Listing };
-  const search = Route.useSearch();
   const meta = categoryMeta[listing.category];
   const Icon = meta.icon;
-  const isDownload = listing.category === "templates";
-  const parsedPrice = parseListingPrice(listing.price);
-  const isPayable = !!parsedPrice;
-  const cartable = isPayable && (getPriceType(listing.price) === "fixed" || getPriceType(listing.price) === "from");
   const { listings: cartListings } = useCart();
   const inCart = cartListings.some((c) => c.id === listing.id);
 
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [authChecked, setAuthChecked] = useState(false);
-  const [isAuthed, setIsAuthed] = useState(false);
   const game = useGame();
   useEffect(() => { game.completeOnboardingStep("marketplace"); }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Auto-prepare an order: as soon as we know the listing is payable and the
-  // user is signed in, the checkout dialog can be opened with a single tap
-  // (the embedded Stripe form fetches the client secret on mount).
-  useEffect(() => {
-    let active = true;
-    supabase.auth.getUser().then(({ data }) => {
-      if (!active) return;
-      setIsAuthed(!!data.user);
-      setAuthChecked(true);
-    });
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setIsAuthed(!!session?.user);
-    });
-    return () => {
-      active = false;
-      sub.subscription.unsubscribe();
-    };
-  }, []);
-
-  // Auto-open checkout when arriving from cart with ?checkout=1
-  useEffect(() => {
-    if (search.checkout === 1 && isPayable && authChecked && isAuthed) {
-      setCheckoutOpen(true);
-    }
-  }, [search.checkout, isPayable, authChecked, isAuthed]);
 
   const handleAddToCart = () => {
     if (inCart) return;
@@ -136,26 +102,12 @@ function ListingDetail() {
   };
 
   const handlePrimaryAction = () => {
-    if (isPayable) {
-      if (!authChecked) return;
-      if (!isAuthed) {
-        toast.info("Sign in to complete your purchase", {
-          description: "We'll bring you back to checkout.",
-        });
-        const next = encodeURIComponent(window.location.pathname);
-        window.location.href = `/login?next=${next}`;
-        return;
-      }
-      setCheckoutOpen(true);
-      return;
-    }
     setDialogOpen(true);
   };
 
-  const ActionIcon = isPayable ? CreditCard : isDownload ? Download : ArrowRight;
-  const ctaLabel = isPayable
-    ? `Pay ${parsedPrice.display}`
-    : listing.cta;
+  const ActionIcon = isDownload ? Download : ArrowRight;
+  const ctaLabel = listing.cta;
+  const isDownload = listing.category === "templates";
 
   return (
     <div className="px-5 py-5 space-y-5">
