@@ -39,10 +39,12 @@ import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
+import { Route as AdminMarketplaceApplicationsRouteImport } from './routes/admin.marketplace-applications'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminDigestSubscribersRouteImport } from './routes/admin.digest-subscribers'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
+import { Route as MarketplaceApplicationTokenRouteImport } from './routes/marketplace.application.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -204,6 +206,12 @@ const AdminSalesRoute = AdminSalesRouteImport.update({
   path: '/admin/sales',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminMarketplaceApplicationsRoute =
+  AdminMarketplaceApplicationsRouteImport.update({
+    id: '/admin/marketplace-applications',
+    path: '/admin/marketplace-applications',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   id: '/admin/insights-comments',
   path: '/admin/insights-comments',
@@ -224,6 +232,12 @@ const AdminAlertsRoute = AdminAlertsRouteImport.update({
   path: '/admin/alerts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketplaceApplicationTokenRoute =
+  MarketplaceApplicationTokenRouteImport.update({
+    id: '/marketplace/application/$token',
+    path: '/marketplace/application/$token',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
@@ -305,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
@@ -318,6 +333,7 @@ export interface FileRoutesByFullPath {
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -351,6 +367,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
@@ -364,6 +381,7 @@ export interface FileRoutesByTo {
   '/insights': typeof InsightsIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -398,6 +416,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
@@ -411,6 +430,7 @@ export interface FileRoutesById {
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
+  '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -446,6 +466,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
@@ -459,6 +480,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/marketplace/'
     | '/lovable/email/suppression'
+    | '/marketplace/application/$token'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -492,6 +514,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
@@ -505,6 +528,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/marketplace'
     | '/lovable/email/suppression'
+    | '/marketplace/application/$token'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -538,6 +562,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
@@ -551,6 +576,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/marketplace/'
     | '/lovable/email/suppression'
+    | '/marketplace/application/$token'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -585,6 +611,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminDigestSubscribersRoute: typeof AdminDigestSubscribersRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
+  AdminMarketplaceApplicationsRoute: typeof AdminMarketplaceApplicationsRoute
   AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
@@ -598,6 +625,7 @@ export interface RootRouteChildren {
   InsightsIndexRoute: typeof InsightsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
+  MarketplaceApplicationTokenRoute: typeof MarketplaceApplicationTokenRoute
   ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
@@ -821,6 +849,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/marketplace-applications': {
+      id: '/admin/marketplace-applications'
+      path: '/admin/marketplace-applications'
+      fullPath: '/admin/marketplace-applications'
+      preLoaderRoute: typeof AdminMarketplaceApplicationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/insights-comments': {
       id: '/admin/insights-comments'
       path: '/admin/insights-comments'
@@ -847,6 +882,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/alerts'
       fullPath: '/admin/alerts'
       preLoaderRoute: typeof AdminAlertsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace/application/$token': {
+      id: '/marketplace/application/$token'
+      path: '/marketplace/application/$token'
+      fullPath: '/marketplace/application/$token'
+      preLoaderRoute: typeof MarketplaceApplicationTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/lovable/email/suppression': {
@@ -945,6 +987,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminDigestSubscribersRoute: AdminDigestSubscribersRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
+  AdminMarketplaceApplicationsRoute: AdminMarketplaceApplicationsRoute,
   AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
@@ -958,6 +1001,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsIndexRoute: InsightsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
+  MarketplaceApplicationTokenRoute: MarketplaceApplicationTokenRoute,
   ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
