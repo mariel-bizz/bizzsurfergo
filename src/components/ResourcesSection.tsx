@@ -149,7 +149,7 @@ function ResourceTile({ r }: { r: Resource }) {
     </>
   );
   const className =
-    "group rounded-3xl bg-card border-2 border-[#02459c] p-4 shadow-card flex flex-row items-center gap-3 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elegant hover:border-[#0357c2] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:shadow-elegant focus-visible:ring-2 focus-visible:ring-[#02459c]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
+    "group rounded-3xl bg-card border-2 border-solid border-[#02459c] p-4 shadow-card flex flex-row items-center gap-3 overflow-hidden transition-all duration-200 hover:-translate-y-0.5 hover:shadow-elegant hover:border-[#0357c2] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:shadow-elegant focus-visible:ring-2 focus-visible:ring-[#02459c]/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]";
   return r.internal ? (
     <Link to={r.href} className={className}>
       {inner}
@@ -298,7 +298,7 @@ export function PoweredBySection() {
     <section className="px-5">
       <div
         tabIndex={0}
-        className="rounded-xl border-border p-3 bg-transparent border-4 border-[#ffad1f] transition-all duration-300 hover:shadow-[0_0_0_4px_rgba(255,173,31,0.18),0_8px_24px_-8px_rgba(255,173,31,0.45)] hover:border-[#ff8c00] focus-visible:outline-none focus-visible:shadow-[0_0_0_4px_rgba(255,173,31,0.25),0_8px_24px_-8px_rgba(255,173,31,0.5)] focus-visible:border-[#ff8c00]"
+        className="rounded-xl border-border p-3 bg-transparent border-4 border-solid border-[#ffad1f] transition-all duration-300 hover:shadow-[0_0_0_4px_rgba(255,173,31,0.18),0_8px_24px_-8px_rgba(255,173,31,0.45)] hover:border-[#ff8c00] focus-visible:outline-none focus-visible:shadow-[0_0_0_4px_rgba(255,173,31,0.25),0_8px_24px_-8px_rgba(255,173,31,0.5)] focus-visible:border-[#ff8c00]"
       >
         <p className="uppercase tracking-widest text-muted-foreground font-semibold text-center text-sm text-[#02459c]">
           BizzSurfer GO! is powered by

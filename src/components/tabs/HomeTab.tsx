@@ -109,7 +109,7 @@ export function HomeTab() {
         <SectionHeader className="mb-3">Go Agentic!</SectionHeader>
         <Link
           to="/marketplace"
-          className="group relative block overflow-hidden rounded-3xl border-2 border-[#4a5fb8] bg-card shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
+          className="group relative block overflow-hidden rounded-3xl border-2 border-solid border-[#4a5fb8] bg-card shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-0.5"
         >
           {/* animated glow halo */}
           <span className="pointer-events-none absolute -inset-12 bg-[radial-gradient(circle_at_20%_20%,#4a5fb8_0%,transparent_55%),radial-gradient(circle_at_85%_85%,#e8853a_0%,transparent_55%)] blur-2xl opacity-30 group-hover:opacity-50 transition-opacity" />

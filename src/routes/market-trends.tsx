@@ -337,7 +337,7 @@ function MarketTrendsPage() {
       </p>
 
       {/* Featured banner */}
-      <section className="mt-6 overflow-hidden rounded-2xl border-2 border-[#02459c] bg-card shadow-card">
+      <section className="mt-6 overflow-hidden rounded-2xl border-2 border-solid border-[#02459c] bg-card shadow-card">
         <img
           src={marketTrendsBanner}
           alt="Market Trends Report — Agentic AI benchmarking study"
