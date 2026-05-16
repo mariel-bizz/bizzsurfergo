@@ -1,0 +1,38 @@
+# Gitleaks configuration for BizzSurfer Go
+# Extends the default ruleset and allowlists known false positives.
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Allowlist for public/publishable keys and generated lockfiles"
+
+# Never scan lockfiles, generated route trees, or vendored type bundles.
+paths = [
+  '''(^|/)bun\.lock$''',
+  '''(^|/)bun\.lockb$''',
+  '''(^|/)package-lock\.json$''',
+  '''(^|/)yarn\.lock$''',
+  '''(^|/)pnpm-lock\.yaml$''',
+  '''(^|/)src/routeTree\.gen\.ts$''',
+  '''(^|/)src/integrations/supabase/types\.ts$''',
+  '''(^|/)dist/''',
+  '''(^|/)node_modules/''',
+]
+
+# Supabase **publishable / anon** JWTs are public by design (they are shipped
+# in the browser bundle and protected by RLS). Their payload always carries
+# `"role":"anon"`, which lets us safely allowlist them without weakening
+# detection of real secrets.
+regexes = [
+  '''eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]*(?:cm9sZSI6ImFub24|InJvbGUiOiJhbm9u)[A-Za-z0-9_-]*\.[A-Za-z0-9_-]+''',
+]
+
+# Specific stopwords that show up in placeholder/example strings.
+stopwords = [
+  "your_api_key",
+  "your-api-key",
+  "example",
+  "placeholder",
+  "changeme",
+]
