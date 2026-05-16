@@ -78,7 +78,7 @@ export function SplashScreen({ onDone }: { onDone: () => void }) {
         </div>
 
         <div className="mt-6 w-full max-w-md">
-          <div className="inline-flex items-center justify-center gap-2 whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 hover:bg-primary/90 rounded-md mt-6 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 px-6 text-sm font-bold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 shadow-md">
+          <div className="flex items-center justify-center gap-1.5 font-semibold uppercase tracking-widest text-muted-foreground mb-3 text-xs text-[#ff6f00]">
             <Globe className="w-3.5 h-3.5" /> LANGUAGE
           </div>
 
