@@ -668,7 +668,6 @@ export function MarketplaceTab() {
         open={listOfferingOpen}
         onOpenChange={setListOfferingOpen}
       />
-      </div>
 
       {/* Save preset dialog */}
       <Dialog open={saveOpen} onOpenChange={setSaveOpen}>
