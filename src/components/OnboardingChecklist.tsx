@@ -169,7 +169,7 @@ export function OnboardingChecklist() {
                     <button
                       type="button"
                       onClick={() => handleClick(item)}
-                      className={`w-full flex items-center gap-3 p-3 text-left relative overflow-hidden rounded-2xl border bg-card transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-2xl ${
+                      className={`w-full flex items-center gap-3 p-3 text-left relative overflow-hidden rounded-2xl border border-solid bg-card transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-2xl ${
                         isDone
                           ? "border-primary/30 bg-primary/5 shadow-none"
                           : "border-[#f49134] shadow-xl hover:bg-muted/50"
