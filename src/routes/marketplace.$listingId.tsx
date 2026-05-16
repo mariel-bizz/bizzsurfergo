@@ -1,15 +1,11 @@
 import { useEffect, useState } from "react";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, ArrowRight, Check, CreditCard, Download, Loader2, Plus, ShoppingCart, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Download, Plus, ShoppingCart, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
-import { categoryMeta, getListing, getPriceType, parseListingPrice, type Listing } from "@/lib/marketplace-data";
+import { categoryMeta, getListing, parseListingPrice, type Listing } from "@/lib/marketplace-data";
 import { addToCart, useCart } from "@/lib/marketplace-cart";
 import { ListingActionDialog } from "@/components/marketplace/ListingActionDialog";
-import { MarketplaceCheckout } from "@/components/marketplace/MarketplaceCheckout";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
-import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useGame } from "@/components/AppShell";
 
