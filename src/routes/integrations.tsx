@@ -24,6 +24,24 @@ import {
 } from "@/lib/integrations.functions";
 
 export const Route = createFileRoute("/integrations")({
+  head: () => ({
+    meta: [
+      { title: "Integrations — BizzSurfer Go!" },
+      {
+        name: "description",
+        content:
+          "Connect your CRM, data warehouse, HR, and analytics tools to BizzSurfer Go! so AI agents can orchestrate work across your enterprise stack.",
+      },
+      { property: "og:title", content: "Integrations — BizzSurfer Go!" },
+      {
+        property: "og:description",
+        content:
+          "Plug BizzSurfer Go! into your CRM, data warehouse, HR, and analytics tools to let AI agents act across your stack.",
+      },
+      { property: "og:url", content: "https://go.bizzsurfer.ai/integrations" },
+    ],
+    links: [{ rel: "canonical", href: "https://go.bizzsurfer.ai/integrations" }],
+  }),
   // Client-only premium gate. We skip on server prerender (no bearer token);
   // on the browser the check runs before the component mounts, so non-Premium
   // users never see the page.
