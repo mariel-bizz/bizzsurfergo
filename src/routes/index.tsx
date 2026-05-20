@@ -6,10 +6,24 @@ const SITE = "https://bizzsurfergo.lovable.app";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
+      { title: "BizzSurfer Go! — Agentic AI for Business Transformation" },
       {
         name: "description",
         content:
           "Agentic AI for enterprise transformation leaders—connect business systems, orchestrate change, and accelerate ROI with AI agents.",
+      },
+      { property: "og:title", content: "BizzSurfer Go! — Agentic AI for Business Transformation" },
+      {
+        property: "og:description",
+        content:
+          "Connect enterprise systems and let AI agents orchestrate change. Built for transformation leaders who want measurable ROI.",
+      },
+      { property: "og:url", content: "https://go.bizzsurfer.ai/" },
+      { name: "twitter:title", content: "BizzSurfer Go! — Agentic AI for Business Transformation" },
+      {
+        name: "twitter:description",
+        content:
+          "Connect enterprise systems and let AI agents orchestrate change. Built for transformation leaders who want measurable ROI.",
       },
     ],
     links: [{ rel: "canonical", href: `${SITE}/` }],

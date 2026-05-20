@@ -21,7 +21,22 @@ export const Route = createFileRoute("/login")({
     return { redirect: safe ? raw : "/" };
   },
   head: () => ({
-    meta: [{ title: "Sign in" }, { name: "robots", content: "noindex, nofollow" }],
+    meta: [
+      { title: "Sign in — BizzSurfer Go!" },
+      {
+        name: "description",
+        content:
+          "Sign in or create your BizzSurfer Go! account to access Agentic AI tools for business transformation.",
+      },
+      { property: "og:title", content: "Sign in — BizzSurfer Go!" },
+      {
+        property: "og:description",
+        content:
+          "Access your BizzSurfer Go! account to use Agentic AI for enterprise transformation.",
+      },
+      { property: "og:url", content: "https://go.bizzsurfer.ai/login" },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
   }),
   component: LoginPage,
 });
