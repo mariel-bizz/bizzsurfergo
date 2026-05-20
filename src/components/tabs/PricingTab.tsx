@@ -201,12 +201,12 @@ export function PricingTab() {
                 <span className={`text-4xl font-bold ${t.highlighted ? "text-white" : "text-foreground"}`}>
                   {displayPrice}
                 </span>
-                <span className={`text-xs ${t.highlighted ? "text-white/80" : "text-muted-foreground"}`}>
+                <span className={`text-xs ${t.highlighted ? "text-white/95" : "text-muted-foreground"}`}>
                   {displaySuffix}
                 </span>
               </div>
 
-              <p className={`mt-3 text-sm ${t.highlighted ? "text-white/85" : "text-muted-foreground"}`}>
+              <p className={`mt-3 text-sm ${t.highlighted ? "text-white/95" : "text-muted-foreground"}`}>
                 {t.tagline}
               </p>
 
@@ -219,7 +219,7 @@ export function PricingTab() {
                       />
                     ) : (
                       <X
-                        className={`w-4 h-4 mt-0.5 shrink-0 ${t.highlighted ? "text-white/85" : "text-muted-foreground"}`}
+                        className={`w-4 h-4 mt-0.5 shrink-0 ${t.highlighted ? "text-white/95" : "text-muted-foreground"}`}
                       />
                     )}
                     <span
@@ -229,7 +229,7 @@ export function PricingTab() {
                             ? "text-white/95 font-extrabold"
                             : "text-foreground"
                           : t.highlighted
-                            ? "text-white/85"
+                            ? "text-white/95"
                             : "text-muted-foreground"
                       }
                     >
