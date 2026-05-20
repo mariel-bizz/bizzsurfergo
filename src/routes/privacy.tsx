@@ -49,7 +49,7 @@ function PrivacyPage() {
 
           <h2>1. Data Controller</h2>
           <p>
-            The data controller is <strong>Coach4expats</strong>, based in The Netherlands.
+            The data controller is <strong>Coach4expats, The Netherlands<br />hello@bizzsurfer.com</strong>.
           </p>
           <p>
             For privacy questions, contact us at{" "}
