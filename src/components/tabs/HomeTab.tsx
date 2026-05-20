@@ -74,8 +74,11 @@ export function HomeTab() {
               <img
                 src={eventAgenticVsAgents}
                 alt={pastEvents[0].title}
+                width={1200}
+                height={675}
                 className="w-full h-auto block"
-                loading="lazy"
+                fetchPriority="high"
+                decoding="async"
               />
               <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
                 <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Replay
