@@ -58,15 +58,6 @@ export const Route = createFileRoute("/integrations")({
       throw redirect({ to: "/login", search: { redirect: "/integrations" } });
     }
   },
-  head: () => ({
-    meta: [
-      { title: "Integrations — BizzSurfer" },
-      {
-        name: "description",
-        content: "Connect your ERP, CRM, HRIS, BI and SaaS tools so agents can orchestrate across them.",
-      },
-    ],
-  }),
   component: IntegrationsPage,
 });
 
