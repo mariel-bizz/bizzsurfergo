@@ -49,8 +49,7 @@ function PrivacyPage() {
 
           <h2>1. Data Controller</h2>
           <p>
-            The data controller is <strong>TheHRchapter B.V.</strong>, a company registered in
-            Zevenaar, Gelderland, the Netherlands.
+            The data controller is <strong>Coach4expats</strong>, based in The Netherlands.
           </p>
           <p>
             For privacy questions, contact us at{" "}
@@ -220,9 +219,7 @@ function PrivacyPage() {
 
           <h2>12. Contact</h2>
           <p>
-            TheHRchapter B.V.
-            <br />
-            Zevenaar, Gelderland, The Netherlands
+            Coach4expats, The Netherlands
             <br />
             <a href="mailto:hello@bizzsurfer.com" className="text-primary underline">
               hello@bizzsurfer.com
