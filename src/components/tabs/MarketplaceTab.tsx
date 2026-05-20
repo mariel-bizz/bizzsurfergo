@@ -581,13 +581,13 @@ export function MarketplaceTab() {
       )}
 
       <div className="rounded-3xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant">
-        <p className="text-xs font-bold uppercase tracking-widest text-white/80">
+        <p className="text-xs font-bold uppercase tracking-widest text-white/95">
           List your offering
         </p>
         <h3 className="mt-2 text-lg font-bold text-white">
           Reach transformation leaders
         </h3>
-        <p className="mt-1 text-sm text-white/85">
+        <p className="mt-1 text-sm text-white/95">
           Submit your agent, service, or playbook for review by the BizzSurfer team.
         </p>
         <Button
