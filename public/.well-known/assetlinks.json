@@ -3,7 +3,7 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "ai.bizzsurfer.go",
+      "package_name": "go.bizzsurfer.myapp",
       "sha256_cert_fingerprints": [
         "9C:4C:CB:87:03:B0:C5:59:9A:77:5B:A8:C7:EE:A3:91:78:77:05:55:45:BE:13:6D:21:6A:A2:05:15:E9:FC:1C"
       ]
