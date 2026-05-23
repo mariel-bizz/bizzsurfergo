@@ -71,6 +71,15 @@ function LoginPage() {
     // redirect (Apple/Google) is picked up immediately on this page.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
+        // First sign-in on this device: reset the chat language-model setup
+        // so the user re-picks their preferred model.
+        try {
+          const flagKey = `bizzsurfer.reset.${session.user.id}`;
+          if (!localStorage.getItem(flagKey)) {
+            localStorage.removeItem("bizzsurfer.gochat.config");
+            localStorage.setItem(flagKey, "1");
+          }
+        } catch { /* ignore */ }
         notifySuccess("signin");
         navigate({ to: redirect });
       }
