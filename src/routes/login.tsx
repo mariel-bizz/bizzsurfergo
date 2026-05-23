@@ -71,6 +71,15 @@ function LoginPage() {
     // redirect (Apple/Google) is picked up immediately on this page.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
+        // First sign-in on this device: reset the chat language-model setup
+        // so the user re-picks their preferred model.
+        try {
+          const flagKey = `bizzsurfer.reset.${session.user.id}`;
+          if (!localStorage.getItem(flagKey)) {
+            localStorage.removeItem("bizzsurfer.gochat.config");
+            localStorage.setItem(flagKey, "1");
+          }
+        } catch { /* ignore */ }
         notifySuccess("signin");
         navigate({ to: redirect });
       }
@@ -136,7 +145,8 @@ function LoginPage() {
           options: { emailRedirectTo: `${window.location.origin}${redirect}` },
         });
         if (error) throw error;
-        setInfo("Check your email to confirm your account.");
+        toast.success("Welcome to BizzSurfer Go! 🎉 Check your email to confirm your account.");
+        setInfo("Welcome aboard! Check your email to confirm your account, then sign in to start your Agentic AI journey.");
       } else if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,

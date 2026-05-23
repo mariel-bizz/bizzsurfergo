@@ -171,6 +171,28 @@ export function AppShell() {
   const location = useLocation();
   const activeTab: TabKey = PATH_TO_TAB[location.pathname] ?? "home";
 
+  // Anonymous visitor logging — one row per pathname per session.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const path = location.pathname;
+    const sessionKey = `bizzsurfer.visit.${path}`;
+    if (sessionStorage.getItem(sessionKey)) return;
+    sessionStorage.setItem(sessionKey, "1");
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data } = await supabase.auth.getUser();
+        await supabase.from("visitor_log").insert({
+          path,
+          referrer: document.referrer || null,
+          user_agent: navigator.userAgent.slice(0, 1024),
+          language: (navigator.language || "en").slice(0, 16),
+          user_id: data.user?.id ?? null,
+        });
+      } catch { /* non-blocking */ }
+    })();
+  }, [location.pathname]);
+
   return (
     <GameContext.Provider value={game}>
       <div className="min-h-screen bg-background relative">
