@@ -145,7 +145,8 @@ function LoginPage() {
           options: { emailRedirectTo: `${window.location.origin}${redirect}` },
         });
         if (error) throw error;
-        setInfo("Check your email to confirm your account.");
+        toast.success("Welcome to BizzSurfer Go! 🎉 Check your email to confirm your account.");
+        setInfo("Welcome aboard! Check your email to confirm your account, then sign in to start your Agentic AI journey.");
       } else if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
