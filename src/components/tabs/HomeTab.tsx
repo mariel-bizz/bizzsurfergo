@@ -174,6 +174,9 @@ export function HomeTab() {
       {/* Powered by — compact, under ROI */}
       <PoweredBySection />
 
+      {/* Explore & download */}
+      <ResourcesSection />
+
       {/* Pain points */}
       <section id="reality-check" className="relative px-5 py-8 overflow-hidden scroll-mt-20">
         <div className="pointer-events-none absolute inset-0 -z-10">
@@ -186,9 +189,6 @@ export function HomeTab() {
 
         <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
       </section>
-
-      {/* Explore & download — under Reality Check */}
-      <ResourcesSection />
 
       {/* Gamification card */}
       <section className="px-5">
