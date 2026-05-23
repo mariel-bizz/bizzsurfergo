@@ -453,25 +453,25 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)]">
-      <div className="px-5 pt-3 pb-2">
-        <div className="rounded-2xl text-primary-foreground p-4 shadow-soft flex items-center gap-3 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
-          <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+      <div className="px-4 pt-2 pb-1.5">
+        <div className="rounded-xl text-primary-foreground px-3 py-2 shadow-soft flex items-center gap-2 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
+          <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
             {providerMeta ? (
-              <img src={providerMeta.logo} alt={providerMeta.name} className="w-6 h-6 object-contain" />
+              <img src={providerMeta.logo} alt={providerMeta.name} className="w-4 h-4 object-contain" />
             ) : (
-              <Sparkles className="w-5 h-5" />
+              <Sparkles className="w-3.5 h-3.5" />
             )}
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] uppercase tracking-widest opacity-90 font-semibold">Agentic AI Advisor</p>
-            <p className="text-sm font-bold truncate">
+          <div className="flex-1 min-w-0 leading-tight">
+            <p className="text-[9px] uppercase tracking-wider opacity-90 font-semibold">Agentic AI Advisor</p>
+            <p className="text-xs font-bold truncate">
               BizzSurfer Go!{providerMeta ? ` · ${providerMeta.name}` : ""}
             </p>
           </div>
           {config ? (
             <button
               onClick={resetConfig}
-              className="rounded-lg bg-white/20 backdrop-blur px-2.5 py-1.5 text-[11px] font-bold flex items-center gap-1"
+              className="rounded-md bg-white/20 backdrop-blur px-2 py-1 text-[10px] font-bold flex items-center gap-1 shrink-0"
               aria-label="Reconfigure"
             >
               <Settings2 className="w-3 h-3" /> Setup
@@ -480,7 +480,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             <a
               href="https://chatgpt.com/g/g-69f61861f0308191bdb780fd6adc5085-bizzsurfer"
               target="_blank" rel="noreferrer"
-              className="rounded-lg bg-white/20 backdrop-blur px-2.5 py-1.5 text-[11px] font-bold flex items-center gap-1"
+              className="rounded-md bg-white/20 backdrop-blur px-2 py-1 text-[10px] font-bold flex items-center gap-1 shrink-0"
             >
               GPT <ExternalLink className="w-3 h-3" />
             </a>
