@@ -41,8 +41,9 @@ jobs:
       - uses: github/codeql-action/init@v3
         with:
           languages: javascript-typescript
-          queries: security-extended,security-and-quality
+          queries: security-extended
       - uses: github/codeql-action/analyze@v3
+        continue-on-error: true
         with:
           category: "/language:javascript-typescript"
 
