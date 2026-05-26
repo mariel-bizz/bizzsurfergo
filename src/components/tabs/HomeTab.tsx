@@ -271,6 +271,19 @@ export function HomeTab() {
 
       <ConnectApisSection />
 
+      {/* Footer links */}
+      <footer className="px-5 pb-6 pt-2">
+        <div className="flex items-center justify-center gap-3 text-xs text-muted-foreground">
+          <Link to="/terms" className="hover:text-foreground hover:underline transition-colors">
+            Terms of Service
+          </Link>
+          <span className="text-border">|</span>
+          <Link to="/privacy" className="hover:text-foreground hover:underline transition-colors">
+            Privacy Policy
+          </Link>
+        </div>
+      </footer>
+
       <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} onJoined={() => {
         game.update((s) => {
           const badges = s.badges.includes("Early Adopter") ? s.badges : [...s.badges, "Early Adopter"];
