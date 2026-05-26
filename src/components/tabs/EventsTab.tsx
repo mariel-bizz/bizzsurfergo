@@ -350,7 +350,7 @@ export function EventsTab() {
                   </a>
                 );
               })()}
-              {e.href && e.href !== "#" && !/linkedin\.com\/events/.test(e.href) && (
+              {e.href && e.href !== "#" && !/^https?:\/\/(?:www\.)?linkedin\.com\/events(?:\/|$)/i.test(e.href) && (
                 <a
                   href={e.href}
                   target="_blank"
