@@ -294,6 +294,7 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
       currencies.add(it.currency);
     }
     if (currencies.size > 1) throw new Error("All cart items must use the same currency");
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
