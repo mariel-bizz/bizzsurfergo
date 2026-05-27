@@ -386,3 +386,4 @@ function Meta({ icon: Icon, label }: { icon: typeof Calendar; label: string }) {
     </div>
   );
 }
+
