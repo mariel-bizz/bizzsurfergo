@@ -43,6 +43,38 @@ function logAndMapStripeError(
   }
 }
 
+// Allowlist of hosts permitted as post-checkout / portal return URLs.
+// Prevents open-redirect abuse where a caller supplies an arbitrary URL
+// and Stripe redirects the customer to it after payment.
+const ALLOWED_RETURN_HOSTS = new Set<string>([
+  "bizzsurfergo.lovable.app",
+  "go.bizzsurfer.ai",
+  "www.bizzsurfer.ai",
+  "bizzsurfer.ai",
+  "bizzsurfer.com",
+  "www.bizzsurfer.com",
+]);
+
+function validateReturnUrl(raw: string): string {
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    throw new Error("Invalid returnUrl");
+  }
+  if (u.protocol !== "https:") throw new Error("returnUrl must use https");
+  // Allow lovable preview/published subdomains for the project.
+  const host = u.hostname.toLowerCase();
+  const isLovablePreview =
+    host.endsWith(".lovable.app") || host.endsWith(".lovable.dev");
+  if (!ALLOWED_RETURN_HOSTS.has(host) && !isLovablePreview) {
+    throw new Error("returnUrl host not allowed");
+  }
+  return raw;
+}
+
+
+
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
   options: { email?: string; userId?: string },
