@@ -43,6 +43,38 @@ function logAndMapStripeError(
   }
 }
 
+// Allowlist of hosts permitted as post-checkout / portal return URLs.
+// Prevents open-redirect abuse where a caller supplies an arbitrary URL
+// and Stripe redirects the customer to it after payment.
+const ALLOWED_RETURN_HOSTS = new Set<string>([
+  "bizzsurfergo.lovable.app",
+  "go.bizzsurfer.ai",
+  "www.bizzsurfer.ai",
+  "bizzsurfer.ai",
+  "bizzsurfer.com",
+  "www.bizzsurfer.com",
+]);
+
+function validateReturnUrl(raw: string): string {
+  let u: URL;
+  try {
+    u = new URL(raw);
+  } catch {
+    throw new Error("Invalid returnUrl");
+  }
+  if (u.protocol !== "https:") throw new Error("returnUrl must use https");
+  // Allow lovable preview/published subdomains for the project.
+  const host = u.hostname.toLowerCase();
+  const isLovablePreview =
+    host.endsWith(".lovable.app") || host.endsWith(".lovable.dev");
+  if (!ALLOWED_RETURN_HOSTS.has(host) && !isLovablePreview) {
+    throw new Error("returnUrl host not allowed");
+  }
+  return raw;
+}
+
+
+
 async function resolveOrCreateCustomer(
   stripe: ReturnType<typeof createStripeClient>,
   options: { email?: string; userId?: string },
@@ -85,6 +117,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     environment: StripeEnv;
   }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -152,6 +185,7 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
       throw new Error("Amount must be at least 50 cents");
     }
     if (data.listingTitle.length > 250) throw new Error("Title too long");
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -260,6 +294,7 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
       currencies.add(it.currency);
     }
     if (currencies.size > 1) throw new Error("All cart items must use the same currency");
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
@@ -371,7 +406,10 @@ export const createMarketplaceCartCheckout = createServerFn({ method: "POST" })
 
 export const createPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => data)
+  .inputValidator((data: { returnUrl?: string; environment: StripeEnv }) => {
+    if (data.returnUrl) validateReturnUrl(data.returnUrl);
+    return data;
+  })
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context;
     const { data: sub, error: subError } = await supabase
