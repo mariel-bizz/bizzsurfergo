@@ -117,6 +117,7 @@ export const createCheckoutSession = createServerFn({ method: "POST" })
     environment: StripeEnv;
   }) => {
     if (!/^[a-zA-Z0-9_-]+$/.test(data.priceId)) throw new Error("Invalid priceId");
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
