@@ -185,6 +185,7 @@ export const createMarketplaceListingCheckout = createServerFn({ method: "POST" 
       throw new Error("Amount must be at least 50 cents");
     }
     if (data.listingTitle.length > 250) throw new Error("Title too long");
+    validateReturnUrl(data.returnUrl);
     return data;
   })
   .handler(async ({ data, context }) => {
