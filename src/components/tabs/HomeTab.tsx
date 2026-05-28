@@ -10,6 +10,7 @@ import { ROICalculator } from "../ROICalculator";
 import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSection, ConnectApisSection, CareersSection } from "../ResourcesSection";
 import { OnboardingChecklist } from "../OnboardingChecklist";
 import { PainTracker, type PainItem } from "../PainTracker";
+import { FeaturedVideoHome } from "../insights/VideoContent";
 
 import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
 import { pastEvents, eventLink } from "@/lib/events-data";
@@ -97,6 +98,10 @@ export function HomeTab() {
           </a>
         </section>
       )}
+
+      {/* Featured video */}
+      <FeaturedVideoHome />
+
 
       {/* Onboarding checklist */}
       <OnboardingChecklist />
