@@ -297,8 +297,6 @@ function InsightsPage() {
         ))}
       </div>
 
-      <VideoContent />
-
       <DownloadResources />
 
       <CtaBlock />
