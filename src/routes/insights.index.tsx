@@ -154,7 +154,7 @@ function InsightsPage() {
           hash="past"
           className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#0a66c2]/10 text-[#0a66c2]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Video className="h-4 w-4" />
           </span>
           <span className="text-sm font-bold text-foreground group-hover:text-primary">Rewatch webinars</span>
@@ -163,7 +163,7 @@ function InsightsPage() {
           to="/podcast"
           className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#1db954]/10 text-[#1db954]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Music2 className="h-4 w-4" />
           </span>
           <span className="text-sm font-bold text-foreground group-hover:text-primary">Spotify</span>
@@ -174,14 +174,16 @@ function InsightsPage() {
           rel="noopener noreferrer"
           className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ff0000]/10 text-[#ff0000]">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Youtube className="h-4 w-4" />
           </span>
           <span className="text-sm font-bold text-foreground group-hover:text-primary">YouTube</span>
         </a>
       </nav>
 
-      <h2 id="blog-articles" className="mb-3 scroll-mt-20 text-lg font-bold text-[#ff6f00]">Blog Articles</h2>
+      <VideoContent />
+
+      <h2 id="blog-articles" className="mb-3 mt-10 scroll-mt-20 text-lg font-bold text-[#ff6f00]">Blog Articles</h2>
 
       <div className="mb-4 space-y-3">
         <div className="relative">
