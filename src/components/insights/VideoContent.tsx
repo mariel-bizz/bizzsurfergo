@@ -84,7 +84,7 @@ export function FeaturedVideoHome() {
             controls
             playsInline
             preload="metadata"
-            poster=""
+            poster={featuredVideo.poster}
             className="aspect-video w-full"
           />
         </div>
