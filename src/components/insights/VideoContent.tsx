@@ -49,6 +49,7 @@ export function VideoContent() {
               <div className="bg-black">
                 <video
                   src={v.src}
+                  poster={v.poster}
                   controls
                   playsInline
                   preload="metadata"
