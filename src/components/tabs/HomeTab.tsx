@@ -190,6 +190,13 @@ export function HomeTab() {
         <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
       </section>
 
+      {/* ROI Calculator — under Pain Points Checker */}
+      <section className="px-5">
+        <SectionHeader className="mb-3">ROI Calculator</SectionHeader>
+        <ROICalculator />
+      </section>
+
+
       {/* Gamification card */}
       <section className="px-5">
         <div className="rounded-2xl bg-gradient-deep p-5 text-primary-foreground shadow-elegant relative overflow-hidden">
