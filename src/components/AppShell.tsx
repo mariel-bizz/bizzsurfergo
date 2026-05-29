@@ -158,8 +158,6 @@ export function AppShell() {
   const [splash, setSplash] = useState(false);
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const p = window.location.pathname.replace(/\/+$/, "") || "/";
-    if (ROOT_PATHS.has(p)) setSplash(true);
     const handler = () => setSplash(true);
     window.addEventListener("bizzsurfer:open-welcome", handler);
     return () => window.removeEventListener("bizzsurfer:open-welcome", handler);

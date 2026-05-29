@@ -11,6 +11,7 @@ export type VideoItem = {
   title: string;
   description: string;
   src: string; // public path
+  poster?: string; // public path
   featured?: boolean;
 };
 
@@ -50,9 +51,11 @@ export const downloadResources: DownloadResource[] = [
 export const videos: VideoItem[] = [
   {
     id: "product-launch",
-    title: "BizzSurfer — Product Launch",
-    description: "Meet BizzSurfer: the Agentic AI platform built for business transformation leaders.",
+    title: "BizzSurfer GO! launch 🚀",
+    description:
+      "Meet BizzSurfer GO! and join the new technology era with Agentic AI orchestration for Business Transformation! ⚡",
     src: "/videos/product-launch.mp4",
+    poster: "/videos/posters/product-launch.jpg",
     featured: true,
   },
   {
@@ -60,6 +63,7 @@ export const videos: VideoItem[] = [
     title: "Agentic AI builds an EU Pay Transparency plan",
     description: "We asked Agentic AI to build a plan for EU Pay Transparency — here's what it produced.",
     src: "/videos/agentic-ai-eu-pay-transparency.mp4",
+    poster: "/videos/posters/eu-pay-transparency.jpg",
   },
 ];
 

@@ -16,6 +16,7 @@ export function VideoContent() {
         <div className="bg-black">
           <video
             src={featuredVideo.src}
+            poster={featuredVideo.poster}
             controls
             playsInline
             preload="metadata"
@@ -48,6 +49,7 @@ export function VideoContent() {
               <div className="bg-black">
                 <video
                   src={v.src}
+                  poster={v.poster}
                   controls
                   playsInline
                   preload="metadata"
@@ -82,7 +84,7 @@ export function FeaturedVideoHome() {
             controls
             playsInline
             preload="metadata"
-            poster=""
+            poster={featuredVideo.poster}
             className="aspect-video w-full"
           />
         </div>
