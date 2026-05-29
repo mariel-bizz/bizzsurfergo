@@ -11,6 +11,7 @@ export type VideoItem = {
   title: string;
   description: string;
   src: string; // public path
+  poster?: string; // public path
   featured?: boolean;
 };
 
