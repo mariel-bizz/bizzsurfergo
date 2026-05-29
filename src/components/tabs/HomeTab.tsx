@@ -106,11 +106,6 @@ export function HomeTab() {
       {/* Onboarding checklist */}
       <OnboardingChecklist />
 
-      {/* ROI Calculator — above Reality Check */}
-      <section className="px-5">
-        <SectionHeader className="mb-3">ROI Calculator</SectionHeader>
-        <ROICalculator />
-      </section>
 
       {/* Go Agentic! */}
       <section className="px-5">
@@ -194,6 +189,13 @@ export function HomeTab() {
 
         <PainTracker items={painPoints} onSubmit={() => game.completeOnboardingStep("reality")} />
       </section>
+
+      {/* ROI Calculator — under Pain Points Checker */}
+      <section className="px-5">
+        <SectionHeader className="mb-3">ROI Calculator</SectionHeader>
+        <ROICalculator />
+      </section>
+
 
       {/* Gamification card */}
       <section className="px-5">
