@@ -49,7 +49,7 @@ type Attachment = { name: string; type: string; dataUrl: string };
 type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
 
 const CONFIG_KEY = "bizzsurfer.gochat.config";
-const QUESTION_LIMIT = 2;
+const QUESTION_LIMIT = 5;
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
@@ -62,13 +62,11 @@ const PRESETS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-chat`;
 
-// Strip markdown markers (### headings, **bold**, * bullets) from streamed answers.
+// Light normalisation only — KEEP markdown so we can render bold/lists/paragraphs.
 function cleanAnswer(text: string): string {
   return text
-    .replace(/^#{1,6}\s+/gm, "")          // ### headings
-    .replace(/\*\*(.+?)\*\*/g, "$1")       // **bold**
-    .replace(/(^|\s)\*(?!\s)/g, "$1")      // stray *
-    .replace(/^\s*[-•*]\s+/gm, "• ");      // normalise bullets
+    .replace(/^#{1,6}\s+/gm, "")          // drop markdown headings (we use paragraphs)
+    .replace(/^\s*[•]\s+/gm, "- ");       // normalise stray bullets to markdown lists
 }
 
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
