@@ -454,9 +454,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
 
+  const creditsLeft = Math.max(0, QUESTION_LIMIT - questionCount);
+
   return (
-    <div className="flex flex-col h-[calc(100vh-7.5rem)]">
-      <div className="px-4 pt-2 pb-1.5">
+    <div className="flex flex-col h-[calc(100vh-7.5rem)] max-h-full">
+      <div className="px-4 pt-2 pb-1.5 pr-12">
         <div className="rounded-xl text-primary-foreground px-3 py-2 shadow-soft flex items-center gap-2 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
           <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
             {providerMeta ? (
@@ -471,6 +473,14 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               BizzSurfer Go!{providerMeta ? ` · ${providerMeta.name}` : ""}
             </p>
           </div>
+          {config && (
+            <span
+              className="hidden xs:inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur px-2 py-0.5 text-[10px] font-bold shrink-0"
+              title={`${creditsLeft} of ${QUESTION_LIMIT} free credits left`}
+            >
+              <Sparkle className="w-3 h-3" /> {creditsLeft}/{QUESTION_LIMIT}
+            </span>
+          )}
           {config ? (
             <button
               onClick={resetConfig}
