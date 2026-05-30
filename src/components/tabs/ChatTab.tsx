@@ -82,11 +82,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
     : "";
   const contextPreamble = config
-    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in plain prose with short paragraphs and simple bullets — do not use markdown headings (no ###) or bold (**) syntax.`
+    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in short paragraphs separated by blank lines. Use markdown **bold** to highlight the key terms, metrics and frameworks. Use simple "-" bullets for short lists. Never use markdown headings.`
     : "";
   const initialAssistant = config
-    ? `I'm BizzSurfer Go! — focused on ${config.departments.join(", ")} in ${config.industries.join(", ")}. Ask me anything, or pick a starter below.`
-    : "I'm BizzSurfer Go! — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started.";
+    ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**.\n\nAsk me anything, or pick a starter below.`
+    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation.\n\nAsk me anything, or pick a question below to get started.";
   const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: initialAssistant }]);
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
@@ -94,6 +94,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [questionCount, setQuestionCount] = useState(0);
   const [emailOpen, setEmailOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [company, setCompany] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
