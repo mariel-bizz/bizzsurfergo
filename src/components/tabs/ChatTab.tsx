@@ -507,7 +507,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         <>
           {/* Quick model switcher */}
           <div className="px-4 pb-2">
-            <div className="flex gap-1.5 overflow-x-auto -mx-4 px-4">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {PROVIDER_META.map((p) => {
                 const isActive = p.id === config.provider;
                 return (
@@ -530,10 +530,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             </div>
           </div>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
+                <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
                   m.role === "user"
                     ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
                     : "bg-card text-card-foreground border border-border rounded-bl-sm"
@@ -545,7 +545,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                         : <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">{a.name}</span>)}
                     </div>
                   ) : null}
-                  <FormattedText text={m.content} />
+                  <FormattedText text={m.content} isUser={m.role === "user"} />
                 </div>
               </div>
             ))}
