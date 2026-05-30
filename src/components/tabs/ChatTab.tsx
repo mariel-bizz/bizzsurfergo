@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
-import { Send, Sparkles, ExternalLink, Settings2, Paperclip, X, Mail, Download } from "lucide-react";
+import { Send, Sparkles, ExternalLink, Settings2, Paperclip, X, Mail, Download, Zap, Sparkle } from "lucide-react";
 import { toast } from "sonner";
 import { GoChatSetup, PROVIDER_META, type GoChatConfig, type Provider } from "@/components/chat/GoChatSetup";
 import jsPDF from "jspdf";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
