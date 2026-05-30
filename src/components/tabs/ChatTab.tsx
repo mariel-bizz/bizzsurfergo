@@ -561,7 +561,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           {messages.length <= 1 && (
             <div className="px-4 pb-2">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">Try a leader question</p>
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 snap-x">
+              <div className="flex gap-2 overflow-x-auto pb-1 snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {PRESETS.map((p) => (
                   <button key={p} onClick={() => send(p)} className="snap-start shrink-0 max-w-[80%] text-left rounded-xl bg-accent text-accent-foreground px-3 py-2 text-xs font-medium border border-primary/20 hover:bg-accent/80 transition">
                     {p}
