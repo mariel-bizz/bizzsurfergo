@@ -133,11 +133,11 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
             )}
           </div>
           <div className="flex gap-2 pt-2">
-            <Button variant="outline" onClick={() => setStep(1)} className="rounded-2xl flex-1">Back</Button>
+            <Button variant="outline" onClick={() => setStep(1)} className="rounded-md flex-1 h-12 text-base font-bold border-2">Back</Button>
             <Button
               disabled={departments.length === 0 && !otherDept.trim()}
               onClick={() => setStep(3)}
-              className="rounded-md flex-1 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid"
+              className="rounded-md flex-1 bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid"
             >
               Continue
             </Button>
