@@ -728,19 +728,16 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   );
 }
 
-function FormattedText({ text }: { text: string }) {
-  const lines = text.split("\n");
+function FormattedText({ text, isUser = false }: { text: string; isUser?: boolean }) {
   return (
-    <div className="space-y-1">
-      {lines.map((line, i) => {
-        const isBullet = /^\s*[•]\s+/.test(line);
-        const clean = line.replace(/^\s*[•]\s+/, "");
-        return (
-          <p key={i} className={isBullet ? "pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-primary before:font-bold" : ""}>
-            {clean}
-          </p>
-        );
-      })}
+    <div
+      className={`prose prose-sm max-w-none break-words ${
+        isUser
+          ? "prose-invert prose-p:my-1.5 prose-strong:text-primary-foreground prose-strong:font-extrabold"
+          : "prose-p:my-1.5 prose-p:text-card-foreground prose-strong:text-primary prose-strong:font-extrabold prose-ul:my-1.5 prose-li:my-0.5 prose-a:text-primary"
+      }`}
+    >
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
     </div>
   );
 }
