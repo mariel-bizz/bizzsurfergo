@@ -657,8 +657,42 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {!emailSubmitted ? (
             <>
+              <div className="rounded-lg bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-orange-500/10 border border-primary/20 px-3 py-2 text-[11px] font-semibold text-foreground flex items-center gap-2">
+                <Sparkle className="w-3.5 h-3.5 text-primary" />
+                <span>Free plan: short executive report. <span className="text-primary">Upgrade</span> for the full report + benefits.</span>
+              </div>
               <div className="space-y-2">
-                <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    autoComplete="given-name"
+                    maxLength={80}
+                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                  <input
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    autoComplete="family-name"
+                    maxLength={80}
+                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+                <input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Company"
+                  autoComplete="organization"
+                  maxLength={120}
+                  className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                {config && (
+                  <div className="text-[11px] text-muted-foreground px-1">
+                    Industry: <span className="font-semibold text-foreground">{config.industries.join(", ")}</span>
+                  </div>
+                )}
                 <input
                   id="email-confirm"
                   value={emailValue}
@@ -670,54 +704,50 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   maxLength={254}
                   placeholder="you@company.com"
                   aria-invalid={!!emailError}
-                  aria-describedby={emailError ? "email-error" : "email-help"}
                   className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
                     emailError
                       ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
                       : "border-border focus:ring-primary/40"
                   }`}
-                  autoFocus
                 />
-                {emailError ? (
-                  <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
-                ) : (
-                  <p id="email-help" className="text-[11px] text-muted-foreground">
-                    The email includes a short version of the PDF, an invite to upcoming events,
-                    full reports, and a 1:1 demo call when you upgrade.
-                  </p>
+                {emailError && (
+                  <p className="text-[11px] font-semibold text-destructive">{emailError}</p>
                 )}
               </div>
               <DialogFooter>
                 <Button
                   onClick={submitEmail}
-                  disabled={sending || !!validateEmail(emailValue)}
-                  className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid"
+                  disabled={sending || !!validateEmail(emailValue) || !firstName.trim() || !lastName.trim() || !company.trim()}
+                  className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid"
                 >
-                  {sending ? "Saving…" : "Confirm email"}
+                  {sending ? "Saving…" : "Send my free report"}
                 </Button>
               </DialogFooter>
             </>
           ) : (
             <>
-              <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm">
-                <p className="font-semibold text-foreground">✓ Email confirmed</p>
-                <p className="text-[12px] text-muted-foreground mt-0.5 break-all">
-                  Saved <span className="font-medium text-foreground">{submittedEmail}</span> to your BizzSurfer list.
+              <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm space-y-1.5">
+                <p className="font-semibold text-foreground">✓ Free short report ready</p>
+                <p className="text-[12px] text-muted-foreground break-all">
+                  Sent to <span className="font-medium text-foreground">{submittedEmail}</span>.
+                </p>
+                <p className="text-[12px] text-foreground pt-1">
+                  💎 <span className="font-bold">Upgrade</span> to unlock the <span className="font-bold">full report</span>, unlimited credits, events &amp; a 1:1 demo.
                 </p>
               </div>
-              <DialogFooter className="gap-2">
+              <DialogFooter className="gap-2 flex-col sm:flex-row">
                 <Button
                   variant="outline"
                   onClick={handleDownloadPdf}
-                  className="rounded-xl"
+                  className="rounded-md h-12 text-base font-bold border-2 flex-1"
                 >
-                  <Download className="w-4 h-4 mr-1" /> Download PDF
+                  <Download className="w-4 h-4 mr-1" /> Short PDF
                 </Button>
                 <Button
                   onClick={handleEmailMe}
-                  className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid"
+                  className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid flex-1"
                 >
-                  <Mail className="w-4 h-4 mr-1" /> Email me
+                  <Zap className="w-4 h-4 mr-1" /> Upgrade
                 </Button>
               </DialogFooter>
             </>
