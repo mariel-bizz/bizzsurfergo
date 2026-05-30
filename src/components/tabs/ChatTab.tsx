@@ -573,7 +573,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {questionCount >= QUESTION_LIMIT && (
             <div className="mx-4 mb-2 rounded-xl bg-accent/60 border border-primary/30 px-3 py-2 text-[11px] text-foreground flex items-center justify-between gap-2">
-              <span>You've used your 2 free questions. Get the full report by email.</span>
+              <span>You've used all {QUESTION_LIMIT} free credits. Unlock the full report by email.</span>
               <button
                 onClick={() => setEmailOpen(true)}
                 className="shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-primary text-primary-foreground px-2.5 py-1 text-[11px] font-bold"
