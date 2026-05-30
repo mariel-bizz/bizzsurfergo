@@ -646,12 +646,12 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary" />
-              {emailSubmitted ? "You're all set" : "Get your full report"}
+              {emailSubmitted ? "Your free report is on its way" : "Get your executive report"}
             </DialogTitle>
             <DialogDescription>
               {emailSubmitted
-                ? "Choose how you'd like to receive your summary."
-                : "Confirm your email so we can send a short summary and download your full PDF."}
+                ? "Download the short PDF now or upgrade for the full report."
+                : "Tell us where to send it. The free plan ships a short executive report — upgrade for the full version."}
             </DialogDescription>
           </DialogHeader>
 
