@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
-import { Send, Sparkles, ExternalLink, Settings2, Paperclip, X, Mail, Download } from "lucide-react";
+import { Send, Sparkles, ExternalLink, Settings2, Paperclip, X, Mail, Download, Zap, Sparkle } from "lucide-react";
 import { toast } from "sonner";
 import { GoChatSetup, PROVIDER_META, type GoChatConfig, type Provider } from "@/components/chat/GoChatSetup";
 import jsPDF from "jspdf";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from "@/components/ui/dialog";
@@ -47,7 +49,7 @@ type Attachment = { name: string; type: string; dataUrl: string };
 type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
 
 const CONFIG_KEY = "bizzsurfer.gochat.config";
-const QUESTION_LIMIT = 2;
+const QUESTION_LIMIT = 5;
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
@@ -60,13 +62,11 @@ const PRESETS = [
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-chat`;
 
-// Strip markdown markers (### headings, **bold**, * bullets) from streamed answers.
+// Light normalisation only — KEEP markdown so we can render bold/lists/paragraphs.
 function cleanAnswer(text: string): string {
   return text
-    .replace(/^#{1,6}\s+/gm, "")          // ### headings
-    .replace(/\*\*(.+?)\*\*/g, "$1")       // **bold**
-    .replace(/(^|\s)\*(?!\s)/g, "$1")      // stray *
-    .replace(/^\s*[-•*]\s+/gm, "• ");      // normalise bullets
+    .replace(/^#{1,6}\s+/gm, "")          // drop markdown headings (we use paragraphs)
+    .replace(/^\s*[•]\s+/gm, "- ");       // normalise stray bullets to markdown lists
 }
 
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
@@ -82,11 +82,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
     : "";
   const contextPreamble = config
-    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in plain prose with short paragraphs and simple bullets — do not use markdown headings (no ###) or bold (**) syntax.`
+    ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in short paragraphs separated by blank lines. Use markdown **bold** to highlight the key terms, metrics and frameworks. Use simple "-" bullets for short lists. Never use markdown headings.`
     : "";
   const initialAssistant = config
-    ? `I'm BizzSurfer Go! — focused on ${config.departments.join(", ")} in ${config.industries.join(", ")}. Ask me anything, or pick a starter below.`
-    : "I'm BizzSurfer Go! — your Agentic AI advisor for business transformation. Ask me anything, or pick a question below to get started.";
+    ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**.\n\nAsk me anything, or pick a starter below.`
+    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation.\n\nAsk me anything, or pick a question below to get started.";
   const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: initialAssistant }]);
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
@@ -94,6 +94,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [questionCount, setQuestionCount] = useState(0);
   const [emailOpen, setEmailOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [company, setCompany] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
@@ -381,10 +384,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     const cleanEmail = emailValue.trim().toLowerCase();
 
     try {
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim() || cleanEmail.split("@")[0];
       const { error } = await supabase.from("waitlist").insert({
         email: cleanEmail,
-        name: cleanEmail.split("@")[0],
-        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+        name: fullName,
+        role: `go_chat · ${company.trim()} · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
       });
       if (error && error.code !== "23505") {
         console.warn("waitlist insert:", error.message);
@@ -394,6 +398,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     trackEvent("go_chat_email_submitted", {
       email: cleanEmail,
       provider: config?.provider,
+      company: company.trim(),
     });
 
     setSubmittedEmail(cleanEmail);
@@ -451,9 +456,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
 
+  const creditsLeft = Math.max(0, QUESTION_LIMIT - questionCount);
+
   return (
-    <div className="flex flex-col h-[calc(100vh-7.5rem)]">
-      <div className="px-4 pt-2 pb-1.5">
+    <div className="flex flex-col h-[calc(100vh-7.5rem)] max-h-full">
+      <div className="px-4 pt-2 pb-1.5 pr-12">
         <div className="rounded-xl text-primary-foreground px-3 py-2 shadow-soft flex items-center gap-2 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
           <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
             {providerMeta ? (
@@ -468,6 +475,14 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               BizzSurfer Go!{providerMeta ? ` · ${providerMeta.name}` : ""}
             </p>
           </div>
+          {config && (
+            <span
+              className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur px-2 py-0.5 text-[10px] font-bold shrink-0"
+              title={`${creditsLeft} of ${QUESTION_LIMIT} free credits left`}
+            >
+              <Sparkle className="w-3 h-3" /> {creditsLeft}/{QUESTION_LIMIT}
+            </span>
+          )}
           {config ? (
             <button
               onClick={resetConfig}
@@ -494,7 +509,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         <>
           {/* Quick model switcher */}
           <div className="px-4 pb-2">
-            <div className="flex gap-1.5 overflow-x-auto -mx-4 px-4">
+            <div className="flex gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
               {PROVIDER_META.map((p) => {
                 const isActive = p.id === config.provider;
                 return (
@@ -517,10 +532,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             </div>
           </div>
 
-          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
             {messages.map((m, i) => (
               <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
+                <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
                   m.role === "user"
                     ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
                     : "bg-card text-card-foreground border border-border rounded-bl-sm"
@@ -532,7 +547,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                         : <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">{a.name}</span>)}
                     </div>
                   ) : null}
-                  <FormattedText text={m.content} />
+                  <FormattedText text={m.content} isUser={m.role === "user"} />
                 </div>
               </div>
             ))}
@@ -548,7 +563,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           {messages.length <= 1 && (
             <div className="px-4 pb-2">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">Try a leader question</p>
-              <div className="flex gap-2 overflow-x-auto pb-1 -mx-4 px-4 snap-x">
+              <div className="flex gap-2 overflow-x-auto pb-1 snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {PRESETS.map((p) => (
                   <button key={p} onClick={() => send(p)} className="snap-start shrink-0 max-w-[80%] text-left rounded-xl bg-accent text-accent-foreground px-3 py-2 text-xs font-medium border border-primary/20 hover:bg-accent/80 transition">
                     {p}
@@ -560,7 +575,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {questionCount >= QUESTION_LIMIT && (
             <div className="mx-4 mb-2 rounded-xl bg-accent/60 border border-primary/30 px-3 py-2 text-[11px] text-foreground flex items-center justify-between gap-2">
-              <span>You've used your 2 free questions. Get the full report by email.</span>
+              <span>You've used all {QUESTION_LIMIT} free credits. Unlock the full report by email.</span>
               <button
                 onClick={() => setEmailOpen(true)}
                 className="shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-primary text-primary-foreground px-2.5 py-1 text-[11px] font-bold"
@@ -633,19 +648,53 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-primary" />
-              {emailSubmitted ? "You're all set" : "Get your full report"}
+              {emailSubmitted ? "Your free report is on its way" : "Get your executive report"}
             </DialogTitle>
             <DialogDescription>
               {emailSubmitted
-                ? "Choose how you'd like to receive your summary."
-                : "Confirm your email so we can send a short summary and download your full PDF."}
+                ? "Download the short PDF now or upgrade for the full report."
+                : "Tell us where to send it. The free plan ships a short executive report — upgrade for the full version."}
             </DialogDescription>
           </DialogHeader>
 
           {!emailSubmitted ? (
             <>
+              <div className="rounded-lg bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-orange-500/10 border border-primary/20 px-3 py-2 text-[11px] font-semibold text-foreground flex items-center gap-2">
+                <Sparkle className="w-3.5 h-3.5 text-primary" />
+                <span>Free plan: short executive report. <span className="text-primary">Upgrade</span> for the full report + benefits.</span>
+              </div>
               <div className="space-y-2">
-                <label htmlFor="email-confirm" className="text-xs font-bold text-foreground">Confirm your email</label>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    autoComplete="given-name"
+                    maxLength={80}
+                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                  <input
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    autoComplete="family-name"
+                    maxLength={80}
+                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                  />
+                </div>
+                <input
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Company"
+                  autoComplete="organization"
+                  maxLength={120}
+                  className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+                />
+                {config && (
+                  <div className="text-[11px] text-muted-foreground px-1">
+                    Industry: <span className="font-semibold text-foreground">{config.industries.join(", ")}</span>
+                  </div>
+                )}
                 <input
                   id="email-confirm"
                   value={emailValue}
@@ -657,54 +706,50 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   maxLength={254}
                   placeholder="you@company.com"
                   aria-invalid={!!emailError}
-                  aria-describedby={emailError ? "email-error" : "email-help"}
                   className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
                     emailError
                       ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
                       : "border-border focus:ring-primary/40"
                   }`}
-                  autoFocus
                 />
-                {emailError ? (
-                  <p id="email-error" className="text-[11px] font-semibold text-destructive">{emailError}</p>
-                ) : (
-                  <p id="email-help" className="text-[11px] text-muted-foreground">
-                    The email includes a short version of the PDF, an invite to upcoming events,
-                    full reports, and a 1:1 demo call when you upgrade.
-                  </p>
+                {emailError && (
+                  <p className="text-[11px] font-semibold text-destructive">{emailError}</p>
                 )}
               </div>
               <DialogFooter>
                 <Button
                   onClick={submitEmail}
-                  disabled={sending || !!validateEmail(emailValue)}
-                  className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid"
+                  disabled={sending || !!validateEmail(emailValue) || !firstName.trim() || !lastName.trim() || !company.trim()}
+                  className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid"
                 >
-                  {sending ? "Saving…" : "Confirm email"}
+                  {sending ? "Saving…" : "Send my free report"}
                 </Button>
               </DialogFooter>
             </>
           ) : (
             <>
-              <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm">
-                <p className="font-semibold text-foreground">✓ Email confirmed</p>
-                <p className="text-[12px] text-muted-foreground mt-0.5 break-all">
-                  Saved <span className="font-medium text-foreground">{submittedEmail}</span> to your BizzSurfer list.
+              <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm space-y-1.5">
+                <p className="font-semibold text-foreground">✓ Free short report ready</p>
+                <p className="text-[12px] text-muted-foreground break-all">
+                  Sent to <span className="font-medium text-foreground">{submittedEmail}</span>.
+                </p>
+                <p className="text-[12px] text-foreground pt-1">
+                  💎 <span className="font-bold">Upgrade</span> to unlock the <span className="font-bold">full report</span>, unlimited credits, events &amp; a 1:1 demo.
                 </p>
               </div>
-              <DialogFooter className="gap-2">
+              <DialogFooter className="gap-2 flex-col sm:flex-row">
                 <Button
                   variant="outline"
                   onClick={handleDownloadPdf}
-                  className="rounded-xl"
+                  className="rounded-md h-12 text-base font-bold border-2 flex-1"
                 >
-                  <Download className="w-4 h-4 mr-1" /> Download PDF
+                  <Download className="w-4 h-4 mr-1" /> Short PDF
                 </Button>
                 <Button
                   onClick={handleEmailMe}
-                  className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid"
+                  className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid flex-1"
                 >
-                  <Mail className="w-4 h-4 mr-1" /> Email me
+                  <Zap className="w-4 h-4 mr-1" /> Upgrade
                 </Button>
               </DialogFooter>
             </>
@@ -715,19 +760,16 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   );
 }
 
-function FormattedText({ text }: { text: string }) {
-  const lines = text.split("\n");
+function FormattedText({ text, isUser = false }: { text: string; isUser?: boolean }) {
   return (
-    <div className="space-y-1">
-      {lines.map((line, i) => {
-        const isBullet = /^\s*[•]\s+/.test(line);
-        const clean = line.replace(/^\s*[•]\s+/, "");
-        return (
-          <p key={i} className={isBullet ? "pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-primary before:font-bold" : ""}>
-            {clean}
-          </p>
-        );
-      })}
+    <div
+      className={`prose prose-sm max-w-none break-words ${
+        isUser
+          ? "prose-invert prose-p:my-1.5 prose-strong:text-primary-foreground prose-strong:font-extrabold"
+          : "prose-p:my-1.5 prose-p:text-card-foreground prose-strong:text-primary prose-strong:font-extrabold prose-ul:my-1.5 prose-li:my-0.5 prose-a:text-primary"
+      }`}
+    >
+      <ReactMarkdown remarkPlugins={[remarkGfm]}>{text}</ReactMarkdown>
     </div>
   );
 }
