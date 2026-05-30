@@ -384,10 +384,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     const cleanEmail = emailValue.trim().toLowerCase();
 
     try {
+      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim() || cleanEmail.split("@")[0];
       const { error } = await supabase.from("waitlist").insert({
         email: cleanEmail,
-        name: cleanEmail.split("@")[0],
-        role: `go_chat · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+        name: fullName,
+        role: `go_chat · ${company.trim()} · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
       });
       if (error && error.code !== "23505") {
         console.warn("waitlist insert:", error.message);
@@ -397,6 +398,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     trackEvent("go_chat_email_submitted", {
       email: cleanEmail,
       provider: config?.provider,
+      company: company.trim(),
     });
 
     setSubmittedEmail(cleanEmail);
