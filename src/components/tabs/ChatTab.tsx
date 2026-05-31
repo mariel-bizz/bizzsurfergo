@@ -379,30 +379,75 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   };
 
   // Step 1: validate + persist email to waitlist, then show inline confirmation.
+  // Send the short-report summary email via the transactional queue.
+  const sendSummaryEmail = async (recipientEmail: string) => {
+    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
+    const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
+    const focus = config
+      ? `${config.departments.join(", ")} in ${config.industries.join(", ")}`
+      : "Your transformation focus";
+
+    const res = await fetch("/api/public/chat/email-summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        recipientEmail,
+        focus,
+        modelUsed: providerMeta?.name ?? "BizzSurfer Go!",
+        question: lastUser,
+        excerpt: lastAi.length > 1200 ? lastAi.slice(0, 1200) + "…" : lastAi,
+      }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json?.error) throw new Error(json?.error || `Request failed (${res.status})`);
+    return json as { reason?: string };
+  };
+
+  // Validate every lead field; show inline errors and submit only when all pass.
   const submitEmail = async () => {
-    const err = validateEmail(emailValue);
-    if (err) { setEmailError(err); return; }
-    setEmailError(null);
+    const fn = firstName.trim();
+    const ln = lastName.trim();
+    const co = company.trim();
+    const industry = config?.industries.join(", ") ?? "";
+    const fnErr = !fn ? "First name is required." : fn.length > 80 ? "Too long." : null;
+    const lnErr = !ln ? "Last name is required." : ln.length > 80 ? "Too long." : null;
+    const coErr = !co ? "Company is required." : co.length > 120 ? "Too long." : null;
+    const indErr = !industry ? "Industry is required — complete chat setup." : null;
+    const emErr = validateEmail(emailValue);
+    setFirstNameError(fnErr);
+    setLastNameError(lnErr);
+    setCompanyError(coErr);
+    setIndustryError(indErr);
+    setEmailError(emErr);
+    if (fnErr || lnErr || coErr || indErr || emErr) return;
+
     setSending(true);
     const cleanEmail = emailValue.trim().toLowerCase();
 
     try {
-      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim() || cleanEmail.split("@")[0];
+      const fullName = `${fn} ${ln}`.trim();
       const { error } = await supabase.from("waitlist").insert({
         email: cleanEmail,
         name: fullName,
-        role: `go_chat · ${company.trim()} · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+        role: `go_chat · ${co} · ${config?.provider ?? ""} · ${industry}`,
       });
-      if (error && error.code !== "23505") {
-        console.warn("waitlist insert:", error.message);
-      }
+      if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
     } catch (e) { /* non-blocking */ }
 
-    trackEvent("go_chat_email_submitted", {
-      email: cleanEmail,
-      provider: config?.provider,
-      company: company.trim(),
-    });
+    trackEvent("go_chat_email_submitted", { email: cleanEmail, provider: config?.provider, company: co });
+
+    // Auto-deliver the short PDF report by email.
+    try {
+      const json = await sendSummaryEmail(cleanEmail);
+      if (json?.reason === "email_suppressed") {
+        toast.error("This email has unsubscribed and can't receive messages.");
+      } else {
+        toast.success(`Short report on its way to ${cleanEmail}.`);
+      }
+    } catch (err) {
+      console.error("email send failed", err);
+      toast.error("Couldn't email the report. You can still download it.");
+    }
 
     setSubmittedEmail(cleanEmail);
     setEmailSubmitted(true);
@@ -416,45 +461,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     toast.success("PDF downloaded.");
   };
 
-  // Step 2b: send the summary email to the user via the transactional queue.
-  const handleEmailMe = async () => {
-    trackEvent("go_chat_email_me_clicked", {
-      email: submittedEmail,
-      provider: config?.provider,
-    });
-    try { await downloadPdf(); } catch (e) { console.error(e); }
-
-    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
-    const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
-    const focus = config
-      ? `${config.departments.join(", ")} in ${config.industries.join(", ")}`
-      : "Your transformation focus";
-
-    try {
-      const res = await fetch("/api/public/chat/email-summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipientEmail: submittedEmail,
-          focus,
-          modelUsed: providerMeta?.name ?? "BizzSurfer Go!",
-          question: lastUser,
-          excerpt: lastAi.length > 1200 ? lastAi.slice(0, 1200) + "…" : lastAi,
-        }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || json?.error) {
-        throw new Error(json?.error || `Request failed (${res.status})`);
-      }
-      if (json?.reason === "email_suppressed") {
-        toast.error("This email has unsubscribed and can't receive messages.");
-        return;
-      }
-      toast.success(`Email sent to ${submittedEmail}. PDF downloaded too.`);
-    } catch (err) {
-      console.error("email send failed", err);
-      toast.error("Couldn't send the email. Please try again.");
-    }
+  // Step 2b: Upgrade CTA — unlocks the full report by sending the user to the pricing flow.
+  const handleUpgrade = () => {
+    trackEvent("go_chat_upgrade_clicked", { email: submittedEmail, provider: config?.provider });
+    setEmailOpen(false);
+    if (typeof window !== "undefined") window.location.assign("/pricing");
   };
 
   const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
