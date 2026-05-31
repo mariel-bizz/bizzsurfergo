@@ -167,6 +167,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setInput("");
     setAttachments([]);
     setStreaming(true);
+    // Decrement credits immediately so the header updates in real time.
+    const newCount = questionCount + 1;
+    setQuestionCount(newCount);
+    if (newCount >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
 
     game.update((s) => {
       const q = s.questionsAsked + 1;
