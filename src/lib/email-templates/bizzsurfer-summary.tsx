@@ -26,7 +26,7 @@ export function BizzSurferSummaryEmail({
   modelUsed = 'BizzSurfer Go!',
   question = 'Your question',
   excerpt = 'Your AI-generated insight excerpt.',
-  upgradeUrl = 'https://bizzsurfergo.lovable.app/pricing',
+  upgradeUrl = 'https://go.bizzsurfer.ai/pricing',
 }: SummaryProps) {
   return (
     <Html>
