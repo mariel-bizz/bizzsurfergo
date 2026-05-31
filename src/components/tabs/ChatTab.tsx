@@ -365,7 +365,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.text("upcoming events and a 1:1 demo call with our team.", margin + 14, y + 54);
     doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
     doc.setFont("helvetica", "bold");
-    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://bizzsurfergo.lovable.app/pricing" });
+    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://go.bizzsurfer.ai/pricing" });
 
     doc.save("bizzsurfer-go-summary.pdf");
     trackEvent("go_chat_pdf_downloaded", {
