@@ -248,11 +248,6 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         }
       }
 
-      setQuestionCount((c) => {
-        const nc = c + 1;
-        if (nc >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
-        return nc;
-      });
     } catch (e) {
       console.error(e);
       toast.error("Couldn't reach BizzSurfer. Try again.");
