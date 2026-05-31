@@ -679,67 +679,90 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               </div>
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First name"
-                    autoComplete="given-name"
-                    maxLength={80}
-                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  />
-                  <input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last name"
-                    autoComplete="family-name"
-                    maxLength={80}
-                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  />
+                  <div>
+                    <input
+                      value={firstName}
+                      onChange={(e) => { setFirstName(e.target.value); if (firstNameError) setFirstNameError(null); }}
+                      onBlur={() => setFirstNameError(firstName.trim() ? null : "First name is required.")}
+                      placeholder="First name"
+                      autoComplete="given-name"
+                      maxLength={80}
+                      aria-invalid={!!firstNameError}
+                      className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${firstNameError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
+                    />
+                    {firstNameError && <p className="mt-1 text-[11px] font-semibold text-destructive">{firstNameError}</p>}
+                  </div>
+                  <div>
+                    <input
+                      value={lastName}
+                      onChange={(e) => { setLastName(e.target.value); if (lastNameError) setLastNameError(null); }}
+                      onBlur={() => setLastNameError(lastName.trim() ? null : "Last name is required.")}
+                      placeholder="Last name (Surname)"
+                      autoComplete="family-name"
+                      maxLength={80}
+                      aria-invalid={!!lastNameError}
+                      className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${lastNameError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
+                    />
+                    {lastNameError && <p className="mt-1 text-[11px] font-semibold text-destructive">{lastNameError}</p>}
+                  </div>
                 </div>
-                <input
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Company"
-                  autoComplete="organization"
-                  maxLength={120}
-                  className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-                {config && (
+                <div>
+                  <input
+                    value={company}
+                    onChange={(e) => { setCompany(e.target.value); if (companyError) setCompanyError(null); }}
+                    onBlur={() => setCompanyError(company.trim() ? null : "Company is required.")}
+                    placeholder="Company"
+                    autoComplete="organization"
+                    maxLength={120}
+                    aria-invalid={!!companyError}
+                    className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${companyError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
+                  />
+                  {companyError && <p className="mt-1 text-[11px] font-semibold text-destructive">{companyError}</p>}
+                </div>
+                {config ? (
                   <div className="text-[11px] text-muted-foreground px-1">
                     Industry: <span className="font-semibold text-foreground">{config.industries.join(", ")}</span>
                   </div>
+                ) : (
+                  <p className="text-[11px] font-semibold text-destructive px-1">
+                    Industry missing — open chat setup to pick an industry before sending.
+                  </p>
                 )}
-                <input
-                  id="email-confirm"
-                  value={emailValue}
-                  onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
-                  onBlur={() => setEmailError(validateEmail(emailValue))}
-                  type="email"
-                  autoComplete="email"
-                  inputMode="email"
-                  maxLength={254}
-                  placeholder="you@company.com"
-                  aria-invalid={!!emailError}
-                  className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                    emailError
-                      ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
-                      : "border-border focus:ring-primary/40"
-                  }`}
-                />
-                {emailError && (
-                  <p className="text-[11px] font-semibold text-destructive">{emailError}</p>
-                )}
+                {industryError && <p className="text-[11px] font-semibold text-destructive px-1">{industryError}</p>}
+                <div>
+                  <input
+                    id="email-confirm"
+                    value={emailValue}
+                    onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+                    onBlur={() => setEmailError(validateEmail(emailValue))}
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    maxLength={254}
+                    placeholder="you@company.com"
+                    aria-invalid={!!emailError}
+                    className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                      emailError
+                        ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
+                        : "border-border focus:ring-primary/40"
+                    }`}
+                  />
+                  {emailError && (
+                    <p className="mt-1 text-[11px] font-semibold text-destructive">{emailError}</p>
+                  )}
+                </div>
               </div>
               <DialogFooter>
                 <Button
                   onClick={submitEmail}
-                  disabled={sending || !!validateEmail(emailValue) || !firstName.trim() || !lastName.trim() || !company.trim()}
+                  disabled={sending}
                   className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid"
                 >
-                  {sending ? "Saving…" : "Send my free report"}
+                  {sending ? "Sending…" : "Email me my free report"}
                 </Button>
               </DialogFooter>
             </>
+
           ) : (
             <>
               <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm space-y-1.5">
