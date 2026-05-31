@@ -26,7 +26,7 @@ export function BizzSurferSummaryEmail({
   modelUsed = 'BizzSurfer Go!',
   question = 'Your question',
   excerpt = 'Your AI-generated insight excerpt.',
-  upgradeUrl = 'https://bizzsurfergo.lovable.app/pricing',
+  upgradeUrl = 'https://go.bizzsurfer.ai/pricing',
 }: SummaryProps) {
   return (
     <Html>
@@ -102,6 +102,6 @@ export const template = {
     modelUsed: 'OpenAI',
     question: 'How do I start with Agentic AI in procurement?',
     excerpt: 'Begin with high-volume, low-risk workflows where audit trails matter…',
-    upgradeUrl: 'https://bizzsurfergo.lovable.app/pricing',
+    upgradeUrl: 'https://go.bizzsurfer.ai/pricing',
   },
 } satisfies TemplateEntry

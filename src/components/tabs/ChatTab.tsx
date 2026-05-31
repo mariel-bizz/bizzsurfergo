@@ -98,6 +98,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [lastName, setLastName] = useState("");
   const [company, setCompany] = useState("");
   const [emailError, setEmailError] = useState<string | null>(null);
+  const [firstNameError, setFirstNameError] = useState<string | null>(null);
+  const [lastNameError, setLastNameError] = useState<string | null>(null);
+  const [companyError, setCompanyError] = useState<string | null>(null);
+  const [industryError, setIndustryError] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [submittedEmail, setSubmittedEmail] = useState<string>("");
@@ -167,6 +171,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setInput("");
     setAttachments([]);
     setStreaming(true);
+    // Decrement credits immediately so the header updates in real time.
+    const newCount = questionCount + 1;
+    setQuestionCount(newCount);
+    if (newCount >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
 
     game.update((s) => {
       const q = s.questionsAsked + 1;
@@ -244,11 +252,6 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         }
       }
 
-      setQuestionCount((c) => {
-        const nc = c + 1;
-        if (nc >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
-        return nc;
-      });
     } catch (e) {
       console.error(e);
       toast.error("Couldn't reach BizzSurfer. Try again.");
@@ -365,7 +368,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.text("upcoming events and a 1:1 demo call with our team.", margin + 14, y + 54);
     doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
     doc.setFont("helvetica", "bold");
-    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://bizzsurfergo.lovable.app/pricing" });
+    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://go.bizzsurfer.ai/pricing" });
 
     doc.save("bizzsurfer-go-summary.pdf");
     trackEvent("go_chat_pdf_downloaded", {
@@ -376,30 +379,75 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   };
 
   // Step 1: validate + persist email to waitlist, then show inline confirmation.
+  // Send the short-report summary email via the transactional queue.
+  const sendSummaryEmail = async (recipientEmail: string) => {
+    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
+    const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
+    const focus = config
+      ? `${config.departments.join(", ")} in ${config.industries.join(", ")}`
+      : "Your transformation focus";
+
+    const res = await fetch("/api/public/chat/email-summary", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        recipientEmail,
+        focus,
+        modelUsed: providerMeta?.name ?? "BizzSurfer Go!",
+        question: lastUser,
+        excerpt: lastAi.length > 1200 ? lastAi.slice(0, 1200) + "…" : lastAi,
+      }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok || json?.error) throw new Error(json?.error || `Request failed (${res.status})`);
+    return json as { reason?: string };
+  };
+
+  // Validate every lead field; show inline errors and submit only when all pass.
   const submitEmail = async () => {
-    const err = validateEmail(emailValue);
-    if (err) { setEmailError(err); return; }
-    setEmailError(null);
+    const fn = firstName.trim();
+    const ln = lastName.trim();
+    const co = company.trim();
+    const industry = config?.industries.join(", ") ?? "";
+    const fnErr = !fn ? "First name is required." : fn.length > 80 ? "Too long." : null;
+    const lnErr = !ln ? "Last name is required." : ln.length > 80 ? "Too long." : null;
+    const coErr = !co ? "Company is required." : co.length > 120 ? "Too long." : null;
+    const indErr = !industry ? "Industry is required — complete chat setup." : null;
+    const emErr = validateEmail(emailValue);
+    setFirstNameError(fnErr);
+    setLastNameError(lnErr);
+    setCompanyError(coErr);
+    setIndustryError(indErr);
+    setEmailError(emErr);
+    if (fnErr || lnErr || coErr || indErr || emErr) return;
+
     setSending(true);
     const cleanEmail = emailValue.trim().toLowerCase();
 
     try {
-      const fullName = `${firstName.trim()} ${lastName.trim()}`.trim() || cleanEmail.split("@")[0];
+      const fullName = `${fn} ${ln}`.trim();
       const { error } = await supabase.from("waitlist").insert({
         email: cleanEmail,
         name: fullName,
-        role: `go_chat · ${company.trim()} · ${config?.provider ?? ""} · ${config?.industries.join("/") ?? ""}`,
+        role: `go_chat · ${co} · ${config?.provider ?? ""} · ${industry}`,
       });
-      if (error && error.code !== "23505") {
-        console.warn("waitlist insert:", error.message);
-      }
+      if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
     } catch (e) { /* non-blocking */ }
 
-    trackEvent("go_chat_email_submitted", {
-      email: cleanEmail,
-      provider: config?.provider,
-      company: company.trim(),
-    });
+    trackEvent("go_chat_email_submitted", { email: cleanEmail, provider: config?.provider, company: co });
+
+    // Auto-deliver the short PDF report by email.
+    try {
+      const json = await sendSummaryEmail(cleanEmail);
+      if (json?.reason === "email_suppressed") {
+        toast.error("This email has unsubscribed and can't receive messages.");
+      } else {
+        toast.success(`Short report on its way to ${cleanEmail}.`);
+      }
+    } catch (err) {
+      console.error("email send failed", err);
+      toast.error("Couldn't email the report. You can still download it.");
+    }
 
     setSubmittedEmail(cleanEmail);
     setEmailSubmitted(true);
@@ -413,45 +461,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     toast.success("PDF downloaded.");
   };
 
-  // Step 2b: send the summary email to the user via the transactional queue.
-  const handleEmailMe = async () => {
-    trackEvent("go_chat_email_me_clicked", {
-      email: submittedEmail,
-      provider: config?.provider,
-    });
-    try { await downloadPdf(); } catch (e) { console.error(e); }
-
-    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
-    const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
-    const focus = config
-      ? `${config.departments.join(", ")} in ${config.industries.join(", ")}`
-      : "Your transformation focus";
-
-    try {
-      const res = await fetch("/api/public/chat/email-summary", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          recipientEmail: submittedEmail,
-          focus,
-          modelUsed: providerMeta?.name ?? "BizzSurfer Go!",
-          question: lastUser,
-          excerpt: lastAi.length > 1200 ? lastAi.slice(0, 1200) + "…" : lastAi,
-        }),
-      });
-      const json = await res.json().catch(() => ({}));
-      if (!res.ok || json?.error) {
-        throw new Error(json?.error || `Request failed (${res.status})`);
-      }
-      if (json?.reason === "email_suppressed") {
-        toast.error("This email has unsubscribed and can't receive messages.");
-        return;
-      }
-      toast.success(`Email sent to ${submittedEmail}. PDF downloaded too.`);
-    } catch (err) {
-      console.error("email send failed", err);
-      toast.error("Couldn't send the email. Please try again.");
-    }
+  // Step 2b: Upgrade CTA — unlocks the full report by sending the user to the pricing flow.
+  const handleUpgrade = () => {
+    trackEvent("go_chat_upgrade_clicked", { email: submittedEmail, provider: config?.provider });
+    setEmailOpen(false);
+    if (typeof window !== "undefined") window.location.assign("/pricing");
   };
 
   const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
@@ -665,67 +679,90 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               </div>
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
-                  <input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First name"
-                    autoComplete="given-name"
-                    maxLength={80}
-                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  />
-                  <input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last name"
-                    autoComplete="family-name"
-                    maxLength={80}
-                    className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                  />
+                  <div>
+                    <input
+                      value={firstName}
+                      onChange={(e) => { setFirstName(e.target.value); if (firstNameError) setFirstNameError(null); }}
+                      onBlur={() => setFirstNameError(firstName.trim() ? null : "First name is required.")}
+                      placeholder="First name"
+                      autoComplete="given-name"
+                      maxLength={80}
+                      aria-invalid={!!firstNameError}
+                      className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${firstNameError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
+                    />
+                    {firstNameError && <p className="mt-1 text-[11px] font-semibold text-destructive">{firstNameError}</p>}
+                  </div>
+                  <div>
+                    <input
+                      value={lastName}
+                      onChange={(e) => { setLastName(e.target.value); if (lastNameError) setLastNameError(null); }}
+                      onBlur={() => setLastNameError(lastName.trim() ? null : "Last name is required.")}
+                      placeholder="Last name (Surname)"
+                      autoComplete="family-name"
+                      maxLength={80}
+                      aria-invalid={!!lastNameError}
+                      className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${lastNameError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
+                    />
+                    {lastNameError && <p className="mt-1 text-[11px] font-semibold text-destructive">{lastNameError}</p>}
+                  </div>
                 </div>
-                <input
-                  value={company}
-                  onChange={(e) => setCompany(e.target.value)}
-                  placeholder="Company"
-                  autoComplete="organization"
-                  maxLength={120}
-                  className="w-full rounded-xl bg-muted border border-border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-                {config && (
+                <div>
+                  <input
+                    value={company}
+                    onChange={(e) => { setCompany(e.target.value); if (companyError) setCompanyError(null); }}
+                    onBlur={() => setCompanyError(company.trim() ? null : "Company is required.")}
+                    placeholder="Company"
+                    autoComplete="organization"
+                    maxLength={120}
+                    aria-invalid={!!companyError}
+                    className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${companyError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
+                  />
+                  {companyError && <p className="mt-1 text-[11px] font-semibold text-destructive">{companyError}</p>}
+                </div>
+                {config ? (
                   <div className="text-[11px] text-muted-foreground px-1">
                     Industry: <span className="font-semibold text-foreground">{config.industries.join(", ")}</span>
                   </div>
+                ) : (
+                  <p className="text-[11px] font-semibold text-destructive px-1">
+                    Industry missing — open chat setup to pick an industry before sending.
+                  </p>
                 )}
-                <input
-                  id="email-confirm"
-                  value={emailValue}
-                  onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
-                  onBlur={() => setEmailError(validateEmail(emailValue))}
-                  type="email"
-                  autoComplete="email"
-                  inputMode="email"
-                  maxLength={254}
-                  placeholder="you@company.com"
-                  aria-invalid={!!emailError}
-                  className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
-                    emailError
-                      ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
-                      : "border-border focus:ring-primary/40"
-                  }`}
-                />
-                {emailError && (
-                  <p className="text-[11px] font-semibold text-destructive">{emailError}</p>
-                )}
+                {industryError && <p className="text-[11px] font-semibold text-destructive px-1">{industryError}</p>}
+                <div>
+                  <input
+                    id="email-confirm"
+                    value={emailValue}
+                    onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+                    onBlur={() => setEmailError(validateEmail(emailValue))}
+                    type="email"
+                    autoComplete="email"
+                    inputMode="email"
+                    maxLength={254}
+                    placeholder="you@company.com"
+                    aria-invalid={!!emailError}
+                    className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${
+                      emailError
+                        ? "border-destructive ring-destructive/40 focus:ring-destructive/40"
+                        : "border-border focus:ring-primary/40"
+                    }`}
+                  />
+                  {emailError && (
+                    <p className="mt-1 text-[11px] font-semibold text-destructive">{emailError}</p>
+                  )}
+                </div>
               </div>
               <DialogFooter>
                 <Button
                   onClick={submitEmail}
-                  disabled={sending || !!validateEmail(emailValue) || !firstName.trim() || !lastName.trim() || !company.trim()}
+                  disabled={sending}
                   className="rounded-md bg-gradient-primary w-full text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid"
                 >
-                  {sending ? "Saving…" : "Send my free report"}
+                  {sending ? "Sending…" : "Email me my free report"}
                 </Button>
               </DialogFooter>
             </>
+
           ) : (
             <>
               <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm space-y-1.5">
@@ -746,7 +783,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   <Download className="w-4 h-4 mr-1" /> Short PDF
                 </Button>
                 <Button
-                  onClick={handleEmailMe}
+                  onClick={handleUpgrade}
                   className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid flex-1"
                 >
                   <Zap className="w-4 h-4 mr-1" /> Upgrade
