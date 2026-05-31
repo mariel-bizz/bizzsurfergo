@@ -9,7 +9,7 @@ const SITE_NAME = 'bizzsurfergo'
 const SENDER_DOMAIN = 'notify.bizzsurfer.com'
 const FROM_DOMAIN = 'notify.bizzsurfer.com'
 const TEMPLATE_NAME = 'bizzsurfer-summary'
-const UPGRADE_URL = 'https://bizzsurfergo.lovable.app/pricing'
+const UPGRADE_URL = 'https://go.bizzsurfer.ai/pricing'
 
 const ALLOWED_ORIGIN_HOSTS = new Set([
   'bizzsurfergo.lovable.app',
