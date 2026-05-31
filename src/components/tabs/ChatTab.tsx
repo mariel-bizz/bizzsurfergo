@@ -783,7 +783,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   <Download className="w-4 h-4 mr-1" /> Short PDF
                 </Button>
                 <Button
-                  onClick={handleEmailMe}
+                  onClick={handleUpgrade}
                   className="rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-base font-extrabold border-[#ff6f00] border-2 border-solid flex-1"
                 >
                   <Zap className="w-4 h-4 mr-1" /> Upgrade
