@@ -12,6 +12,7 @@ export interface TemplateEntry {
 import { template as bizzsurferSummary } from './bizzsurfer-summary'
 import { template as waitlistConfirmation } from './waitlist-confirmation'
 import { template as waitlistAdminNotification } from './waitlist-admin-notification'
+import { template as contactFormAdminNotification } from './contact-form-admin-notification'
 import { template as marketplaceListingApplication } from './marketplace-listing-application'
 import { template as marketplaceListingConfirmation } from './marketplace-listing-confirmation'
 import { template as marketplaceOrderRequest } from './marketplace-order-request'
@@ -24,6 +25,7 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'bizzsurfer-summary': bizzsurferSummary,
   'waitlist-confirmation': waitlistConfirmation,
   'waitlist-admin-notification': waitlistAdminNotification,
+  'contact-form-admin-notification': contactFormAdminNotification,
   'marketplace-listing-application': marketplaceListingApplication,
   'marketplace-listing-confirmation': marketplaceListingConfirmation,
   'marketplace-order-request': marketplaceOrderRequest,

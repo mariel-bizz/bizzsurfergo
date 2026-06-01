@@ -48,6 +48,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as MarketplaceApplicationTokenRouteImport } from './routes/marketplace.application.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
@@ -255,6 +256,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
+  id: '/api/public/contact',
+  path: '/api/public/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailTransactionalSendRoute =
   LovableEmailTransactionalSendRouteImport.update({
     id: '/lovable/email/transactional/send',
@@ -346,6 +352,7 @@ export interface FileRoutesByFullPath {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
@@ -396,6 +403,7 @@ export interface FileRoutesByTo {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights': typeof InsightsIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
@@ -447,6 +455,7 @@ export interface FileRoutesById {
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
+  '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
@@ -499,6 +508,7 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/insights/'
     | '/marketplace/'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/public/chat/email-summary'
@@ -549,6 +559,7 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/insights'
     | '/marketplace'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/public/chat/email-summary'
@@ -599,6 +610,7 @@ export interface FileRouteTypes {
     | '/marketplace/checkout'
     | '/insights/'
     | '/marketplace/'
+    | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/public/chat/email-summary'
@@ -650,6 +662,7 @@ export interface RootRouteChildren {
   MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
+  ApiPublicContactRoute: typeof ApiPublicContactRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   MarketplaceApplicationTokenRoute: typeof MarketplaceApplicationTokenRoute
   ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
@@ -938,6 +951,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/contact': {
+      id: '/api/public/contact'
+      path: '/api/public/contact'
+      fullPath: '/api/public/contact'
+      preLoaderRoute: typeof ApiPublicContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/transactional/send': {
       id: '/lovable/email/transactional/send'
       path: '/lovable/email/transactional/send'
@@ -1042,6 +1062,7 @@ const rootRouteChildren: RootRouteChildren = {
   MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
+  ApiPublicContactRoute: ApiPublicContactRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   MarketplaceApplicationTokenRoute: MarketplaceApplicationTokenRoute,
   ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,

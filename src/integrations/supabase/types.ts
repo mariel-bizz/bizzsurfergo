@@ -50,6 +50,48 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_submissions: {
+        Row: {
+          company: string
+          created_at: string
+          email: string
+          id: string
+          ip_hint: string | null
+          message: string
+          name: string
+          phone: string
+          role: string
+          topic: string
+          user_agent: string | null
+        }
+        Insert: {
+          company: string
+          created_at?: string
+          email: string
+          id?: string
+          ip_hint?: string | null
+          message: string
+          name: string
+          phone: string
+          role: string
+          topic: string
+          user_agent?: string | null
+        }
+        Update: {
+          company?: string
+          created_at?: string
+          email?: string
+          id?: string
+          ip_hint?: string | null
+          message?: string
+          name?: string
+          phone?: string
+          role?: string
+          topic?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       digest_subscribers: {
         Row: {
           created_at: string
