@@ -288,6 +288,10 @@ export function HomeTab() {
           <Link to="/privacy" className="hover:text-foreground hover:underline transition-colors">
             Privacy Policy
           </Link>
+          <span className="text-border">|</span>
+          <Link to="/contact" className="hover:text-foreground hover:underline transition-colors">
+            Contact Us
+          </Link>
         </div>
       </footer>
 
