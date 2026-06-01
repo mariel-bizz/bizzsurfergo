@@ -24,6 +24,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IntegrationsRouteImport } from './routes/integrations'
 import { Route as FeedDotxmlRouteImport } from './routes/feed[.]xml'
 import { Route as EventsRouteImport } from './routes/events'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ChatRouteImport } from './routes/chat'
 import { Route as CareersRouteImport } from './routes/careers'
 import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
@@ -130,6 +131,11 @@ const FeedDotxmlRoute = FeedDotxmlRouteImport.update({
 const EventsRoute = EventsRouteImport.update({
   id: '/events',
   path: '/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChatRoute = ChatRouteImport.update({
@@ -307,6 +313,7 @@ export interface FileRoutesByFullPath {
   '/atom.xml': typeof AtomDotxmlRoute
   '/careers': typeof CareersRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/atom.xml': typeof AtomDotxmlRoute
   '/careers': typeof CareersRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
@@ -406,6 +414,7 @@ export interface FileRoutesById {
   '/atom.xml': typeof AtomDotxmlRoute
   '/careers': typeof CareersRoute
   '/chat': typeof ChatRoute
+  '/contact': typeof ContactRoute
   '/events': typeof EventsRoute
   '/feed.xml': typeof FeedDotxmlRoute
   '/integrations': typeof IntegrationsRoute
@@ -457,6 +466,7 @@ export interface FileRouteTypes {
     | '/atom.xml'
     | '/careers'
     | '/chat'
+    | '/contact'
     | '/events'
     | '/feed.xml'
     | '/integrations'
@@ -506,6 +516,7 @@ export interface FileRouteTypes {
     | '/atom.xml'
     | '/careers'
     | '/chat'
+    | '/contact'
     | '/events'
     | '/feed.xml'
     | '/integrations'
@@ -555,6 +566,7 @@ export interface FileRouteTypes {
     | '/atom.xml'
     | '/careers'
     | '/chat'
+    | '/contact'
     | '/events'
     | '/feed.xml'
     | '/integrations'
@@ -605,6 +617,7 @@ export interface RootRouteChildren {
   AtomDotxmlRoute: typeof AtomDotxmlRoute
   CareersRoute: typeof CareersRoute
   ChatRoute: typeof ChatRoute
+  ContactRoute: typeof ContactRoute
   EventsRoute: typeof EventsRoute
   FeedDotxmlRoute: typeof FeedDotxmlRoute
   IntegrationsRoute: typeof IntegrationsRoute
@@ -755,6 +768,13 @@ declare module '@tanstack/react-router' {
       path: '/events'
       fullPath: '/events'
       preLoaderRoute: typeof EventsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/chat': {
@@ -989,6 +1009,7 @@ const rootRouteChildren: RootRouteChildren = {
   AtomDotxmlRoute: AtomDotxmlRoute,
   CareersRoute: CareersRoute,
   ChatRoute: ChatRoute,
+  ContactRoute: ContactRoute,
   EventsRoute: EventsRoute,
   FeedDotxmlRoute: FeedDotxmlRoute,
   IntegrationsRoute: IntegrationsRoute,
@@ -1036,13 +1057,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
