@@ -1,4 +1,4 @@
-const SITE = "https://bizzsurfergo.lovable.app";
+const SITE = "https://go.bizzsurfer.ai";
 
 export function pageHead(opts: {
   path: string;

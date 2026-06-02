@@ -30,8 +30,8 @@ export const Route = createFileRoute("/events")({
       ...base,
       links: [
         ...(base.links ?? []),
-        { rel: "alternate", type: "application/rss+xml", title: "BizzSurfer Events (RSS)", href: "https://bizzsurfergo.lovable.app/feed.xml" },
-        { rel: "alternate", type: "application/atom+xml", title: "BizzSurfer Events (Atom)", href: "https://bizzsurfergo.lovable.app/atom.xml" },
+        { rel: "alternate", type: "application/rss+xml", title: "BizzSurfer Events (RSS)", href: "https://go.bizzsurfer.ai/feed.xml" },
+        { rel: "alternate", type: "application/atom+xml", title: "BizzSurfer Events (Atom)", href: "https://go.bizzsurfer.ai/atom.xml" },
       ],
       scripts: [
         ...(base.scripts ?? []),

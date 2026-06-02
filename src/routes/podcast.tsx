@@ -19,7 +19,7 @@ export const Route = createFileRoute("/podcast")({
         "Listen on Spotify: candid conversations with founders, CIOs, and operators shipping Agentic AI in production. New episodes every week.",
       breadcrumbName: "Podcast",
     });
-    const ogImage = "https://bizzsurfergo.lovable.app/og-podcast.jpg";
+    const ogImage = "https://go.bizzsurfer.ai/og-podcast.jpg";
     return {
       ...base,
       meta: [

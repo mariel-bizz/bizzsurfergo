@@ -35,7 +35,7 @@ export function buildICS(e: FeedEvent): string {
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",
-    `UID:bizzsurfer-event-${e.id}@bizzsurfergo.lovable.app`,
+    `UID:bizzsurfer-event-${e.id}@go.bizzsurfer.ai`,
     `DTSTAMP:${toICSDate(new Date())}`,
     `DTSTART:${toICSDate(start)}`,
     `DTEND:${toICSDate(end)}`,

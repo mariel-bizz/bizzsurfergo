@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { AlertCircle, AlertTriangle, CheckCircle2, Info } from "lucide-react";
 import { AdminGate } from "@/components/AdminGate";
 
-const SITE = "https://bizzsurfergo.lovable.app";
+const SITE = "https://go.bizzsurfer.ai";
 const PRESET_PATHS = ["/", "/chat", "/events", "/pricing", "/profile"];
 
 export const Route = createFileRoute("/admin/seo")({

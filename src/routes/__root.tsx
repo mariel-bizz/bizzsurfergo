@@ -94,9 +94,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@Lovable" },
       { name: "twitter:title", content: "BizzSurfer Go! Agentic AI & Business Transformation" },
       { name: "twitter:description", content: "BizzSurfer Go! Agentic AI for transformation leaders. Connect enterprise systems and let AI agents orchestrate change and accelerate ROI." },
-      { property: "og:image", content: "https://bizzsurfergo.lovable.app/og-image.png" },
+      { property: "og:image", content: "https://go.bizzsurfer.ai/og-image.png" },
       { property: "og:image:alt", content: "BizzSurfer Go! - Agentic AI Intelligence for Business Transformation" },
-      { name: "twitter:image", content: "https://bizzsurfergo.lovable.app/og-image.png" },
+      { name: "twitter:image", content: "https://go.bizzsurfer.ai/og-image.png" },
       { name: "twitter:image:alt", content: "BizzSurfer Go! - Agentic AI Intelligence for Business Transformation" },
     ],
     links: [
