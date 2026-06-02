@@ -306,7 +306,7 @@ function MarketTrendsPage() {
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return NEWS.filter((item) => {
+    return newsItems.filter((item) => {
       if (showSavedOnly && !bookmarks.has(item.id)) return false;
       if (category !== "All" && item.category !== category) return false;
       if (!q) return true;
@@ -316,7 +316,7 @@ function MarketTrendsPage() {
         item.source.toLowerCase().includes(q)
       );
     });
-  }, [query, category, showSavedOnly, bookmarks]);
+  }, [query, category, showSavedOnly, bookmarks, newsItems]);
 
   // Reset paging when filters change
   useEffect(() => {
