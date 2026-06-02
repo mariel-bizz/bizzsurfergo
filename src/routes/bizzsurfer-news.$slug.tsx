@@ -450,7 +450,7 @@ function PaywallOverlay({
               Keep reading the full story
             </h3>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              You've read the first {PREVIEW_COUNT} paragraphs. Unlock for €1 to
+              You've read the first 2 paragraphs. Unlock for €1 to
               get a <span className="font-bold text-foreground">24-hour pass</span>{" "}
               to every BizzSurfer News article.
             </p>
