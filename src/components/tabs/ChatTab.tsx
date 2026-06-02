@@ -926,7 +926,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/*,.pdf,.txt,.csv,.doc,.docx"
+                accept="image/*,audio/*,.pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.md,.json"
                 multiple
                 hidden
                 onChange={(e) => {
@@ -934,16 +934,93 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   e.target.value = "";
                 }}
               />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={streaming}
-                className="rounded-2xl w-11 h-11 bg-muted text-foreground flex items-center justify-center hover:bg-accent transition shrink-0"
-                aria-label="Attach file"
-                title="Attach image or file"
-              >
-                <Paperclip className="w-4 h-4" />
-              </button>
+              <Popover open={plusOpen} onOpenChange={setPlusOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={streaming}
+                    className="rounded-2xl w-11 h-11 bg-muted text-foreground flex items-center justify-center hover:bg-accent transition shrink-0"
+                    aria-label="Add"
+                    title="Add photos, files, audio, or create"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" side="top" className="w-64 p-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      fileRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <Paperclip className="w-4 h-4 text-muted-foreground" />
+                    Add photos &amp; files
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      if (recording) stopRecording();
+                      else startRecording();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    {recording ? (
+                      <StopCircle className="w-4 h-4 text-destructive" />
+                    ) : (
+                      <Mic className="w-4 h-4 text-muted-foreground" />
+                    )}
+                    {recording ? "Stop recording" : "Record audio"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      setImageDialogOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                    Create image
+                  </button>
+                  <div className="my-1 h-px bg-border" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      saveCurrentAsProject();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <Save className="w-4 h-4 text-muted-foreground" />
+                    Save as project
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      setProjectsDialogOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <span className="flex items-center gap-3">
+                      <FolderOpen className="w-4 h-4 text-muted-foreground" />
+                      My projects
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {savedProjects.length}
+                    </span>
+                  </button>
+                </PopoverContent>
+              </Popover>
+              {recording && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-destructive font-medium">
+                  <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+                  REC
+                </span>
+              )}
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
