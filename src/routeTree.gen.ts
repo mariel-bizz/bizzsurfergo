@@ -43,6 +43,7 @@ import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminMarketplaceApplicationsRouteImport } from './routes/admin.marketplace-applications'
+import { Route as AdminMarketNewsRouteImport } from './routes/admin.market-news'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminDigestSubscribersRouteImport } from './routes/admin.digest-subscribers'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -231,6 +232,11 @@ const AdminMarketplaceApplicationsRoute =
     path: '/admin/marketplace-applications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminMarketNewsRoute = AdminMarketNewsRouteImport.update({
+  id: '/admin/market-news',
+  path: '/admin/market-news',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   id: '/admin/insights-comments',
   path: '/admin/insights-comments',
@@ -345,6 +351,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -397,6 +404,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -450,6 +458,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -504,6 +513,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/market-news'
     | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
@@ -556,6 +566,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/market-news'
     | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
@@ -608,6 +619,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/market-news'
     | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
@@ -661,6 +673,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminDigestSubscribersRoute: typeof AdminDigestSubscribersRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
+  AdminMarketNewsRoute: typeof AdminMarketNewsRoute
   AdminMarketplaceApplicationsRoute: typeof AdminMarketplaceApplicationsRoute
   AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
@@ -929,6 +942,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketplaceApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/market-news': {
+      id: '/admin/market-news'
+      path: '/admin/market-news'
+      fullPath: '/admin/market-news'
+      preLoaderRoute: typeof AdminMarketNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/insights-comments': {
       id: '/admin/insights-comments'
       path: '/admin/insights-comments'
@@ -1069,6 +1089,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminDigestSubscribersRoute: AdminDigestSubscribersRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
+  AdminMarketNewsRoute: AdminMarketNewsRoute,
   AdminMarketplaceApplicationsRoute: AdminMarketplaceApplicationsRoute,
   AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,

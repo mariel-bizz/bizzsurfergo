@@ -4,7 +4,7 @@ import { AdminGate } from "@/components/AdminGate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Newspaper, CheckCircle2, AlertTriangle, ArrowRight } from "lucide-react";
+import { RefreshCw, Newspaper, CheckCircle2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin/market-news")({
@@ -158,7 +158,7 @@ function MarketNewsAdminPage() {
   $$
   SELECT net.http_post(
     url:='https://project--93cf30e3-bdcc-47f4-a14e-e80c68d0be7a.lovable.app/api/public/hooks/sync-market-news',
-    headers:='{"Content-Type": "application/json", "apikey": "${process.env.SUPABASE_ANON_KEY ?? "YOUR_ANON_KEY"}"}'::jsonb,
+    headers:='{"Content-Type": "application/json", "apikey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVlZHNtYnhxbmZ1cmthaGd3bG90Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgxNzI3ODAsImV4cCI6MjA5Mzc0ODc4MH0.7X4VzZ_Cd3e1yOCmv0Csn3jai5WhIzeOQLSsp-TsGRc"}'::jsonb,
     body:='{}'::jsonb
   ) as request_id;
   $$
