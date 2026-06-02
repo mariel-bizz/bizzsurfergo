@@ -197,7 +197,7 @@ function BizzSurferNewsPage() {
       .filter(Boolean);
   }, [bodyQuery.data]);
 
-  const PREVIEW_COUNT = 3;
+  const PREVIEW_COUNT = 2;
   const previewParagraphs = paragraphs.slice(0, PREVIEW_COUNT);
   const gatedParagraphs = paragraphs.slice(PREVIEW_COUNT);
 
