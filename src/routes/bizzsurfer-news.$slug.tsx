@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createFileRoute, Link, notFound, useRouter } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,6 +14,8 @@ import {
   LogIn,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { trackEvent } from "@/lib/analytics";
 import { getMarketNewsBySlug } from "@/lib/market-news.functions";
 import { getMarketNewsBody } from "@/lib/market-news-body.functions";
 import { getPremiumStatus } from "@/lib/premium.functions";
@@ -203,9 +205,52 @@ function BizzSurferNewsPage() {
 
   // --- Image --------------------------------------------------------------
   // Always use our branded cover. Many publisher image URLs are hotlink-blocked
-  // (e.g. NVIDIA investor site behind Cloudflare) and would render an error page.
+  // (e.g. NVIDIA investor site behind Cloudflare). If even the local asset
+  // fails (offline, cache-miss), we fall back to an inline SVG so the card
+  // never renders empty.
   const heroImage = newsDefault;
+  const [imgState, setImgState] = useState<"loading" | "loaded" | "fallback">("loading");
+  const INLINE_FALLBACK =
+    "data:image/svg+xml;utf8," +
+    encodeURIComponent(
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'>
+        <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+          <stop offset='0' stop-color='#1e1b4b'/><stop offset='0.5' stop-color='#6d28d9'/><stop offset='1' stop-color='#ff6f00'/>
+        </linearGradient></defs>
+        <rect width='1200' height='630' fill='url(#g)'/>
+        <text x='50%' y='52%' fill='white' font-family='system-ui' font-size='44' font-weight='700' text-anchor='middle'>BizzSurfer News</text>
+      </svg>`,
+    );
 
+  // --- Paywall analytics ----------------------------------------------------
+  const blurFiredRef = useRef(false);
+  useEffect(() => {
+    if (
+      !hasAccess &&
+      gatedParagraphs.length > 0 &&
+      !bodyQuery.isLoading &&
+      !blurFiredRef.current
+    ) {
+      blurFiredRef.current = true;
+      trackEvent("news_preview_blur_triggered", {
+        slug,
+        source: item.source,
+        category: item.category,
+        preview_count: PREVIEW_COUNT,
+        gated_paragraphs: gatedParagraphs.length,
+      });
+    }
+  }, [hasAccess, gatedParagraphs.length, bodyQuery.isLoading, slug, item.source, item.category]);
+
+  const handleUnlockClick = () => {
+    trackEvent("news_paywall_unlock_clicked", {
+      slug,
+      source: item.source,
+      category: item.category,
+      is_authenticated: !!userId,
+    });
+    setPaywallOpen(true);
+  };
 
   // --- Return URL for Stripe ------------------------------------------------
   const returnUrl =
@@ -249,16 +294,18 @@ function BizzSurferNewsPage() {
         )}
       </div>
 
-      {/* Hero image with BizzSurfer watermark */}
-      <div className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+      {/* Hero image with BizzSurfer watermark + loading skeleton + offline fallback */}
+      <div className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-card aspect-[16/9]">
+        {imgState === "loading" && (
+          <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+        )}
         <img
-          src={heroImage}
+          src={imgState === "fallback" ? INLINE_FALLBACK : heroImage}
           alt={item.title}
-          className="w-full h-auto object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-300 ${imgState === "loading" ? "opacity-0" : "opacity-100"}`}
           loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = newsDefault;
-          }}
+          onLoad={() => setImgState((s) => (s === "fallback" ? "fallback" : "loaded"))}
+          onError={() => setImgState("fallback")}
         />
         <img
           src={bizzsurferLogo}
@@ -267,6 +314,7 @@ function BizzSurferNewsPage() {
           className="pointer-events-none absolute left-3 top-3 h-9 w-auto rounded-md bg-white/85 px-2 py-1 shadow-sm backdrop-blur-sm"
         />
       </div>
+
 
       {item.summary && (
         <p className="mt-6 text-base leading-relaxed text-foreground font-medium">
@@ -277,11 +325,12 @@ function BizzSurferNewsPage() {
       {/* Body */}
       <div className="mt-8 space-y-5">
         {bodyQuery.isLoading && (
-          <div className="space-y-3">
-            <div className="h-4 rounded bg-muted animate-pulse" />
-            <div className="h-4 rounded bg-muted animate-pulse w-11/12" />
-            <div className="h-4 rounded bg-muted animate-pulse w-10/12" />
-            <div className="h-4 rounded bg-muted animate-pulse w-11/12" />
+          <div className="space-y-3" aria-label="Loading article">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-10/12" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-9/12" />
           </div>
         )}
 
@@ -340,7 +389,7 @@ function BizzSurferNewsPage() {
             {!hasAccess && (
               <PaywallOverlay
                 isPremiumUser={!!userId}
-                onUnlock={() => setPaywallOpen(true)}
+                onUnlock={handleUnlockClick}
                 verifying={verifying}
               />
             )}
@@ -401,15 +450,28 @@ function PaywallOverlay({
               Keep reading the full story
             </h3>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Contribute <span className="font-bold text-foreground">€1</span> to
-              get a 24-hour pass to every BizzSurfer News article.
-              <br />
-              100% of contributions go to{" "}
-              <span className="font-semibold text-foreground">
-                IT-skills programs for children
-              </span>{" "}
-              — building the next generation of operators.
+              You've read the first 2 paragraphs. Unlock for €1 to
+              get a <span className="font-bold text-foreground">24-hour pass</span>{" "}
+              to every BizzSurfer News article.
             </p>
+            <ul className="mt-3 space-y-1.5 text-left text-xs text-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>Full long-form article + curated analysis</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>Direct link to the original publisher</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>24-hour access across all BizzSurfer News</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Heart className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>100% donated to IT-skills programs for children</span>
+              </li>
+            </ul>
             <Button
               type="button"
               onClick={onUnlock}

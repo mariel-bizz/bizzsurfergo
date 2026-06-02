@@ -10,20 +10,46 @@ export const Route = createFileRoute("/api/public/hooks/sync-market-news")({
       POST: async () => {
         const csvUrl = CSV_URL;
 
-        let csvText: string;
-        try {
-          const res = await fetch(csvUrl, { headers: { Accept: "text/csv" } });
-          if (!res.ok) {
-            return Response.json(
-              { ok: false, error: `Failed to fetch CSV: ${res.status} ${res.statusText}` },
-              { status: 502 }
-            );
+        // Fetch with up to 3 attempts + exponential backoff. Publisher feeds
+        // (Google Sheets export, Cloudflare-fronted origins) occasionally return
+        // 403/429/5xx on the first hit and succeed shortly after.
+        const fetchWithRetry = async (): Promise<{ ok: true; text: string } | { ok: false; status?: number; error: string }> => {
+          let lastErr = "";
+          let lastStatus: number | undefined;
+          for (let attempt = 1; attempt <= 3; attempt++) {
+            try {
+              const res = await fetch(csvUrl, {
+                headers: {
+                  Accept: "text/csv",
+                  // Some Cloudflare-fronted origins block requests without a UA.
+                  "User-Agent": "BizzSurferBot/1.0 (+https://bizzsurfer.ai)",
+                },
+              });
+              if (res.ok) return { ok: true, text: await res.text() };
+              lastStatus = res.status;
+              lastErr = `${res.status} ${res.statusText}`;
+              // Don't retry on 4xx that isn't 408/425/429.
+              if (res.status >= 400 && res.status < 500 && ![408, 425, 429].includes(res.status)) break;
+            } catch (e) {
+              lastErr = e instanceof Error ? e.message : "Fetch failed";
+            }
+            if (attempt < 3) await new Promise((r) => setTimeout(r, 400 * attempt));
           }
-          csvText = await res.text();
-        } catch (e) {
-          const msg = e instanceof Error ? e.message : "Fetch failed";
-          return Response.json({ ok: false, error: msg }, { status: 502 });
+          return { ok: false, status: lastStatus, error: lastErr };
+        };
+
+        const fetched = await fetchWithRetry();
+        if (!fetched.ok) {
+          const isBlocked = fetched.status === 403 || fetched.status === 429 || /cloudflare/i.test(fetched.error);
+          const friendly = isBlocked
+            ? "The publisher feed is temporarily blocked (Cloudflare). We'll retry on the next scheduled sync."
+            : `Could not fetch the publisher feed after 3 attempts: ${fetched.error}`;
+          return Response.json(
+            { ok: false, error: friendly, status: fetched.status ?? null, blocked: isBlocked },
+            { status: 502 }
+          );
         }
+        const csvText = fetched.text;
 
         const rows = parseCsv(csvText);
         if (rows.length === 0) {
