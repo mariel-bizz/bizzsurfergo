@@ -210,17 +210,6 @@ function BizzSurferNewsPage() {
   // never renders empty.
   const heroImage = newsDefault;
   const [imgState, setImgState] = useState<"loading" | "loaded" | "fallback">("loading");
-  const INLINE_FALLBACK =
-    "data:image/svg+xml;utf8," +
-    encodeURIComponent(
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'>
-        <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
-          <stop offset='0' stop-color='#1e1b4b'/><stop offset='0.5' stop-color='#6d28d9'/><stop offset='1' stop-color='#ff6f00'/>
-        </linearGradient></defs>
-        <rect width='1200' height='630' fill='url(#g)'/>
-        <text x='50%' y='52%' fill='white' font-family='system-ui' font-size='44' font-weight='700' text-anchor='middle'>BizzSurfer News</text>
-      </svg>`,
-    );
 
   // --- Paywall analytics ----------------------------------------------------
   const blurFiredRef = useRef(false);
