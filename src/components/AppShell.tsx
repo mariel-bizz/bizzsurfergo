@@ -213,7 +213,7 @@ export function AppShell() {
               <img
                 src={headerLogo}
                 alt="BizzSurfer Go!"
-                className="h-9 w-auto max-w-full object-contain xs:h-10 sm:h-11 md:h-12 lg:h-14"
+                className="h-8 w-auto object-contain xs:h-9 sm:h-10"
               />
             </div>
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
