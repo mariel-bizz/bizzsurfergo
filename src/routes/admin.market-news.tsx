@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
 import { AdminGate } from "@/components/AdminGate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Newspaper, CheckCircle2, AlertTriangle } from "lucide-react";
+import { RefreshCw, Newspaper, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/market-news")({
   head: () => ({
@@ -29,9 +30,29 @@ type SyncResult = {
   errors: string[];
 };
 
+type RecentItem = { id: string; title: string; slug: string; source: string; published_at: string | null; category: string };
+
 function MarketNewsAdminPage() {
   const [syncing, setSyncing] = useState(false);
   const [lastResult, setLastResult] = useState<SyncResult | null>(null);
+  const [total, setTotal] = useState<number | null>(null);
+  const [recent, setRecent] = useState<RecentItem[]>([]);
+
+  const loadStats = useCallback(async () => {
+    const { count } = await supabase
+      .from("market_news")
+      .select("id", { count: "exact", head: true });
+    setTotal(count ?? 0);
+    const { data } = await supabase
+      .from("market_news")
+      .select("id,title,slug,source,published_at,category")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .limit(10);
+    setRecent((data ?? []) as RecentItem[]);
+  }, []);
+
+  useEffect(() => { loadStats(); }, [loadStats]);
 
   const triggerSync = async () => {
     setSyncing(true);
@@ -56,6 +77,7 @@ function MarketNewsAdminPage() {
         toast.success("Sync completed", {
           description: `${result.inserted} inserted, ${result.updated} updated, ${result.skipped} skipped`,
         });
+        loadStats();
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unknown error";
@@ -114,6 +136,49 @@ function MarketNewsAdminPage() {
           </CardContent>
         </Card>
       )}
+
+      <Card>
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Newspaper className="w-4 h-4" />
+            Latest items {total !== null && <Badge variant="secondary">{total} total</Badge>}
+          </CardTitle>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/market-trends">
+              View public page <ExternalLink className="w-3 h-3 ml-1" />
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {recent.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No items yet. Click Sync now.</p>
+          ) : (
+            <ul className="space-y-2">
+              {recent.map((it) => (
+                <li key={it.id} className="flex items-start justify-between gap-3 text-sm border-b pb-2 last:border-0">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{it.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {it.source} · {it.category} · {it.published_at ? new Date(it.published_at).toLocaleDateString() : "no date"}
+                    </p>
+                  </div>
+                  <Link
+                    to="/bizzsurfer-news/$slug"
+                    params={{ slug: it.slug }}
+                    className="text-xs text-primary hover:underline shrink-0"
+                  >
+                    Open
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-3 text-xs text-muted-foreground">
+            Public list lives at <code className="rounded bg-muted px-1">/market-trends</code>.
+          </p>
+        </CardContent>
+      </Card>
+
 
       <Card>
         <CardHeader>
