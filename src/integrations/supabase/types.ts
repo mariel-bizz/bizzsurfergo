@@ -369,6 +369,7 @@ export type Database = {
       }
       market_news: {
         Row: {
+          body: string | null
           category: string
           created_at: string
           id: string
@@ -383,6 +384,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          body?: string | null
           category?: string
           created_at?: string
           id?: string
@@ -397,6 +399,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          body?: string | null
           category?: string
           created_at?: string
           id?: string
