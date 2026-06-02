@@ -450,15 +450,28 @@ function PaywallOverlay({
               Keep reading the full story
             </h3>
             <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-              Contribute <span className="font-bold text-foreground">€1</span> to
-              get a 24-hour pass to every BizzSurfer News article.
-              <br />
-              100% of contributions go to{" "}
-              <span className="font-semibold text-foreground">
-                IT-skills programs for children
-              </span>{" "}
-              — building the next generation of operators.
+              You've read the first {PREVIEW_COUNT} paragraphs. Unlock for €1 to
+              get a <span className="font-bold text-foreground">24-hour pass</span>{" "}
+              to every BizzSurfer News article.
             </p>
+            <ul className="mt-3 space-y-1.5 text-left text-xs text-foreground">
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>Full long-form article + curated analysis</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>Direct link to the original publisher</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <CheckCircle2 className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>24-hour access across all BizzSurfer News</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <Heart className="w-3.5 h-3.5 mt-0.5 text-[#ff6f00] shrink-0" />
+                <span>100% donated to IT-skills programs for children</span>
+              </li>
+            </ul>
             <Button
               type="button"
               onClick={onUnlock}
