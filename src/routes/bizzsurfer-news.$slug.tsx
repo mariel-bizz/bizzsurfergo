@@ -205,9 +205,52 @@ function BizzSurferNewsPage() {
 
   // --- Image --------------------------------------------------------------
   // Always use our branded cover. Many publisher image URLs are hotlink-blocked
-  // (e.g. NVIDIA investor site behind Cloudflare) and would render an error page.
+  // (e.g. NVIDIA investor site behind Cloudflare). If even the local asset
+  // fails (offline, cache-miss), we fall back to an inline SVG so the card
+  // never renders empty.
   const heroImage = newsDefault;
+  const [imgState, setImgState] = useState<"loading" | "loaded" | "fallback">("loading");
+  const INLINE_FALLBACK =
+    "data:image/svg+xml;utf8," +
+    encodeURIComponent(
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 630'>
+        <defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+          <stop offset='0' stop-color='#1e1b4b'/><stop offset='0.5' stop-color='#6d28d9'/><stop offset='1' stop-color='#ff6f00'/>
+        </linearGradient></defs>
+        <rect width='1200' height='630' fill='url(#g)'/>
+        <text x='50%' y='52%' fill='white' font-family='system-ui' font-size='44' font-weight='700' text-anchor='middle'>BizzSurfer News</text>
+      </svg>`,
+    );
 
+  // --- Paywall analytics ----------------------------------------------------
+  const blurFiredRef = useRef(false);
+  useEffect(() => {
+    if (
+      !hasAccess &&
+      gatedParagraphs.length > 0 &&
+      !bodyQuery.isLoading &&
+      !blurFiredRef.current
+    ) {
+      blurFiredRef.current = true;
+      trackEvent("news_preview_blur_triggered", {
+        slug,
+        source: item.source,
+        category: item.category,
+        preview_count: PREVIEW_COUNT,
+        gated_paragraphs: gatedParagraphs.length,
+      });
+    }
+  }, [hasAccess, gatedParagraphs.length, bodyQuery.isLoading, slug, item.source, item.category]);
+
+  const handleUnlockClick = () => {
+    trackEvent("news_paywall_unlock_clicked", {
+      slug,
+      source: item.source,
+      category: item.category,
+      is_authenticated: !!userId,
+    });
+    setPaywallOpen(true);
+  };
 
   // --- Return URL for Stripe ------------------------------------------------
   const returnUrl =
