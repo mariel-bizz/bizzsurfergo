@@ -1,11 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useCallback, useEffect, useState } from "react";
 import { AdminGate } from "@/components/AdminGate";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { RefreshCw, Newspaper, CheckCircle2, AlertTriangle } from "lucide-react";
+import { RefreshCw, Newspaper, CheckCircle2, AlertTriangle, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/market-news")({
   head: () => ({
