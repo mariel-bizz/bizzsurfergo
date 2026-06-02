@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { events as eventsList, eventDate } from "@/lib/events-data";
+import { events as eventsList, eventDate, eventLink } from "@/lib/events-data";
 import {
   createCalendarEventWithMeet,
   addAttendeeToEvent,
