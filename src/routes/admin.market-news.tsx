@@ -138,6 +138,49 @@ function MarketNewsAdminPage() {
       )}
 
       <Card>
+        <CardHeader className="pb-2 flex flex-row items-center justify-between">
+          <CardTitle className="text-base flex items-center gap-2">
+            <Newspaper className="w-4 h-4" />
+            Latest items {total !== null && <Badge variant="secondary">{total} total</Badge>}
+          </CardTitle>
+          <Button asChild size="sm" variant="outline">
+            <Link to="/market-trends">
+              View public page <ExternalLink className="w-3 h-3 ml-1" />
+            </Link>
+          </Button>
+        </CardHeader>
+        <CardContent>
+          {recent.length === 0 ? (
+            <p className="text-sm text-muted-foreground">No items yet. Click Sync now.</p>
+          ) : (
+            <ul className="space-y-2">
+              {recent.map((it) => (
+                <li key={it.id} className="flex items-start justify-between gap-3 text-sm border-b pb-2 last:border-0">
+                  <div className="min-w-0">
+                    <p className="font-medium truncate">{it.title}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {it.source} · {it.category} · {it.published_at ? new Date(it.published_at).toLocaleDateString() : "no date"}
+                    </p>
+                  </div>
+                  <Link
+                    to="/bizzsurfer-news/$slug"
+                    params={{ slug: it.slug }}
+                    className="text-xs text-primary hover:underline shrink-0"
+                  >
+                    Open
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <p className="mt-3 text-xs text-muted-foreground">
+            Public list lives at <code className="rounded bg-muted px-1">/market-trends</code>.
+          </p>
+        </CardContent>
+      </Card>
+
+
+      <Card>
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2">
             <Newspaper className="w-4 h-4" />
