@@ -18,8 +18,7 @@ import {
   Image as ImageIcon,
   FolderOpen,
   Save,
-  FileText,
-} from "lucide-react";
+}  from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useServerFn } from "@tanstack/react-start";
 import { generateChatImage } from "@/lib/chat-image.functions";
