@@ -367,6 +367,51 @@ export type Database = {
         }
         Relationships: []
       }
+      market_news: {
+        Row: {
+          category: string
+          created_at: string
+          id: string
+          image_url: string | null
+          published_at: string | null
+          seed: boolean
+          slug: string
+          source: string
+          source_url: string
+          summary: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          seed?: boolean
+          slug: string
+          source: string
+          source_url: string
+          summary?: string | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          published_at?: string | null
+          seed?: boolean
+          slug?: string
+          source?: string
+          source_url?: string
+          summary?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       marketplace_inquiries: {
         Row: {
           action_type: string
