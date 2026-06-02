@@ -11,13 +11,13 @@ type State =
   | { kind: "error"; message: string }
   | { kind: "authorized" };
 
-async function withTimeout<T>(promise: Promise<T>, message: string, ms = 8000) {
+async function withTimeout<T>(promise: PromiseLike<T>, message: string, ms = 8000): Promise<T> {
   let timeoutId: ReturnType<typeof setTimeout> | undefined;
   const timeout = new Promise<never>((_, reject) => {
     timeoutId = setTimeout(() => reject(new Error(message)), ms);
   });
   try {
-    return await Promise.race([promise, timeout]);
+    return await Promise.race([Promise.resolve(promise), timeout]);
   } finally {
     if (timeoutId) clearTimeout(timeoutId);
   }
@@ -116,6 +116,27 @@ export function AdminGate({ children }: { children: ReactNode }) {
               onClick={() => supabase.auth.signOut()}
             >
               Sign out
+            </Button>
+          </CardContent>
+        </Card>
+      </main>
+    );
+  }
+
+  if (state.kind === "error") {
+    return (
+      <main className="flex min-h-screen items-center justify-center p-4">
+        <Card className="w-full max-w-sm">
+          <CardHeader>
+            <CardTitle>Access check failed</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <p className="text-muted-foreground">{state.message}</p>
+            <Button className="w-full" onClick={() => window.location.reload()}>
+              Retry
+            </Button>
+            <Button asChild variant="outline" className="w-full">
+              <Link to="/login" search={{ redirect: location.pathname }}>Sign in again</Link>
             </Button>
           </CardContent>
         </Card>
