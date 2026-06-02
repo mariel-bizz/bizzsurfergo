@@ -23,6 +23,7 @@ import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import marketTrendsBanner from "@/assets/market-trends-banner.png";
+import bizzsurferLogo from "@/assets/bizzsurfer-logo.png";
 import { listMarketNews } from "@/lib/market-news.functions";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
@@ -208,57 +209,85 @@ function getHostname(href: string): string {
   }
 }
 
+// Domains known to block hotlinking / scraping (q4inc investor portals, etc.)
+// — skip preview screenshot services and go straight to logo fallback.
+const BLOCKED_PREVIEW_HOSTS = [
+  "q4inc.com",
+  "q4cdn.com",
+  "prnewswire.com",
+  "businesswire.com",
+];
+
+function isBlockedHost(host: string): boolean {
+  return BLOCKED_PREVIEW_HOSTS.some((b) => host === b || host.endsWith(`.${b}`));
+}
+
 function NewsThumbnail({
   href,
   source,
   title,
+  image,
 }: {
   href: string;
   source: string;
   title: string;
+  image?: string;
 }) {
   const host = getHostname(href);
+  const blocked = isBlockedHost(host);
   const sources = useMemo(
     () =>
       [
-        `https://api.microlink.io/?url=${encodeURIComponent(href)}&embed=image.url`,
-        `https://image.thum.io/get/width/800/crop/450/${href}`,
+        image || "",
+        blocked ? "" : `https://api.microlink.io/?url=${encodeURIComponent(href)}&embed=image.url`,
+        blocked ? "" : `https://image.thum.io/get/width/800/crop/450/${href}`,
         host ? `https://logo.clearbit.com/${host}?size=256` : "",
         host ? `https://www.google.com/s2/favicons?domain=${host}&sz=256` : "",
       ].filter(Boolean),
-    [href, host],
+    [href, host, blocked, image],
   );
   const [idx, setIdx] = useState(0);
   const [failed, setFailed] = useState(false);
 
-  if (failed || sources.length === 0) {
-    const initial = (source || host || "?").charAt(0).toUpperCase();
-    return (
-      <div className="absolute inset-0 flex items-center justify-center bg-gradient-agentic">
-        <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/95 text-3xl font-black text-[#02459c] shadow-lg">
-          {initial}
-        </div>
-      </div>
-    );
-  }
+  const initial = (source || host || "?").charAt(0).toUpperCase();
+  const showFallback = failed || sources.length === 0;
+  // First entries are full-bleed photos; logo-style sources render contained.
+  const photoStages = (image ? 1 : 0) + (blocked ? 0 : 2);
+  const isLogoStage = !showFallback && idx >= photoStages;
 
-  const isLogoStage = idx >= 2; // clearbit/favicon = render contained, not cover
   return (
-    <img
-      key={sources[idx]}
-      src={sources[idx]}
-      alt={title}
-      loading="lazy"
-      className={
-        isLogoStage
-          ? "absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/95 object-contain p-3 shadow-lg"
-          : "absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
-      }
-      onError={() => {
-        if (idx + 1 < sources.length) setIdx(idx + 1);
-        else setFailed(true);
-      }}
-    />
+    <>
+      {showFallback ? (
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-agentic">
+          <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white/95 text-3xl font-black text-[#02459c] shadow-lg">
+            {initial}
+          </div>
+        </div>
+      ) : (
+        <img
+          key={sources[idx]}
+          src={sources[idx]}
+          alt={title}
+          loading="lazy"
+          className={
+            isLogoStage
+              ? "absolute left-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-2xl bg-white/95 object-contain p-3 shadow-lg"
+              : "absolute inset-0 h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+          }
+          onError={() => {
+            if (idx + 1 < sources.length) setIdx(idx + 1);
+            else setFailed(true);
+          }}
+        />
+      )}
+      {/* BizzSurfer watermark overlay */}
+      <img
+        src={bizzsurferLogo}
+        alt=""
+        aria-hidden="true"
+        className="pointer-events-none absolute left-2 top-2 h-8 w-auto rounded-md bg-white/85 px-1.5 py-1 shadow-sm backdrop-blur-sm"
+      />
+    </>
   );
 }
 
@@ -499,12 +528,12 @@ function MarketTrendsPage() {
         ) : (
           <ul className="mt-4 grid gap-3">
             {visibleItems.map((item) => {
-              const isInternal = item.href.startsWith("/");
+              
               const saved = bookmarks.has(item.id);
               const inner = (
                 <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-agentic">
-                    <NewsThumbnail href={item.href} source={item.source} title={item.title} />
+                    <NewsThumbnail href={item.href} source={item.source} title={item.title} image={item.image} />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                       <span className="text-xs font-bold uppercase tracking-widest text-white drop-shadow">
                         {item.source}
@@ -578,36 +607,21 @@ function MarketTrendsPage() {
                     </p>
                     <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
                       Read more
-                      {isInternal ? (
-                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                      ) : (
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      )}
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </div>
                 </article>
               );
               return (
                 <li key={item.id}>
-                  {isInternal ? (
-                    <Link
-                      to={item.href}
-                      onClick={() => trackOutbound(item)}
-                      className="block"
-                    >
-                      {inner}
-                    </Link>
-                  ) : (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackOutbound(item)}
-                      className="block"
-                    >
-                      {inner}
-                    </a>
-                  )}
+                  <Link
+                    to="/bizzsurfer-news/$slug"
+                    params={{ slug: item.id }}
+                    onClick={() => trackOutbound(item)}
+                    className="block"
+                  >
+                    {inner}
+                  </Link>
                 </li>
               );
             })}
