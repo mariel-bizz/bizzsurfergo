@@ -375,7 +375,7 @@ function BizzSurferNewsPage() {
           </p>
         ))}
 
-        {gatedParagraphs.length > 0 && (
+        {hasGatedContent && (
           <div className="relative">
             <div
               className={
@@ -385,11 +385,29 @@ function BizzSurferNewsPage() {
               }
               aria-hidden={!hasAccess}
             >
-              {gatedParagraphs.map((p, i) => (
-                <p key={`gp-${i}`} className="text-base leading-relaxed text-foreground">
-                  {p}
-                </p>
-              ))}
+              {hasAccess
+                ? gatedParagraphs.map((p, i) => (
+                    <p
+                      key={`gp-${i}`}
+                      className="text-base leading-relaxed text-foreground"
+                    >
+                      {p}
+                    </p>
+                  ))
+                : // Visual-only placeholder — the real gated text never leaves the server
+                  // until access is verified. This keeps the paywall layout intact.
+                  Array.from({
+                    length: Math.min(Math.max(totalParagraphs - PREVIEW_COUNT, 1), 3),
+                  }).map((_, i) => (
+                    <p
+                      key={`gp-ph-${i}`}
+                      className="text-base leading-relaxed text-muted-foreground/60"
+                    >
+                      ████████ ████ ████████ ██████ ██ ████████ ██████ ████ ████████
+                      ██████ ████ ████████ ██████ ████ ████████ ██████ ████
+                      ████████ ██████ ████ ████████ ██████ ████ ████████.
+                    </p>
+                  ))}
 
               {/* Original-source CTA also gets blurred when locked */}
               <div className="mt-6 rounded-2xl border-2 border-solid border-[#02459c] bg-card p-5 shadow-elegant">
