@@ -1,65 +1,34 @@
-## What's happening
 
-GitHub posts "No jobs were run" against a commit / PR whenever a workflow file matches the event, but every job inside ends up either skipped or filtered out. In our `security.yml` this happens in two realistic scenarios:
+## Goal
+You maintain a Google Sheet of news items. A daily job pulls it into the `market_news` table. Every row automatically gets a branded `/bizzsurfer-news/<slug>` share URL (already built).
 
-1. **Lovable pushes to a branch other than `main`** (preview / sync branches). The workflow has `branches: [main]` on both `push` and `pull_request`, so GitHub still shows the workflow file as "triggered" against the commit checks UI but runs zero jobs.
-2. **A PR has no changes under `supabase/migrations/**`**, so the `migrations` job is skipped via `if: hashFiles(...)`. That alone shouldn't produce the message (other jobs still run) — but combined with branch mismatches, every job ends up skipped.
+## What you do (one-time)
+1. Create a Google Sheet with these columns (header row, exact names):
+   `slug, title, summary, source, source_url, image_url, published_at, category`
+   - `slug`: lowercase, hyphenated, unique (e.g. `microsoft-wti-2026`). If left blank, the job auto-generates one from the title.
+   - `published_at`: ISO date (`2026-06-01`) or blank.
+   - `category`: defaults to `Operators` if blank.
+2. File → Share → **Publish to web** → choose the sheet → **CSV** → copy the URL.
+3. Paste that URL once into a new secret `MARKET_NEWS_CSV_URL`.
 
-The cleanest fix is to make sure the workflow either runs real jobs or doesn't get registered as a run at all.
+## What I build
+1. **Server route** `/api/public/hooks/sync-market-news` (POST):
+   - Fetches the published CSV URL.
+   - Parses rows, auto-slugifies missing slugs, validates with Zod.
+   - Upserts into `market_news` by `slug` (existing rows updated, new ones inserted).
+   - Returns `{ inserted, updated, skipped, errors }`.
+   - Auth via `apikey` header (Supabase anon key).
+2. **pg_cron job** running daily at 06:00 UTC that calls the route.
+3. **Admin trigger button** on `/admin/storage` (or a small `/admin/market-news` page) so you can click "Sync now" without waiting for cron.
+4. **`/market-trends` page** already reads from `market_news` — no change needed; new rows appear automatically with their share buttons.
 
-## Plan
+## Out of scope
+- No scraping of the Perplexity page.
+- No file upload UI (Google Sheet is the source of truth).
+- No changes to the existing branded share page.
 
-Edit `.github/workflows/security.yml` with three small changes:
-
-1. **Add `workflow_dispatch`** so the workflow can always be run manually without a trigger surprise.
-2. **Broaden the push/PR triggers** so syncs from Lovable still produce real runs:
-   - Keep `push.branches: [main]` (production scans).
-   - Add `pull_request:` without a `branches` filter so any PR targeting any branch runs the scans.
-3. **Move the `migrations` skip from job-level `if:` to a step-level guard.** The job itself always runs (so GitHub never reports "no jobs"), but the risky-pattern check no-ops when there are no migration files. Update the `gate` job's `needs` accordingly (it already tolerates `skipped`, but with this change `migrations` will always be `success`).
-
-Optionally (only if the user wants belt-and-braces):
-
-4. **Add a tiny `noop` job** with `runs-on: ubuntu-latest` and a single `echo` step that has no `if:`. This guarantees at least one job runs on every trigger, killing the "No jobs were run" message permanently regardless of future edits.
-
-## Technical details
-
-Concrete YAML changes:
-
-```text
-on:
-  push:
-    branches: [main]
-  pull_request:        # remove "branches: [main]" so all PRs run
-  schedule:
-    - cron: "0 6 * * 1"
-  workflow_dispatch:   # new
-
-jobs:
-  migrations:
-    name: Migration safety
-    runs-on: ubuntu-latest
-    # remove: if: hashFiles('supabase/migrations/**/*.sql') != ''
-    steps:
-      - uses: actions/checkout@v4
-      - name: Skip if no migrations
-        id: check
-        run: |
-          if ls supabase/migrations/*.sql >/dev/null 2>&1; then
-            echo "has_migrations=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_migrations=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Set up Python
-        if: steps.check.outputs.has_migrations == 'true'
-        uses: actions/setup-python@v5
-        with: { python-version: "3.12" }
-      # …existing sqlfluff + risky-pattern steps gated by the same if
-```
-
-Everything else (dependencies, codeql, secrets, sbom, gate) stays the same.
-
-## Outcome
-
-- Lovable sync commits to non-main branches no longer create empty workflow runs (PRs against any branch trigger the real jobs; pushes to non-main are simply not registered as runs at all).
-- The `migrations` job always reports `success`, so the "No jobs were run" notification stops.
-- You can still run the full scan manually from the Actions tab via `workflow_dispatch`.
+## Technical notes
+- CSV parsing: lightweight inline parser (handles quoted fields, commas, newlines) — no new dependency.
+- Idempotent upsert on `slug` unique constraint.
+- Rows with invalid `source_url` are skipped and reported in the response (not fatal).
+- pg_cron uses the stable URL `https://project--93cf30e3-bdcc-47f4-a14e-e80c68d0be7a.lovable.app/api/public/hooks/sync-market-news`.
