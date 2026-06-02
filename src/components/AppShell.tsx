@@ -70,22 +70,23 @@ export function useGameStateInternal(): Game {
     if (typeof window === "undefined") return;
     try {
       const raw = localStorage.getItem(STORAGE);
-      const parsed: GameState = raw
-        ? { ...defaultState, ...JSON.parse(raw) }
-        : defaultState;
+      const parsed: GameState = raw ? { ...defaultState, ...JSON.parse(raw) } : defaultState;
       parsed.onboarding = normalizeOnboarding(parsed.onboarding);
       const today = new Date().toDateString();
       if (parsed.lastVisit !== today) {
         const yesterday = new Date(Date.now() - 86400000).toDateString();
         const newStreak = parsed.lastVisit === yesterday ? parsed.streak + 1 : 1;
         const newState = { ...parsed, streak: newStreak, lastVisit: today, xp: parsed.xp + 10 };
-        if (newStreak >= 3 && !newState.badges.includes("Consistency")) newState.badges.push("Consistency");
+        if (newStreak >= 3 && !newState.badges.includes("Consistency"))
+          newState.badges.push("Consistency");
         setState(newState);
         localStorage.setItem(STORAGE, JSON.stringify(newState));
       } else {
         setState(parsed);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const update = (partial: Partial<GameState> | ((s: GameState) => GameState)) => {
@@ -109,7 +110,10 @@ export function useGameStateInternal(): Game {
         if (!badges.includes("Launch Crew")) badges.push("Launch Crew");
         trackEvent("onboarding_completed", {});
         // Defer toast so it doesn't fire during render
-        setTimeout(() => toast.success("Onboarding complete! +100 XP · Launch Crew badge unlocked"), 0);
+        setTimeout(
+          () => toast.success("Onboarding complete! +100 XP · Launch Crew badge unlocked"),
+          0,
+        );
       } else {
         setTimeout(() => toast.success("+25 XP · Step complete"), 0);
       }
@@ -121,7 +125,9 @@ export function useGameStateInternal(): Game {
         onboarding: {
           ...prev.onboarding,
           steps,
-          completedAt: allDone ? (prev.onboarding.completedAt ?? new Date().toISOString()) : prev.onboarding.completedAt,
+          completedAt: allDone
+            ? (prev.onboarding.completedAt ?? new Date().toISOString())
+            : prev.onboarding.completedAt,
         },
       };
       if (typeof window !== "undefined") localStorage.setItem(STORAGE, JSON.stringify(next));
@@ -129,12 +135,13 @@ export function useGameStateInternal(): Game {
     });
   };
 
-  const dismissOnboarding = () => update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: true } }));
-  const reopenOnboarding = () => update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: false } }));
+  const dismissOnboarding = () =>
+    update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: true } }));
+  const reopenOnboarding = () =>
+    update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: false } }));
 
   return { state, update, completeOnboardingStep, dismissOnboarding, reopenOnboarding };
 }
-
 
 const GameContext = createContext<Game | null>(null);
 
@@ -188,7 +195,9 @@ export function AppShell() {
           language: (navigator.language || "en").slice(0, 16),
           user_id: data.user?.id ?? null,
         });
-      } catch { /* non-blocking */ }
+      } catch {
+        /* non-blocking */
+      }
     })();
   }, [location.pathname]);
 
@@ -210,11 +219,15 @@ export function AppShell() {
             <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
                 <span className="text-xs">🔥</span>
-                <span className="text-xs font-bold text-accent-foreground">{game.state.streak}</span>
+                <span className="text-xs font-bold text-accent-foreground">
+                  {game.state.streak}
+                </span>
               </div>
               <div className="flex items-center gap-1 rounded-full bg-gradient-primary px-2.5 py-1 shadow-soft">
                 <span className="text-xs">⚡</span>
-                <span className="text-xs font-bold text-primary-foreground">{game.state.xp} XP</span>
+                <span className="text-xs font-bold text-primary-foreground">
+                  {game.state.xp} XP
+                </span>
               </div>
             </div>
           </div>
