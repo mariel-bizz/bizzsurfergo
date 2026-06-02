@@ -140,6 +140,18 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [submittedEmail, setSubmittedEmail] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [plusOpen, setPlusOpen] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [projectsDialogOpen, setProjectsDialogOpen] = useState(false);
+  const [savedProjects, setSavedProjects] = useState<
+    Array<{ id: string; name: string; messages: Msg[]; savedAt: string }>
+  >([]);
+  const generateImageFn = useServerFn(generateChatImage);
 
   useEffect(() => {
     try {
