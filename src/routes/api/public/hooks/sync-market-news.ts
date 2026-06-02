@@ -112,13 +112,15 @@ export const Route = createFileRoute("/api/public/hooks/sync-market-news")({
 });
 
 function parseCsv(text: string): Record<string, string>[] {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim() !== "");
-  if (lines.length < 2) return [];
+  // Parse with multi-line quoted field support
+  const records = parseCsvRecords(text);
+  if (records.length < 2) return [];
 
-  const headers = parseCsvLine(lines[0]);
+  const headers = records[0].map((h) => h.trim().toLowerCase());
   const rows: Record<string, string>[] = [];
-  for (let i = 1; i < lines.length; i++) {
-    const values = parseCsvLine(lines[i]);
+  for (let i = 1; i < records.length; i++) {
+    const values = records[i];
+    if (values.length === 1 && values[0] === "") continue;
     const row: Record<string, string> = {};
     headers.forEach((h, idx) => {
       row[h] = values[idx] ?? "";
@@ -126,6 +128,32 @@ function parseCsv(text: string): Record<string, string>[] {
     rows.push(row);
   }
   return rows;
+}
+
+function parseCsvRecords(text: string): string[][] {
+  const records: string[][] = [];
+  let current: string[] = [];
+  let field = "";
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQuotes) {
+      if (ch === '"') {
+        if (text[i + 1] === '"') { field += '"'; i++; } else { inQuotes = false; }
+      } else { field += ch; }
+    } else {
+      if (ch === '"') inQuotes = true;
+      else if (ch === ',') { current.push(field); field = ""; }
+      else if (ch === '\n' || ch === '\r') {
+        if (ch === '\r' && text[i + 1] === '\n') i++;
+        current.push(field); field = "";
+        records.push(current);
+        current = [];
+      } else { field += ch; }
+    }
+  }
+  if (field !== "" || current.length > 0) { current.push(field); records.push(current); }
+  return records;
 }
 
 function parseCsvLine(line: string): string[] {
