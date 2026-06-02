@@ -607,11 +607,7 @@ function MarketTrendsPage() {
                     </p>
                     <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary">
                       Read more
-                      {isInternal ? (
-                        <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-                      ) : (
-                        <ExternalLink className="w-3.5 h-3.5" />
-                      )}
+                      <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
                     </span>
                   </div>
                 </article>
