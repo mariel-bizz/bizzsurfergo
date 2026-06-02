@@ -533,7 +533,7 @@ function MarketTrendsPage() {
               const inner = (
                 <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
                   <div className="relative aspect-[16/9] w-full overflow-hidden bg-gradient-agentic">
-                    <NewsThumbnail href={item.href} source={item.source} title={item.title} />
+                    <NewsThumbnail href={item.href} source={item.source} title={item.title} image={item.image} />
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-3">
                       <span className="text-xs font-bold uppercase tracking-widest text-white drop-shadow">
                         {item.source}
