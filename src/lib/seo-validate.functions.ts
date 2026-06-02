@@ -5,6 +5,9 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 // endpoint, but we still constrain the URL to prevent SSRF if auth is ever
 // loosened.
 const ALLOWED_HOSTS = new Set([
+  "go.bizzsurfer.ai",
+  "www.bizzsurfer.ai",
+  "bizzsurfer.ai",
   "bizzsurfergo.lovable.app",
   "bizzsurfer.com",
   "www.bizzsurfer.com",

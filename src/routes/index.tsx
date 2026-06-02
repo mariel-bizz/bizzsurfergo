@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HomeTab } from "@/components/tabs/HomeTab";
 
-const SITE = "https://bizzsurfergo.lovable.app";
+const SITE = "https://go.bizzsurfer.ai";
 
 export const Route = createFileRoute("/")({
   head: () => ({

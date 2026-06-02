@@ -12,7 +12,7 @@ export type FeedEvent = {
   href: string;
 };
 
-export const SITE = "https://bizzsurfergo.lovable.app";
+export const SITE = "https://go.bizzsurfer.ai";
 
 export const events: FeedEvent[] = [
   {
