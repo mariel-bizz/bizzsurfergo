@@ -12,7 +12,17 @@ import {
   Download,
   Zap,
   Sparkle,
+  Plus,
+  Mic,
+  StopCircle,
+  Image as ImageIcon,
+  FolderOpen,
+  Save,
+  FileText,
 } from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useServerFn } from "@tanstack/react-start";
+import { generateChatImage } from "@/lib/chat-image.functions";
 import { toast } from "sonner";
 import {
   GoChatSetup,
