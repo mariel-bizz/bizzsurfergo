@@ -262,8 +262,8 @@ function BizzSurferNewsPage() {
   useEffect(() => {
     if (
       !hasAccess &&
-      gatedParagraphs.length > 0 &&
-      !bodyQuery.isLoading &&
+      hasGatedContent &&
+      !previewQuery.isLoading &&
       !blurFiredRef.current
     ) {
       blurFiredRef.current = true;
@@ -272,10 +272,10 @@ function BizzSurferNewsPage() {
         source: item.source,
         category: item.category,
         preview_count: PREVIEW_COUNT,
-        gated_paragraphs: gatedParagraphs.length,
+        gated_paragraphs: Math.max(totalParagraphs - PREVIEW_COUNT, 0),
       });
     }
-  }, [hasAccess, gatedParagraphs.length, bodyQuery.isLoading, slug, item.source, item.category]);
+  }, [hasAccess, hasGatedContent, totalParagraphs, previewQuery.isLoading, slug, item.source, item.category]);
 
   const handleUnlockClick = () => {
     trackEvent("news_paywall_unlock_clicked", {
@@ -359,7 +359,7 @@ function BizzSurferNewsPage() {
 
       {/* Body */}
       <div className="mt-8 space-y-5">
-        {bodyQuery.isLoading && (
+        {bodyLoading && (
           <div className="space-y-3" aria-label="Loading article">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-11/12" />
