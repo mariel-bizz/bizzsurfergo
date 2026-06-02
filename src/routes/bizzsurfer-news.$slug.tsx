@@ -201,8 +201,11 @@ function BizzSurferNewsPage() {
   const previewParagraphs = paragraphs.slice(0, PREVIEW_COUNT);
   const gatedParagraphs = paragraphs.slice(PREVIEW_COUNT);
 
-  // --- Image with fallback --------------------------------------------------
-  const heroImage = item.image_url || newsDefault;
+  // --- Image --------------------------------------------------------------
+  // Always use our branded cover. Many publisher image URLs are hotlink-blocked
+  // (e.g. NVIDIA investor site behind Cloudflare) and would render an error page.
+  const heroImage = newsDefault;
+
 
   // --- Return URL for Stripe ------------------------------------------------
   const returnUrl =
