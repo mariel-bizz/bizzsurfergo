@@ -69,25 +69,22 @@ function cleanAnswer(text: string): string {
     .replace(/^\s*[•]\s+/gm, "- ");       // normalise stray bullets to markdown lists
 }
 
+function buildInitialAssistant(cfg: GoChatConfig | null): string {
+  return cfg
+    ? `I'm **BizzSurfer Go!** — focused on **${cfg.departments.join(", ")}** in **${cfg.industries.join(", ")}**.\n\nAsk me anything, or pick a starter below.`
+    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation.\n\nAsk me anything, or pick a question below to get started.";
+}
+
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const game = useGame();
-  const [config, setConfig] = useState<GoChatConfig | null>(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      const raw = window.localStorage.getItem(CONFIG_KEY);
-      return raw ? (JSON.parse(raw) as GoChatConfig) : null;
-    } catch { return null; }
-  });
+  const [config, setConfig] = useState<GoChatConfig | null>(null);
   const gemPersona = config?.provider === "gemini"
     ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
     : "";
   const contextPreamble = config
     ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in short paragraphs separated by blank lines. Use markdown **bold** to highlight the key terms, metrics and frameworks. Use simple "-" bullets for short lists. Never use markdown headings.`
     : "";
-  const initialAssistant = config
-    ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**.\n\nAsk me anything, or pick a starter below.`
-    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation.\n\nAsk me anything, or pick a question below to get started.";
-  const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: initialAssistant }]);
+  const [messages, setMessages] = useState<Msg[]>(() => [{ role: "assistant", content: buildInitialAssistant(null) }]);
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -107,6 +104,20 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [submittedEmail, setSubmittedEmail] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CONFIG_KEY);
+      const saved = raw ? (JSON.parse(raw) as GoChatConfig) : null;
+      if (!saved) return;
+      setConfig(saved);
+      setMessages((prev) => (
+        prev.length === 1 && prev[0]?.role === "assistant" && prev[0]?.content === buildInitialAssistant(null)
+          ? [{ role: "assistant", content: buildInitialAssistant(saved) }]
+          : prev
+      ));
+    } catch { /* ignore */ }
+  }, []);
 
   // Load any prior session email to pre-fill the popup.
   useEffect(() => {
