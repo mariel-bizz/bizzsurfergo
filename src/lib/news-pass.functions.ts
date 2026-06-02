@@ -17,10 +17,13 @@ function validateReturnUrl(raw: string): string {
   } catch {
     throw new Error("Invalid returnUrl");
   }
-  if (u.protocol !== "https:") throw new Error("returnUrl must use https");
   const host = u.hostname.toLowerCase();
+  const isLocal = host === "localhost" || host === "127.0.0.1";
+  if (u.protocol !== "https:" && !(isLocal && u.protocol === "http:")) {
+    throw new Error("returnUrl must use https");
+  }
   const isLovable = host.endsWith(".lovable.app") || host.endsWith(".lovable.dev");
-  if (!ALLOWED_RETURN_HOSTS.has(host) && !isLovable) {
+  if (!ALLOWED_RETURN_HOSTS.has(host) && !isLovable && !isLocal) {
     throw new Error("returnUrl host not allowed");
   }
   return raw;
