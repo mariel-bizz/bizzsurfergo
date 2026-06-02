@@ -268,8 +268,36 @@ function MarketTrendsPage() {
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(NEWS);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const { ids: bookmarks, toggle: toggleBookmark } = useBookmarks();
+
+  useEffect(() => {
+    let cancelled = false;
+    listMarketNews()
+      .then(({ items }) => {
+        if (cancelled || items.length === 0) return;
+        const mapped: NewsItem[] = items.map((item) => ({
+          id: item.slug,
+          source: item.source,
+          title: item.title,
+          summary: item.summary ?? "",
+          href: item.source_url,
+          date: item.published_at
+            ? new Date(item.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            : new Date(item.created_at).getFullYear().toString(),
+          category: (item.category as Exclude<Category, "All">) || "Operators",
+          image: item.image_url || "",
+        }));
+        setNewsItems(mapped);
+      })
+      .catch((err) => {
+        console.error("Failed to load market news:", err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
