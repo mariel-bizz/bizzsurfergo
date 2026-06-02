@@ -333,6 +333,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     }
   };
 
+  const onPickFiles = async (files: FileList | null) => {
     if (!files) return;
     const items: Attachment[] = [];
     for (const f of Array.from(files).slice(0, 4)) {
