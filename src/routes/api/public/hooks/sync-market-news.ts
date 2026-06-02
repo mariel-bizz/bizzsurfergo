@@ -1,17 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
+const CSV_URL =
+  "https://docs.google.com/spreadsheets/d/1hRxMtRQV4FR5ipU9jRFO_Z_YBfzV_PNLP_zHKwsTbx4/export?format=csv&gid=0";
+
 export const Route = createFileRoute("/api/public/hooks/sync-market-news")({
   server: {
     handlers: {
       POST: async () => {
-        const csvUrl = process.env.MARKET_NEWS_CSV_URL;
-        if (!csvUrl) {
-          return Response.json(
-            { ok: false, error: "MARKET_NEWS_CSV_URL not configured" },
-            { status: 503 }
-          );
-        }
+        const csvUrl = CSV_URL;
 
         let csvText: string;
         try {
