@@ -1,14 +1,35 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useGame } from "../AppShell";
 import { Button } from "@/components/ui/button";
-import { Send, Sparkles, ExternalLink, Settings2, Paperclip, X, Mail, Download, Zap, Sparkle } from "lucide-react";
+import {
+  Send,
+  Sparkles,
+  ExternalLink,
+  Settings2,
+  Paperclip,
+  X,
+  Mail,
+  Download,
+  Zap,
+  Sparkle,
+} from "lucide-react";
 import { toast } from "sonner";
-import { GoChatSetup, PROVIDER_META, type GoChatConfig, type Provider } from "@/components/chat/GoChatSetup";
+import {
+  GoChatSetup,
+  PROVIDER_META,
+  type GoChatConfig,
+  type Provider,
+} from "@/components/chat/GoChatSetup";
 import jsPDF from "jspdf";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import bizzsurferGoLogo from "@/assets/bizzsurfer-go-logo.png";
@@ -42,7 +63,9 @@ async function getLogoDataUrl(): Promise<string | null> {
       r.readAsDataURL(blob);
     });
     return logoDataUrl;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 type Attachment = { name: string; type: string; dataUrl: string };
@@ -65,29 +88,29 @@ const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bizzsurfer-c
 // Light normalisation only — KEEP markdown so we can render bold/lists/paragraphs.
 function cleanAnswer(text: string): string {
   return text
-    .replace(/^#{1,6}\s+/gm, "")          // drop markdown headings (we use paragraphs)
-    .replace(/^\s*[•]\s+/gm, "- ");       // normalise stray bullets to markdown lists
+    .replace(/^#{1,6}\s+/gm, "") // drop markdown headings (we use paragraphs)
+    .replace(/^\s*[•]\s+/gm, "- "); // normalise stray bullets to markdown lists
+}
+
+function buildInitialAssistant(cfg: GoChatConfig | null): string {
+  return cfg
+    ? `I'm **BizzSurfer Go!** — focused on **${cfg.departments.join(", ")}** in **${cfg.industries.join(", ")}**.\n\nAsk me anything, or pick a starter below.`
+    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation.\n\nAsk me anything, or pick a question below to get started.";
 }
 
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const game = useGame();
-  const [config, setConfig] = useState<GoChatConfig | null>(() => {
-    if (typeof window === "undefined") return null;
-    try {
-      const raw = window.localStorage.getItem(CONFIG_KEY);
-      return raw ? (JSON.parse(raw) as GoChatConfig) : null;
-    } catch { return null; }
-  });
-  const gemPersona = config?.provider === "gemini"
-    ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
-    : "";
+  const [config, setConfig] = useState<GoChatConfig | null>(null);
+  const gemPersona =
+    config?.provider === "gemini"
+      ? "You are the BizzSurfer Gem — a Gemini-powered Agentic AI transformation advisor for senior leaders. Mirror the tone and structure of a Google Gemini Gem: concise, structured, with crisp headings and bullets. Never tell the user to open Gemini, sign in to Google, or leave this app — you are the Gem, running here."
+      : "";
   const contextPreamble = config
     ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in short paragraphs separated by blank lines. Use markdown **bold** to highlight the key terms, metrics and frameworks. Use simple "-" bullets for short lists. Never use markdown headings.`
     : "";
-  const initialAssistant = config
-    ? `I'm **BizzSurfer Go!** — focused on **${config.departments.join(", ")}** in **${config.industries.join(", ")}**.\n\nAsk me anything, or pick a starter below.`
-    : "I'm **BizzSurfer Go!** — your Agentic AI advisor for business transformation.\n\nAsk me anything, or pick a question below to get started.";
-  const [messages, setMessages] = useState<Msg[]>([{ role: "assistant", content: initialAssistant }]);
+  const [messages, setMessages] = useState<Msg[]>(() => [
+    { role: "assistant", content: buildInitialAssistant(null) },
+  ]);
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -108,6 +131,24 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(CONFIG_KEY);
+      const saved = raw ? (JSON.parse(raw) as GoChatConfig) : null;
+      if (!saved) return;
+      setConfig(saved);
+      setMessages((prev) =>
+        prev.length === 1 &&
+        prev[0]?.role === "assistant" &&
+        prev[0]?.content === buildInitialAssistant(null)
+          ? [{ role: "assistant", content: buildInitialAssistant(saved) }]
+          : prev,
+      );
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
   // Load any prior session email to pre-fill the popup.
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -115,31 +156,47 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     });
   }, []);
 
-  useEffect(() => { if (seedPrompt) setInput(seedPrompt); }, [seedPrompt]);
+  useEffect(() => {
+    if (seedPrompt) setInput(seedPrompt);
+  }, [seedPrompt]);
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
 
   const saveConfig = (cfg: GoChatConfig) => {
-    try { window.localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); } catch { /* ignore */ }
+    try {
+      window.localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
+    } catch {
+      /* ignore */
+    }
     setConfig(cfg);
-    setMessages([{
-      role: "assistant",
-      content: `Locked in: ${PROVIDER_META.find(p => p.id === cfg.provider)?.name} for ${cfg.departments.join(", ")} in ${cfg.industries.join(", ")}. What's the first question on your board agenda?`,
-    }]);
+    setMessages([
+      {
+        role: "assistant",
+        content: `Locked in: ${PROVIDER_META.find((p) => p.id === cfg.provider)?.name} for ${cfg.departments.join(", ")} in ${cfg.industries.join(", ")}. What's the first question on your board agenda?`,
+      },
+    ]);
     setQuestionCount(0);
   };
 
   const switchProvider = (provider: Provider) => {
     if (!config) return;
     const next = { ...config, provider };
-    try { window.localStorage.setItem(CONFIG_KEY, JSON.stringify(next)); } catch { /* ignore */ }
+    try {
+      window.localStorage.setItem(CONFIG_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
     setConfig(next);
-    toast.success(`Switched to ${PROVIDER_META.find(p => p.id === provider)?.name}`);
+    toast.success(`Switched to ${PROVIDER_META.find((p) => p.id === provider)?.name}`);
   };
 
   const resetConfig = () => {
-    try { window.localStorage.removeItem(CONFIG_KEY); } catch { /* ignore */ }
+    try {
+      window.localStorage.removeItem(CONFIG_KEY);
+    } catch {
+      /* ignore */
+    }
     setConfig(null);
     setMessages([{ role: "assistant", content: "Let's reconfigure your BizzSurfer GO! chat." }]);
     setQuestionCount(0);
@@ -149,7 +206,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     if (!files) return;
     const items: Attachment[] = [];
     for (const f of Array.from(files).slice(0, 4)) {
-      if (f.size > 5 * 1024 * 1024) { toast.error(`${f.name} is over 5MB`); continue; }
+      if (f.size > 5 * 1024 * 1024) {
+        toast.error(`${f.name} is over 5MB`);
+        continue;
+      }
       const dataUrl: string = await new Promise((resolve, reject) => {
         const r = new FileReader();
         r.onload = () => resolve(r.result as string);
@@ -163,9 +223,16 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   const send = async (text: string) => {
     if ((!text.trim() && attachments.length === 0) || streaming) return;
-    if (questionCount >= QUESTION_LIMIT) { setEmailOpen(true); return; }
+    if (questionCount >= QUESTION_LIMIT) {
+      setEmailOpen(true);
+      return;
+    }
 
-    const userMsg: Msg = { role: "user", content: text, attachments: attachments.length ? attachments : undefined };
+    const userMsg: Msg = {
+      role: "user",
+      content: text,
+      attachments: attachments.length ? attachments : undefined,
+    };
     const next = [...messages, userMsg];
     setMessages(next);
     setInput("");
@@ -195,7 +262,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           assistantStarted = true;
           return [...prev, { role: "assistant" as const, content: cleanAnswer(acc) }];
         }
-        return prev.map((m, i) => i === prev.length - 1 ? { ...m, content: cleanAnswer(acc) } : m);
+        return prev.map((m, i) =>
+          i === prev.length - 1 ? { ...m, content: cleanAnswer(acc) } : m,
+        );
       });
     };
 
@@ -204,7 +273,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
       const apiMessages = next.map((m) => ({
         role: m.role,
         content: m.attachments?.length
-          ? `${m.content}\n\n[Attached files: ${m.attachments.map(a => a.name).join(", ")}]`
+          ? `${m.content}\n\n[Attached files: ${m.attachments.map((a) => a.name).join(", ")}]`
           : m.content,
       }));
 
@@ -215,14 +284,27 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify({
-          messages: contextPreamble ? [{ role: "system", content: contextPreamble }, ...apiMessages] : apiMessages,
+          messages: contextPreamble
+            ? [{ role: "system", content: contextPreamble }, ...apiMessages]
+            : apiMessages,
           provider: config?.provider ?? null,
-          language: typeof window !== "undefined" ? window.localStorage.getItem("bizzsurfer.lang") || "en" : "en",
+          language:
+            typeof window !== "undefined"
+              ? window.localStorage.getItem("bizzsurfer.lang") || "en"
+              : "en",
         }),
       });
 
-      if (resp.status === 429) { toast.error("Rate limit reached. Try again shortly."); setStreaming(false); return; }
-      if (resp.status === 402) { toast.error("AI credits exhausted. Add credits to continue."); setStreaming(false); return; }
+      if (resp.status === 429) {
+        toast.error("Rate limit reached. Try again shortly.");
+        setStreaming(false);
+        return;
+      }
+      if (resp.status === 402) {
+        toast.error("AI credits exhausted. Add credits to continue.");
+        setStreaming(false);
+        return;
+      }
       if (!resp.ok || !resp.body) throw new Error("Stream failed");
 
       const reader = resp.body.getReader();
@@ -240,7 +322,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           if (line.endsWith("\r")) line = line.slice(0, -1);
           if (!line.startsWith("data: ")) continue;
           const json = line.slice(6).trim();
-          if (json === "[DONE]") { done = true; break; }
+          if (json === "[DONE]") {
+            done = true;
+            break;
+          }
           try {
             const p = JSON.parse(json);
             const c = p.choices?.[0]?.delta?.content;
@@ -251,7 +336,6 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           }
         }
       }
-
     } catch (e) {
       console.error(e);
       toast.error("Couldn't reach BizzSurfer. Try again.");
@@ -267,7 +351,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     const lines: string[] = [];
     lines.push("BizzSurfer Go! — Conversation summary");
     if (config) {
-      lines.push(`Model: ${PROVIDER_META.find(p => p.id === config.provider)?.name}`);
+      lines.push(`Model: ${PROVIDER_META.find((p) => p.id === config.provider)?.name}`);
       lines.push(`Departments: ${config.departments.join(", ")}`);
       lines.push(`Industries: ${config.industries.join(", ")}`);
     }
@@ -298,7 +382,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     // Logo
     const logo = await getLogoDataUrl();
     if (logo) {
-      try { doc.addImage(logo, "PNG", margin, 22, 46, 46); } catch { /* ignore */ }
+      try {
+        doc.addImage(logo, "PNG", margin, 22, 46, 46);
+      } catch {
+        /* ignore */
+      }
     }
 
     // Wordmark
@@ -315,20 +403,26 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(20);
-    doc.text("Your conversation report", margin, y); y += 10;
+    doc.text("Your conversation report", margin, y);
+    y += 10;
     doc.setDrawColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
     doc.setLineWidth(2);
-    doc.line(margin, y, margin + 48, y); y += 24;
+    doc.line(margin, y, margin + 48, y);
+    y += 24;
 
     // Meta block
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-    doc.text(new Date().toLocaleString(), margin, y); y += 14;
+    doc.text(new Date().toLocaleString(), margin, y);
+    y += 14;
     if (config) {
-      doc.text(`Model: ${PROVIDER_META.find(p => p.id === config.provider)?.name}`, margin, y); y += 14;
-      doc.text(`Departments: ${config.departments.join(", ")}`, margin, y); y += 14;
-      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y); y += 22;
+      doc.text(`Model: ${PROVIDER_META.find((p) => p.id === config.provider)?.name}`, margin, y);
+      y += 14;
+      doc.text(`Departments: ${config.departments.join(", ")}`, margin, y);
+      y += 14;
+      doc.text(`Industries: ${config.industries.join(", ")}`, margin, y);
+      y += 22;
     }
 
     // Conversation
@@ -336,24 +430,35 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.setFontSize(11);
 
     messages.slice(1).forEach((m) => {
-      if (y > pageH - 40) { doc.addPage(); y = margin; }
+      if (y > pageH - 40) {
+        doc.addPage();
+        y = margin;
+      }
       doc.setFont("helvetica", "bold");
       doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
       doc.setFontSize(10);
-      doc.text(m.role === "user" ? "YOU" : "BIZZSURFER GO!", margin, y); y += 14;
+      doc.text(m.role === "user" ? "YOU" : "BIZZSURFER GO!", margin, y);
+      y += 14;
       doc.setFont("helvetica", "normal");
       doc.setTextColor(TEXT[0], TEXT[1], TEXT[2]);
       doc.setFontSize(11);
       const body = doc.splitTextToSize(m.content, width);
       body.forEach((l: string) => {
-        if (y > pageH) { doc.addPage(); y = margin; }
-        doc.text(l, margin, y); y += 15;
+        if (y > pageH) {
+          doc.addPage();
+          y = margin;
+        }
+        doc.text(l, margin, y);
+        y += 15;
       });
       y += 10;
     });
 
     // CTA card
-    if (y > pageH - 110) { doc.addPage(); y = margin; }
+    if (y > pageH - 110) {
+      doc.addPage();
+      y = margin;
+    }
     y += 10;
     doc.setFillColor(244, 248, 249);
     doc.roundedRect(margin, y, width, 90, 8, 8, "F");
@@ -364,11 +469,17 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     doc.setFont("helvetica", "normal");
     doc.setFontSize(10);
     doc.setTextColor(MUTED[0], MUTED[1], MUTED[2]);
-    doc.text("Upgrade to BizzSurfer Pro for unlimited questions, full reports,", margin + 14, y + 40);
+    doc.text(
+      "Upgrade to BizzSurfer Pro for unlimited questions, full reports,",
+      margin + 14,
+      y + 40,
+    );
     doc.text("upcoming events and a 1:1 demo call with our team.", margin + 14, y + 54);
     doc.setTextColor(PRIMARY[0], PRIMARY[1], PRIMARY[2]);
     doc.setFont("helvetica", "bold");
-    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, { url: "https://go.bizzsurfer.ai/pricing" });
+    doc.textWithLink("→ Book a demo call", margin + 14, y + 76, {
+      url: "https://go.bizzsurfer.ai/pricing",
+    });
 
     doc.save("bizzsurfer-go-summary.pdf");
     trackEvent("go_chat_pdf_downloaded", {
@@ -381,8 +492,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   // Step 1: validate + persist email to waitlist, then show inline confirmation.
   // Send the short-report summary email via the transactional queue.
   const sendSummaryEmail = async (recipientEmail: string) => {
-    const lastUser = [...messages].reverse().find(m => m.role === "user")?.content ?? "";
-    const lastAi = [...messages].reverse().find(m => m.role === "assistant")?.content ?? "";
+    const lastUser = [...messages].reverse().find((m) => m.role === "user")?.content ?? "";
+    const lastAi = [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
     const focus = config
       ? `${config.departments.join(", ")} in ${config.industries.join(", ")}`
       : "Your transformation focus";
@@ -432,9 +543,15 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         role: `go_chat · ${co} · ${config?.provider ?? ""} · ${industry}`,
       });
       if (error && error.code !== "23505") console.warn("waitlist insert:", error.message);
-    } catch (e) { /* non-blocking */ }
+    } catch (e) {
+      /* non-blocking */
+    }
 
-    trackEvent("go_chat_email_submitted", { email: cleanEmail, provider: config?.provider, company: co });
+    trackEvent("go_chat_email_submitted", {
+      email: cleanEmail,
+      provider: config?.provider,
+      company: co,
+    });
 
     // Auto-deliver the short PDF report by email.
     try {
@@ -457,7 +574,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   // Step 2a: trigger the in-browser PDF download.
   const handleDownloadPdf = async () => {
     trackEvent("go_chat_pdf_download_clicked", { email: submittedEmail });
-    try { await downloadPdf(); } catch (e) { console.error(e); }
+    try {
+      await downloadPdf();
+    } catch (e) {
+      console.error(e);
+    }
     toast.success("PDF downloaded.");
   };
 
@@ -468,7 +589,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     if (typeof window !== "undefined") window.location.assign("/pricing");
   };
 
-  const otherProviders = useMemo(() => PROVIDER_META.filter(p => p.id !== config?.provider), [config?.provider]);
+  const otherProviders = useMemo(
+    () => PROVIDER_META.filter((p) => p.id !== config?.provider),
+    [config?.provider],
+  );
 
   const creditsLeft = Math.max(0, QUESTION_LIMIT - questionCount);
 
@@ -478,13 +602,19 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         <div className="rounded-xl text-primary-foreground px-3 py-2 shadow-soft flex items-center gap-2 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
           <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
             {providerMeta ? (
-              <img src={providerMeta.logo} alt={providerMeta.name} className="w-4 h-4 object-contain" />
+              <img
+                src={providerMeta.logo}
+                alt={providerMeta.name}
+                className="w-4 h-4 object-contain"
+              />
             ) : (
               <Sparkles className="w-3.5 h-3.5" />
             )}
           </div>
           <div className="flex-1 min-w-0 leading-tight">
-            <p className="text-[9px] uppercase tracking-wider opacity-90 font-semibold">Agentic AI Advisor</p>
+            <p className="text-[9px] uppercase tracking-wider opacity-90 font-semibold">
+              Agentic AI Advisor
+            </p>
             <p className="text-xs font-bold truncate">
               BizzSurfer Go!{providerMeta ? ` · ${providerMeta.name}` : ""}
             </p>
@@ -508,7 +638,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           ) : (
             <a
               href="https://chatgpt.com/g/g-69f61861f0308191bdb780fd6adc5085-bizzsurfer"
-              target="_blank" rel="noreferrer"
+              target="_blank"
+              rel="noreferrer"
               className="rounded-md bg-white/20 backdrop-blur px-2 py-1 text-[10px] font-bold flex items-center gap-1 shrink-0"
             >
               GPT <ExternalLink className="w-3 h-3" />
@@ -548,17 +679,33 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-3 space-y-3 min-h-0">
             {messages.map((m, i) => (
-              <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
-                  m.role === "user"
-                    ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
-                    : "bg-card text-card-foreground border border-border rounded-bl-sm"
-                }`}>
+              <div
+                key={i}
+                className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-[88%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-card ${
+                    m.role === "user"
+                      ? "bg-gradient-primary text-primary-foreground rounded-br-sm"
+                      : "bg-card text-card-foreground border border-border rounded-bl-sm"
+                  }`}
+                >
                   {m.attachments?.length ? (
                     <div className="flex flex-wrap gap-1.5 mb-2">
-                      {m.attachments.map((a, j) => a.type.startsWith("image/")
-                        ? <img key={j} src={a.dataUrl} alt={a.name} className="w-16 h-16 rounded-lg object-cover" />
-                        : <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">{a.name}</span>)}
+                      {m.attachments.map((a, j) =>
+                        a.type.startsWith("image/") ? (
+                          <img
+                            key={j}
+                            src={a.dataUrl}
+                            alt={a.name}
+                            className="w-16 h-16 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">
+                            {a.name}
+                          </span>
+                        ),
+                      )}
                     </div>
                   ) : null}
                   <FormattedText text={m.content} isUser={m.role === "user"} />
@@ -568,7 +715,13 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             {streaming && messages[messages.length - 1]?.role === "user" && (
               <div className="flex justify-start">
                 <div className="bg-card border border-border rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1">
-                  {[0,1,2].map(i => <span key={i} className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" style={{ animationDelay: `${i*150}ms` }} />)}
+                  {[0, 1, 2].map((i) => (
+                    <span
+                      key={i}
+                      className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"
+                      style={{ animationDelay: `${i * 150}ms` }}
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -576,10 +729,16 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {messages.length <= 1 && (
             <div className="px-4 pb-2">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">Try a leader question</p>
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mb-2 px-1">
+                Try a leader question
+              </p>
               <div className="flex gap-2 overflow-x-auto pb-1 snap-x [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
                 {PRESETS.map((p) => (
-                  <button key={p} onClick={() => send(p)} className="snap-start shrink-0 max-w-[80%] text-left rounded-xl bg-accent text-accent-foreground px-3 py-2 text-xs font-medium border border-primary/20 hover:bg-accent/80 transition">
+                  <button
+                    key={p}
+                    onClick={() => send(p)}
+                    className="snap-start shrink-0 max-w-[80%] text-left rounded-xl bg-accent text-accent-foreground px-3 py-2 text-xs font-medium border border-primary/20 hover:bg-accent/80 transition"
+                  >
                     {p}
                   </button>
                 ))}
@@ -589,7 +748,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {questionCount >= QUESTION_LIMIT && (
             <div className="mx-4 mb-2 rounded-xl bg-accent/60 border border-primary/30 px-3 py-2 text-[11px] text-foreground flex items-center justify-between gap-2">
-              <span>You've used all {QUESTION_LIMIT} free credits. Unlock the full report by email.</span>
+              <span>
+                You've used all {QUESTION_LIMIT} free credits. Unlock the full report by email.
+              </span>
               <button
                 onClick={() => setEmailOpen(true)}
                 className="shrink-0 inline-flex items-center gap-1 rounded-full bg-gradient-primary text-primary-foreground px-2.5 py-1 text-[11px] font-bold"
@@ -602,12 +763,20 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           {attachments.length > 0 && (
             <div className="px-4 pb-1 flex gap-1.5 flex-wrap">
               {attachments.map((a, i) => (
-                <span key={i} className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-[11px]">
-                  {a.type.startsWith("image/")
-                    ? <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
-                    : <Paperclip className="w-3 h-3" />}
+                <span
+                  key={i}
+                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-[11px]"
+                >
+                  {a.type.startsWith("image/") ? (
+                    <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
+                  ) : (
+                    <Paperclip className="w-3 h-3" />
+                  )}
                   {a.name}
-                  <button onClick={() => setAttachments(prev => prev.filter((_, j) => j !== i))} aria-label="Remove">
+                  <button
+                    onClick={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
+                    aria-label="Remove"
+                  >
                     <X className="w-3 h-3" />
                   </button>
                 </span>
@@ -615,7 +784,13 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             </div>
           )}
 
-          <form onSubmit={(e) => { e.preventDefault(); send(input); }} className="px-4 pt-2 pb-3 bg-background border-t border-border">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              send(input);
+            }}
+            className="px-4 pt-2 pb-3 bg-background border-t border-border"
+          >
             <div className="flex items-center gap-2">
               <input
                 ref={fileRef}
@@ -623,7 +798,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 accept="image/*,.pdf,.txt,.csv,.doc,.docx"
                 multiple
                 hidden
-                onChange={(e) => { onPickFiles(e.target.files); e.target.value = ""; }}
+                onChange={(e) => {
+                  onPickFiles(e.target.files);
+                  e.target.value = "";
+                }}
               />
               <button
                 type="button"
@@ -638,11 +816,20 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={questionCount >= QUESTION_LIMIT ? "Get the PDF to continue…" : `Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`}
+                placeholder={
+                  questionCount >= QUESTION_LIMIT
+                    ? "Get the PDF to continue…"
+                    : `Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`
+                }
                 disabled={streaming || questionCount >= QUESTION_LIMIT}
                 className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
               />
-              <Button type="submit" size="icon" disabled={streaming || (!input.trim() && attachments.length === 0)} className="rounded-2xl w-12 h-12 bg-gradient-primary shadow-soft">
+              <Button
+                type="submit"
+                size="icon"
+                disabled={streaming || (!input.trim() && attachments.length === 0)}
+                className="rounded-2xl w-12 h-12 bg-gradient-primary shadow-soft"
+              >
                 <Send className="w-5 h-5" />
               </Button>
             </div>
@@ -655,7 +842,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         open={emailOpen}
         onOpenChange={(o) => {
           setEmailOpen(o);
-          if (!o) { setEmailSubmitted(false); setSubmittedEmail(""); }
+          if (!o) {
+            setEmailSubmitted(false);
+            setSubmittedEmail("");
+          }
         }}
       >
         <DialogContent className="max-w-sm">
@@ -675,41 +865,65 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             <>
               <div className="rounded-lg bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-orange-500/10 border border-primary/20 px-3 py-2 text-[11px] font-semibold text-foreground flex items-center gap-2">
                 <Sparkle className="w-3.5 h-3.5 text-primary" />
-                <span>Free plan: short executive report. <span className="text-primary">Upgrade</span> for the full report + benefits.</span>
+                <span>
+                  Free plan: short executive report. <span className="text-primary">Upgrade</span>{" "}
+                  for the full report + benefits.
+                </span>
               </div>
               <div className="space-y-2">
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <input
                       value={firstName}
-                      onChange={(e) => { setFirstName(e.target.value); if (firstNameError) setFirstNameError(null); }}
-                      onBlur={() => setFirstNameError(firstName.trim() ? null : "First name is required.")}
+                      onChange={(e) => {
+                        setFirstName(e.target.value);
+                        if (firstNameError) setFirstNameError(null);
+                      }}
+                      onBlur={() =>
+                        setFirstNameError(firstName.trim() ? null : "First name is required.")
+                      }
                       placeholder="First name"
                       autoComplete="given-name"
                       maxLength={80}
                       aria-invalid={!!firstNameError}
                       className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${firstNameError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
                     />
-                    {firstNameError && <p className="mt-1 text-[11px] font-semibold text-destructive">{firstNameError}</p>}
+                    {firstNameError && (
+                      <p className="mt-1 text-[11px] font-semibold text-destructive">
+                        {firstNameError}
+                      </p>
+                    )}
                   </div>
                   <div>
                     <input
                       value={lastName}
-                      onChange={(e) => { setLastName(e.target.value); if (lastNameError) setLastNameError(null); }}
-                      onBlur={() => setLastNameError(lastName.trim() ? null : "Last name is required.")}
+                      onChange={(e) => {
+                        setLastName(e.target.value);
+                        if (lastNameError) setLastNameError(null);
+                      }}
+                      onBlur={() =>
+                        setLastNameError(lastName.trim() ? null : "Last name is required.")
+                      }
                       placeholder="Last name (Surname)"
                       autoComplete="family-name"
                       maxLength={80}
                       aria-invalid={!!lastNameError}
                       className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${lastNameError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
                     />
-                    {lastNameError && <p className="mt-1 text-[11px] font-semibold text-destructive">{lastNameError}</p>}
+                    {lastNameError && (
+                      <p className="mt-1 text-[11px] font-semibold text-destructive">
+                        {lastNameError}
+                      </p>
+                    )}
                   </div>
                 </div>
                 <div>
                   <input
                     value={company}
-                    onChange={(e) => { setCompany(e.target.value); if (companyError) setCompanyError(null); }}
+                    onChange={(e) => {
+                      setCompany(e.target.value);
+                      if (companyError) setCompanyError(null);
+                    }}
                     onBlur={() => setCompanyError(company.trim() ? null : "Company is required.")}
                     placeholder="Company"
                     autoComplete="organization"
@@ -717,23 +931,35 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                     aria-invalid={!!companyError}
                     className={`w-full rounded-xl bg-muted border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 ${companyError ? "border-destructive ring-destructive/40 focus:ring-destructive/40" : "border-border focus:ring-primary/40"}`}
                   />
-                  {companyError && <p className="mt-1 text-[11px] font-semibold text-destructive">{companyError}</p>}
+                  {companyError && (
+                    <p className="mt-1 text-[11px] font-semibold text-destructive">
+                      {companyError}
+                    </p>
+                  )}
                 </div>
                 {config ? (
                   <div className="text-[11px] text-muted-foreground px-1">
-                    Industry: <span className="font-semibold text-foreground">{config.industries.join(", ")}</span>
+                    Industry:{" "}
+                    <span className="font-semibold text-foreground">
+                      {config.industries.join(", ")}
+                    </span>
                   </div>
                 ) : (
                   <p className="text-[11px] font-semibold text-destructive px-1">
                     Industry missing — open chat setup to pick an industry before sending.
                   </p>
                 )}
-                {industryError && <p className="text-[11px] font-semibold text-destructive px-1">{industryError}</p>}
+                {industryError && (
+                  <p className="text-[11px] font-semibold text-destructive px-1">{industryError}</p>
+                )}
                 <div>
                   <input
                     id="email-confirm"
                     value={emailValue}
-                    onChange={(e) => { setEmailValue(e.target.value); if (emailError) setEmailError(null); }}
+                    onChange={(e) => {
+                      setEmailValue(e.target.value);
+                      if (emailError) setEmailError(null);
+                    }}
                     onBlur={() => setEmailError(validateEmail(emailValue))}
                     type="email"
                     autoComplete="email"
@@ -762,7 +988,6 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 </Button>
               </DialogFooter>
             </>
-
           ) : (
             <>
               <div className="rounded-xl border border-primary/30 bg-accent/60 p-3 text-sm space-y-1.5">
@@ -771,7 +996,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   Sent to <span className="font-medium text-foreground">{submittedEmail}</span>.
                 </p>
                 <p className="text-[12px] text-foreground pt-1">
-                  💎 <span className="font-bold">Upgrade</span> to unlock the <span className="font-bold">full report</span>, unlimited credits, events &amp; a 1:1 demo.
+                  💎 <span className="font-bold">Upgrade</span> to unlock the{" "}
+                  <span className="font-bold">full report</span>, unlimited credits, events &amp; a
+                  1:1 demo.
                 </p>
               </div>
               <DialogFooter className="gap-2 flex-col sm:flex-row">

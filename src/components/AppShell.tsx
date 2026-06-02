@@ -70,22 +70,23 @@ export function useGameStateInternal(): Game {
     if (typeof window === "undefined") return;
     try {
       const raw = localStorage.getItem(STORAGE);
-      const parsed: GameState = raw
-        ? { ...defaultState, ...JSON.parse(raw) }
-        : defaultState;
+      const parsed: GameState = raw ? { ...defaultState, ...JSON.parse(raw) } : defaultState;
       parsed.onboarding = normalizeOnboarding(parsed.onboarding);
       const today = new Date().toDateString();
       if (parsed.lastVisit !== today) {
         const yesterday = new Date(Date.now() - 86400000).toDateString();
         const newStreak = parsed.lastVisit === yesterday ? parsed.streak + 1 : 1;
         const newState = { ...parsed, streak: newStreak, lastVisit: today, xp: parsed.xp + 10 };
-        if (newStreak >= 3 && !newState.badges.includes("Consistency")) newState.badges.push("Consistency");
+        if (newStreak >= 3 && !newState.badges.includes("Consistency"))
+          newState.badges.push("Consistency");
         setState(newState);
         localStorage.setItem(STORAGE, JSON.stringify(newState));
       } else {
         setState(parsed);
       }
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const update = (partial: Partial<GameState> | ((s: GameState) => GameState)) => {
@@ -109,7 +110,10 @@ export function useGameStateInternal(): Game {
         if (!badges.includes("Launch Crew")) badges.push("Launch Crew");
         trackEvent("onboarding_completed", {});
         // Defer toast so it doesn't fire during render
-        setTimeout(() => toast.success("Onboarding complete! +100 XP · Launch Crew badge unlocked"), 0);
+        setTimeout(
+          () => toast.success("Onboarding complete! +100 XP · Launch Crew badge unlocked"),
+          0,
+        );
       } else {
         setTimeout(() => toast.success("+25 XP · Step complete"), 0);
       }
@@ -121,7 +125,9 @@ export function useGameStateInternal(): Game {
         onboarding: {
           ...prev.onboarding,
           steps,
-          completedAt: allDone ? (prev.onboarding.completedAt ?? new Date().toISOString()) : prev.onboarding.completedAt,
+          completedAt: allDone
+            ? (prev.onboarding.completedAt ?? new Date().toISOString())
+            : prev.onboarding.completedAt,
         },
       };
       if (typeof window !== "undefined") localStorage.setItem(STORAGE, JSON.stringify(next));
@@ -129,12 +135,13 @@ export function useGameStateInternal(): Game {
     });
   };
 
-  const dismissOnboarding = () => update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: true } }));
-  const reopenOnboarding = () => update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: false } }));
+  const dismissOnboarding = () =>
+    update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: true } }));
+  const reopenOnboarding = () =>
+    update((s) => ({ ...s, onboarding: { ...s.onboarding, dismissed: false } }));
 
   return { state, update, completeOnboardingStep, dismissOnboarding, reopenOnboarding };
 }
-
 
 const GameContext = createContext<Game | null>(null);
 
@@ -188,7 +195,9 @@ export function AppShell() {
           language: (navigator.language || "en").slice(0, 16),
           user_id: data.user?.id ?? null,
         });
-      } catch { /* non-blocking */ }
+      } catch {
+        /* non-blocking */
+      }
     })();
   }, [location.pathname]);
 
@@ -199,22 +208,26 @@ export function AppShell() {
 
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
-          <div className="mx-auto max-w-md flex items-center justify-between gap-2 px-3 sm:px-4 py-2">
-            <div className="flex items-center min-w-0 flex-shrink">
+          <div className="mx-auto flex w-full max-w-md items-center justify-between gap-2 px-3 py-2 sm:max-w-2xl sm:px-4 md:max-w-4xl lg:max-w-5xl">
+            <div className="flex min-w-0 flex-1 items-center overflow-hidden">
               <img
                 src={headerLogo}
                 alt="BizzSurfer Go!"
-                className="h-10 xs:h-11 sm:h-12 md:h-14 lg:h-16 w-auto max-w-[180px] xs:max-w-[220px] sm:max-w-[320px] md:max-w-[420px] lg:max-w-[520px] object-contain shrink-0"
+                className="h-9 w-auto max-w-full object-contain xs:h-10 sm:h-11 md:h-12 lg:h-14"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
                 <span className="text-xs">🔥</span>
-                <span className="text-xs font-bold text-accent-foreground">{game.state.streak}</span>
+                <span className="text-xs font-bold text-accent-foreground">
+                  {game.state.streak}
+                </span>
               </div>
               <div className="flex items-center gap-1 rounded-full bg-gradient-primary px-2.5 py-1 shadow-soft">
                 <span className="text-xs">⚡</span>
-                <span className="text-xs font-bold text-primary-foreground">{game.state.xp} XP</span>
+                <span className="text-xs font-bold text-primary-foreground">
+                  {game.state.xp} XP
+                </span>
               </div>
             </div>
           </div>
