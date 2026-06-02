@@ -23,6 +23,7 @@ import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import marketTrendsBanner from "@/assets/market-trends-banner.png";
+import { listMarketNews } from "@/lib/market-news.functions";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
