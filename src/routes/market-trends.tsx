@@ -12,6 +12,7 @@ import {
   Mail,
   Newspaper,
   Search,
+  Share2,
   TrendingUp,
   X,
 } from "lucide-react";
@@ -480,28 +481,56 @@ function MarketTrendsPage() {
                         {item.source}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        toggleBookmark(item.id);
-                      }}
-                      aria-label={saved ? "Remove from saved" : "Save for later"}
-                      aria-pressed={saved}
-                      className={
-                        "absolute right-2 top-2 rounded-full p-1.5 backdrop-blur transition-colors " +
-                        (saved
-                          ? "bg-[#ff6f00] text-white hover:bg-[#ff6f00]/90"
-                          : "bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground")
-                      }
-                    >
-                      {saved ? (
-                        <BookmarkCheck className="w-4 h-4" />
-                      ) : (
-                        <Bookmark className="w-4 h-4" />
-                      )}
-                    </button>
+                    <div className="absolute right-2 top-2 flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          const url = `https://go.bizzsurfer.ai/bizzsurfer-news/${item.id}`;
+                          const doCopy = () => {
+                            navigator.clipboard
+                              ?.writeText(url)
+                              .then(() => toast.success("BizzSurfer link copied to clipboard"))
+                              .catch(() => toast.error("Couldn't copy link"));
+                          };
+                          if (typeof navigator !== "undefined" && (navigator as Navigator & { share?: (d: ShareData) => Promise<void> }).share) {
+                            (navigator as Navigator & { share: (d: ShareData) => Promise<void> })
+                              .share({ title: item.title, text: item.summary, url })
+                              .catch(() => doCopy());
+                          } else {
+                            doCopy();
+                          }
+                          trackEvent("market_trends_share", { id: item.id, url });
+                        }}
+                        aria-label="Share BizzSurfer link"
+                        className="rounded-full p-1.5 backdrop-blur transition-colors bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground"
+                      >
+                        <Share2 className="w-4 h-4" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          toggleBookmark(item.id);
+                        }}
+                        aria-label={saved ? "Remove from saved" : "Save for later"}
+                        aria-pressed={saved}
+                        className={
+                          "rounded-full p-1.5 backdrop-blur transition-colors " +
+                          (saved
+                            ? "bg-[#ff6f00] text-white hover:bg-[#ff6f00]/90"
+                            : "bg-background/80 text-muted-foreground hover:bg-background hover:text-foreground")
+                        }
+                      >
+                        {saved ? (
+                          <BookmarkCheck className="w-4 h-4" />
+                        ) : (
+                          <Bookmark className="w-4 h-4" />
+                        )}
+                      </button>
+                    </div>
                   </div>
                   <div className="p-4">
                     <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-widest text-primary">
