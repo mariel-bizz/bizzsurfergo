@@ -23,6 +23,7 @@ import { trackEvent } from "@/lib/analytics";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import marketTrendsBanner from "@/assets/market-trends-banner.png";
+import { listMarketNews } from "@/lib/market-news.functions";
 
 const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -267,12 +268,40 @@ function MarketTrendsPage() {
   const [showSavedOnly, setShowSavedOnly] = useState(false);
   const [visible, setVisible] = useState(PAGE_SIZE);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [newsItems, setNewsItems] = useState<NewsItem[]>(NEWS);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const { ids: bookmarks, toggle: toggleBookmark } = useBookmarks();
 
+  useEffect(() => {
+    let cancelled = false;
+    listMarketNews()
+      .then(({ items }) => {
+        if (cancelled || items.length === 0) return;
+        const mapped: NewsItem[] = items.map((item) => ({
+          id: item.slug,
+          source: item.source,
+          title: item.title,
+          summary: item.summary ?? "",
+          href: item.source_url,
+          date: item.published_at
+            ? new Date(item.published_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+            : new Date(item.created_at).getFullYear().toString(),
+          category: (item.category as Exclude<Category, "All">) || "Operators",
+          image: item.image_url || "",
+        }));
+        setNewsItems(mapped);
+      })
+      .catch((err) => {
+        console.error("Failed to load market news:", err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    return NEWS.filter((item) => {
+    return newsItems.filter((item) => {
       if (showSavedOnly && !bookmarks.has(item.id)) return false;
       if (category !== "All" && item.category !== category) return false;
       if (!q) return true;
@@ -282,7 +311,7 @@ function MarketTrendsPage() {
         item.source.toLowerCase().includes(q)
       );
     });
-  }, [query, category, showSavedOnly, bookmarks]);
+  }, [query, category, showSavedOnly, bookmarks, newsItems]);
 
   // Reset paging when filters change
   useEffect(() => {

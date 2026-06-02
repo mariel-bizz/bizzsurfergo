@@ -43,6 +43,7 @@ import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminMarketplaceApplicationsRouteImport } from './routes/admin.marketplace-applications'
+import { Route as AdminMarketNewsRouteImport } from './routes/admin.market-news'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
 import { Route as AdminDigestSubscribersRouteImport } from './routes/admin.digest-subscribers'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
@@ -56,6 +57,7 @@ import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/e
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
+import { Route as ApiPublicHooksSyncMarketNewsRouteImport } from './routes/api/public/hooks/sync-market-news'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
 import { Route as ApiPublicChatEmailSummaryRouteImport } from './routes/api/public/chat/email-summary'
@@ -231,6 +233,11 @@ const AdminMarketplaceApplicationsRoute =
     path: '/admin/marketplace-applications',
     getParentRoute: () => rootRouteImport,
   } as any)
+const AdminMarketNewsRoute = AdminMarketNewsRouteImport.update({
+  id: '/admin/market-news',
+  path: '/admin/market-news',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   id: '/admin/insights-comments',
   path: '/admin/insights-comments',
@@ -301,6 +308,12 @@ const ApiPublicPaymentsWebhookRoute =
     path: '/api/public/payments/webhook',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSyncMarketNewsRoute =
+  ApiPublicHooksSyncMarketNewsRouteImport.update({
+    id: '/api/public/hooks/sync-market-news',
+    path: '/api/public/hooks/sync-market-news',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksIframeAlertCheckRoute =
   ApiPublicHooksIframeAlertCheckRouteImport.update({
     id: '/api/public/hooks/iframe-alert-check',
@@ -345,6 +358,7 @@ export interface FileRoutesByFullPath {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -365,6 +379,7 @@ export interface FileRoutesByFullPath {
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -397,6 +412,7 @@ export interface FileRoutesByTo {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -417,6 +433,7 @@ export interface FileRoutesByTo {
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -450,6 +467,7 @@ export interface FileRoutesById {
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
+  '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
@@ -470,6 +488,7 @@ export interface FileRoutesById {
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -504,6 +523,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/market-news'
     | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
@@ -524,6 +544,7 @@ export interface FileRouteTypes {
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -556,6 +577,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/market-news'
     | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
@@ -576,6 +598,7 @@ export interface FileRouteTypes {
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -608,6 +631,7 @@ export interface FileRouteTypes {
     | '/admin/analytics'
     | '/admin/digest-subscribers'
     | '/admin/insights-comments'
+    | '/admin/market-news'
     | '/admin/marketplace-applications'
     | '/admin/sales'
     | '/admin/seo'
@@ -628,6 +652,7 @@ export interface FileRouteTypes {
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -661,6 +686,7 @@ export interface RootRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminDigestSubscribersRoute: typeof AdminDigestSubscribersRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
+  AdminMarketNewsRoute: typeof AdminMarketNewsRoute
   AdminMarketplaceApplicationsRoute: typeof AdminMarketplaceApplicationsRoute
   AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
@@ -681,6 +707,7 @@ export interface RootRouteChildren {
   ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
+  ApiPublicHooksSyncMarketNewsRoute: typeof ApiPublicHooksSyncMarketNewsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -929,6 +956,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminMarketplaceApplicationsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/market-news': {
+      id: '/admin/market-news'
+      path: '/admin/market-news'
+      fullPath: '/admin/market-news'
+      preLoaderRoute: typeof AdminMarketNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/insights-comments': {
       id: '/admin/insights-comments'
       path: '/admin/insights-comments'
@@ -1020,6 +1054,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicPaymentsWebhookRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/sync-market-news': {
+      id: '/api/public/hooks/sync-market-news'
+      path: '/api/public/hooks/sync-market-news'
+      fullPath: '/api/public/hooks/sync-market-news'
+      preLoaderRoute: typeof ApiPublicHooksSyncMarketNewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/iframe-alert-check': {
       id: '/api/public/hooks/iframe-alert-check'
       path: '/api/public/hooks/iframe-alert-check'
@@ -1069,6 +1110,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminDigestSubscribersRoute: AdminDigestSubscribersRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
+  AdminMarketNewsRoute: AdminMarketNewsRoute,
   AdminMarketplaceApplicationsRoute: AdminMarketplaceApplicationsRoute,
   AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
@@ -1089,6 +1131,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
+  ApiPublicHooksSyncMarketNewsRoute: ApiPublicHooksSyncMarketNewsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
@@ -1099,3 +1142,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
