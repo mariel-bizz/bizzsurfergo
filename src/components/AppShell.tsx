@@ -199,15 +199,15 @@ export function AppShell() {
 
         {/* Top bar */}
         <header className="sticky top-0 z-30 bg-background/85 backdrop-blur-xl border-b border-border">
-          <div className="mx-auto max-w-md flex items-center justify-between gap-2 px-3 sm:px-4 py-2">
-            <div className="flex items-center min-w-0 flex-shrink">
+          <div className="mx-auto flex w-full max-w-md items-center justify-between gap-2 px-3 py-2 sm:max-w-2xl sm:px-4 md:max-w-4xl lg:max-w-5xl">
+            <div className="flex min-w-0 flex-1 items-center overflow-hidden">
               <img
                 src={headerLogo}
                 alt="BizzSurfer Go!"
-                className="h-10 xs:h-11 sm:h-12 md:h-14 lg:h-16 w-auto max-w-[180px] xs:max-w-[220px] sm:max-w-[320px] md:max-w-[420px] lg:max-w-[520px] object-contain shrink-0"
+                className="h-9 w-auto max-w-full object-contain xs:h-10 sm:h-11 md:h-12 lg:h-14"
               />
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
               <div className="flex items-center gap-1 rounded-full bg-accent px-2.5 py-1">
                 <span className="text-xs">🔥</span>
                 <span className="text-xs font-bold text-accent-foreground">{game.state.streak}</span>
