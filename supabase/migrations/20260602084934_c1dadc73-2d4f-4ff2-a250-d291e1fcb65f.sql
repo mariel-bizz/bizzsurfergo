@@ -1,0 +1,1 @@
+ALTER TABLE public.market_news ADD COLUMN IF NOT EXISTS body text;
