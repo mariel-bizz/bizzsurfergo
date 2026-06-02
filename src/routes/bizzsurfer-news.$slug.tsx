@@ -197,7 +197,7 @@ function BizzSurferNewsPage() {
       .filter(Boolean);
   }, [bodyQuery.data]);
 
-  const PREVIEW_COUNT = 3;
+  const PREVIEW_COUNT = 2;
   const previewParagraphs = paragraphs.slice(0, PREVIEW_COUNT);
   const gatedParagraphs = paragraphs.slice(PREVIEW_COUNT);
 
@@ -406,7 +406,7 @@ function PaywallOverlay({
             <Button
               type="button"
               onClick={onUnlock}
-              className="mt-4 w-full bg-[#ff6f00] text-white hover:bg-[#e85f00]"
+              className="mt-4 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-[#ff6f00] text-white hover:opacity-90 transition-opacity"
             >
               <Heart className="w-4 h-4 mr-1.5" />
               Unlock for €1 — donate &amp; read
