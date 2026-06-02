@@ -30,9 +30,29 @@ type SyncResult = {
   errors: string[];
 };
 
+type RecentItem = { id: string; title: string; slug: string; source: string; published_at: string | null; category: string };
+
 function MarketNewsAdminPage() {
   const [syncing, setSyncing] = useState(false);
   const [lastResult, setLastResult] = useState<SyncResult | null>(null);
+  const [total, setTotal] = useState<number | null>(null);
+  const [recent, setRecent] = useState<RecentItem[]>([]);
+
+  const loadStats = useCallback(async () => {
+    const { count } = await supabase
+      .from("market_news")
+      .select("id", { count: "exact", head: true });
+    setTotal(count ?? 0);
+    const { data } = await supabase
+      .from("market_news")
+      .select("id,title,slug,source,published_at,category")
+      .order("published_at", { ascending: false, nullsFirst: false })
+      .order("created_at", { ascending: false })
+      .limit(10);
+    setRecent((data ?? []) as RecentItem[]);
+  }, []);
+
+  useEffect(() => { loadStats(); }, [loadStats]);
 
   const triggerSync = async () => {
     setSyncing(true);
@@ -57,6 +77,7 @@ function MarketNewsAdminPage() {
         toast.success("Sync completed", {
           description: `${result.inserted} inserted, ${result.updated} updated, ${result.skipped} skipped`,
         });
+        loadStats();
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : "Unknown error";
