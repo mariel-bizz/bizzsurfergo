@@ -294,16 +294,18 @@ function BizzSurferNewsPage() {
         )}
       </div>
 
-      {/* Hero image with BizzSurfer watermark */}
-      <div className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-card">
+      {/* Hero image with BizzSurfer watermark + loading skeleton + offline fallback */}
+      <div className="relative mt-6 overflow-hidden rounded-2xl border border-border bg-card aspect-[16/9]">
+        {imgState === "loading" && (
+          <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+        )}
         <img
-          src={heroImage}
+          src={imgState === "fallback" ? INLINE_FALLBACK : heroImage}
           alt={item.title}
-          className="w-full h-auto object-cover"
+          className={`w-full h-full object-cover transition-opacity duration-300 ${imgState === "loading" ? "opacity-0" : "opacity-100"}`}
           loading="lazy"
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = newsDefault;
-          }}
+          onLoad={() => setImgState((s) => (s === "fallback" ? "fallback" : "loaded"))}
+          onError={() => setImgState("fallback")}
         />
         <img
           src={bizzsurferLogo}
@@ -312,6 +314,18 @@ function BizzSurferNewsPage() {
           className="pointer-events-none absolute left-3 top-3 h-9 w-auto rounded-md bg-white/85 px-2 py-1 shadow-sm backdrop-blur-sm"
         />
       </div>
+
+      {/* Body */}
+      <div className="mt-8 space-y-5">
+        {bodyQuery.isLoading && (
+          <div className="space-y-3" aria-label="Loading article">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-10/12" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-9/12" />
+          </div>
+        )}
 
       {item.summary && (
         <p className="mt-6 text-base leading-relaxed text-foreground font-medium">
