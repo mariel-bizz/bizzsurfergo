@@ -224,7 +224,115 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setQuestionCount(0);
   };
 
-  const onPickFiles = async (files: FileList | null) => {
+  const PROJECTS_KEY = "bizzsurfer.chat.projects";
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(PROJECTS_KEY);
+      if (raw) setSavedProjects(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const saveProjectsList = (
+    list: Array<{ id: string; name: string; messages: Msg[]; savedAt: string }>,
+  ) => {
+    setSavedProjects(list);
+    try {
+      window.localStorage.setItem(PROJECTS_KEY, JSON.stringify(list));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const saveCurrentAsProject = () => {
+    const name = window.prompt("Name this project");
+    if (!name?.trim()) return;
+    const entry = {
+      id: crypto.randomUUID(),
+      name: name.trim(),
+      messages,
+      savedAt: new Date().toISOString(),
+    };
+    saveProjectsList([entry, ...savedProjects].slice(0, 20));
+    toast.success(`Saved project "${entry.name}"`);
+  };
+
+  const loadProject = (id: string) => {
+    const p = savedProjects.find((x) => x.id === id);
+    if (!p) return;
+    setMessages(p.messages);
+    setProjectsDialogOpen(false);
+    toast.success(`Loaded "${p.name}"`);
+  };
+
+  const deleteProject = (id: string) => {
+    saveProjectsList(savedProjects.filter((p) => p.id !== id));
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      recordedChunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
+        if (blob.size > 5 * 1024 * 1024) {
+          toast.error("Recording over 5MB");
+          return;
+        }
+        const dataUrl: string = await new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result as string);
+          r.onerror = reject;
+          r.readAsDataURL(blob);
+        });
+        setAttachments((prev) =>
+          [
+            ...prev,
+            { name: `recording-${Date.now()}.webm`, type: "audio/webm", dataUrl },
+          ].slice(0, 4),
+        );
+      };
+      rec.start();
+      recorderRef.current = rec;
+      setRecording(true);
+    } catch {
+      toast.error("Microphone access denied");
+    }
+  };
+
+  const stopRecording = () => {
+    recorderRef.current?.stop();
+    recorderRef.current = null;
+    setRecording(false);
+  };
+
+  const runImageGen = async () => {
+    if (!imagePrompt.trim() || generatingImage) return;
+    setGeneratingImage(true);
+    try {
+      const { dataUrl } = await generateImageFn({ data: { prompt: imagePrompt.trim() } });
+      setAttachments((prev) =>
+        [
+          ...prev,
+          { name: `image-${Date.now()}.png`, type: "image/png", dataUrl },
+        ].slice(0, 4),
+      );
+      setImageDialogOpen(false);
+      setImagePrompt("");
+      toast.success("Image attached");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Image generation failed");
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
     if (!files) return;
     const items: Attachment[] = [];
     for (const f of Array.from(files).slice(0, 4)) {
