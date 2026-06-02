@@ -43,7 +43,13 @@ export function VideoContent() {
       </Card>
 
       {others.length > 0 && (
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div
+          className={
+            others.length === 1
+              ? "mt-4 grid gap-3"
+              : "mt-4 grid gap-3 sm:grid-cols-2"
+          }
+        >
           {others.map((v) => (
             <Card key={v.id} className="overflow-hidden">
               <div className="bg-black">
@@ -53,7 +59,7 @@ export function VideoContent() {
                   controls
                   playsInline
                   preload="metadata"
-                  className="aspect-video w-full"
+                  className="aspect-video w-full object-cover"
                 />
               </div>
               <CardContent className="space-y-1.5 p-4">

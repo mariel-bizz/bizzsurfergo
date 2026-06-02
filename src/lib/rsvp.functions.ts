@@ -2,7 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
-import { events as eventsList, eventDate } from "@/lib/events-data";
+import { events as eventsList, eventDate, eventLink } from "@/lib/events-data";
 import {
   createCalendarEventWithMeet,
   addAttendeeToEvent,
@@ -39,14 +39,17 @@ async function ensureMeetForEvent(eventId: number): Promise<{
   if (!event) throw new Error("Event not found");
   const startISO = eventDate(event).toISOString();
   const endISO = endISOFor(startISO);
+  const publicUrl = eventLink(event);
   const created = await createCalendarEventWithMeet({
     calendarId: CALENDAR_ID,
     summary: event.title,
-    description: `${event.subtitle}\n\nSpeaker: ${event.speaker}\nAudience: ${event.audience}`,
+    description: `${event.subtitle}\n\nSpeaker: ${event.speaker}\nAudience: ${event.audience}\n\nEvent page: ${publicUrl}`,
     location: event.location,
     startISO,
     endISO,
     timeZone: "Europe/Paris",
+    sourceUrl: publicUrl,
+    sourceTitle: event.title,
   });
   const meet_link = extractMeetLink(created) ?? null;
   const html_link = created.htmlLink ?? null;
