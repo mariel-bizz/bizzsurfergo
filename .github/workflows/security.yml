@@ -188,7 +188,12 @@ jobs:
           node-version: "20"
           cache: npm
       - name: Install dependencies (npm, for lockfile-based SBOM)
-        run: npm ci --no-audit --no-fund --ignore-scripts
+        # Refresh the npm lockfile from package.json so the SBOM step always
+        # has a coherent tree to walk, even when the repo is primarily managed
+        # with Bun and package-lock.json may have drifted.
+        run: |
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund --legacy-peer-deps
+          npm install --ignore-scripts --no-audit --no-fund --legacy-peer-deps
       - name: Generate CycloneDX SBOM (JSON + XML)
         run: |
           mkdir -p sbom
