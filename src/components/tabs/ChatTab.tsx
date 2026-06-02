@@ -1045,6 +1045,79 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         </>
       )}
 
+      {/* Create image dialog */}
+      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Create an image</DialogTitle>
+            <DialogDescription>
+              Describe the image you want. It will be attached to your next message.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={imagePrompt}
+            onChange={(e) => setImagePrompt(e.target.value)}
+            placeholder="e.g. A boardroom diagram showing agentic AI handoffs"
+            className="w-full min-h-[100px] rounded-lg border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setImageDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={runImageGen}
+              disabled={!imagePrompt.trim() || generatingImage}
+              className="bg-gradient-primary"
+            >
+              {generatingImage ? "Generating…" : "Generate"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Projects dialog */}
+      <Dialog open={projectsDialogOpen} onOpenChange={setProjectsDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>My projects</DialogTitle>
+            <DialogDescription>
+              Saved conversations stored on this device.
+            </DialogDescription>
+          </DialogHeader>
+          {savedProjects.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              No saved projects yet. Use “Save as project” from the + menu.
+            </p>
+          ) : (
+            <ul className="space-y-1 max-h-72 overflow-y-auto">
+              {savedProjects.map((p) => (
+                <li
+                  key={p.id}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                >
+                  <button
+                    onClick={() => loadProject(p.id)}
+                    className="flex-1 text-left"
+                  >
+                    <div className="text-sm font-medium">{p.name}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {new Date(p.savedAt).toLocaleString()} · {p.messages.length} msgs
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => deleteProject(p.id)}
+                    aria-label="Delete"
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </DialogContent>
+      </Dialog>
+
       {/* Email capture popup after 2 questions */}
       <Dialog
         open={emailOpen}
