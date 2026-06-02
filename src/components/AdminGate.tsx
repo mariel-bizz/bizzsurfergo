@@ -8,7 +8,20 @@ type State =
   | { kind: "loading" }
   | { kind: "anonymous" }
   | { kind: "forbidden"; email: string }
+  | { kind: "error"; message: string }
   | { kind: "authorized" };
+
+async function withTimeout<T>(promise: Promise<T>, message: string, ms = 8000) {
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<never>((_, reject) => {
+    timeoutId = setTimeout(() => reject(new Error(message)), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
+}
 
 export function AdminGate({ children }: { children: ReactNode }) {
   const [state, setState] = useState<State>({ kind: "loading" });
@@ -17,21 +30,39 @@ export function AdminGate({ children }: { children: ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     const check = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (cancelled) return;
-      if (!session?.user) {
-        setState({ kind: "anonymous" });
-        return;
-      }
-      const { data, error } = await supabase.rpc("has_role", {
-        _user_id: session.user.id,
-        _role: "admin",
-      });
-      if (cancelled) return;
-      if (error || !data) {
-        setState({ kind: "forbidden", email: session.user.email ?? "" });
-      } else {
-        setState({ kind: "authorized" });
+      setState({ kind: "loading" });
+      try {
+        const { data: { session } } = await withTimeout(
+          supabase.auth.getSession(),
+          "The sign-in check timed out. Refresh the page or sign in again.",
+        );
+        if (cancelled) return;
+        if (!session?.user) {
+          setState({ kind: "anonymous" });
+          return;
+        }
+        const { data, error } = await withTimeout(
+          supabase.rpc("has_role", {
+            _user_id: session.user.id,
+            _role: "admin",
+          }),
+          "The admin permission check timed out. Please try again.",
+        );
+        if (cancelled) return;
+        if (error) {
+          setState({ kind: "error", message: error.message });
+        } else if (!data) {
+          setState({ kind: "forbidden", email: session.user.email ?? "" });
+        } else {
+          setState({ kind: "authorized" });
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setState({
+            kind: "error",
+            message: error instanceof Error ? error.message : "Unable to check admin access.",
+          });
+        }
       }
     };
     check();
