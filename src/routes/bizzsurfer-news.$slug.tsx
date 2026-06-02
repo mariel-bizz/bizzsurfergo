@@ -325,11 +325,12 @@ function BizzSurferNewsPage() {
       {/* Body */}
       <div className="mt-8 space-y-5">
         {bodyQuery.isLoading && (
-          <div className="space-y-3">
-            <div className="h-4 rounded bg-muted animate-pulse" />
-            <div className="h-4 rounded bg-muted animate-pulse w-11/12" />
-            <div className="h-4 rounded bg-muted animate-pulse w-10/12" />
-            <div className="h-4 rounded bg-muted animate-pulse w-11/12" />
+          <div className="space-y-3" aria-label="Loading article">
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-10/12" />
+            <Skeleton className="h-4 w-11/12" />
+            <Skeleton className="h-4 w-9/12" />
           </div>
         )}
 
