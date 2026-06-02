@@ -12,6 +12,7 @@ import {
   Mail,
   Newspaper,
   Search,
+  Share2,
   TrendingUp,
   X,
 } from "lucide-react";
