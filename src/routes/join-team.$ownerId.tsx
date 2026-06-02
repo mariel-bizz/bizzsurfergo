@@ -1,4 +1,10 @@
-import { createFileRoute, Link, useNavigate, useParams } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  Link,
+  useNavigate,
+  useParams,
+  useSearch,
+} from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,15 +13,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { requestTeamJoin } from "@/lib/team-join.functions";
 import { toast } from "sonner";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export const Route = createFileRoute("/join-team/$ownerId")({
   head: () => ({
     meta: [{ title: "Join team" }, { name: "robots", content: "noindex, nofollow" }],
+  }),
+  validateSearch: (s: Record<string, unknown>): { token?: string } => ({
+    token:
+      typeof s.token === "string" && UUID_RE.test(s.token) ? s.token : undefined,
   }),
   component: JoinTeamPage,
 });
 
 function JoinTeamPage() {
   const { ownerId } = useParams({ from: "/join-team/$ownerId" });
+  const { token } = useSearch({ from: "/join-team/$ownerId" });
   const navigate = useNavigate();
   const join = useServerFn(requestTeamJoin);
   const [authed, setAuthed] = useState<boolean | null>(null);
@@ -30,10 +43,14 @@ function JoinTeamPage() {
   }, []);
 
   const onJoin = async () => {
+    if (!token) {
+      setError("This team link is missing its invite token.");
+      return;
+    }
     setWorking(true);
     setError(null);
     try {
-      await join({ data: { owner_id: ownerId } });
+      await join({ data: { owner_id: ownerId, invite_token: token } });
       setDone(true);
       toast.success("You've joined the team");
       setTimeout(() => navigate({ to: "/profile" }), 1200);
@@ -52,20 +69,29 @@ function JoinTeamPage() {
         </CardHeader>
         <CardContent className="space-y-3">
           {error && <p className="text-sm text-destructive">{error}</p>}
+          {!token && (
+            <p className="text-sm text-destructive">
+              This team link is invalid. Ask the team owner to send you the full
+              invite link, which includes a unique token.
+            </p>
+          )}
           {done && <p className="text-sm text-primary">You're in! Redirecting…</p>}
-          {!done && (
+          {!done && token && (
             <p className="text-sm text-muted-foreground">
               You've been invited to join a team. Sign in to confirm and your account will be added to the team's records.
             </p>
           )}
-          {!done && (
+          {!done && token && (
             authed ? (
               <Button className="w-full" onClick={onJoin} disabled={working}>
                 {working ? "Joining…" : "Join team"}
               </Button>
             ) : (
               <Button asChild className="w-full">
-                <Link to="/login" search={{ redirect: `/join-team/${ownerId}` }}>
+                <Link
+                  to="/login"
+                  search={{ redirect: `/join-team/${ownerId}?token=${token}` }}
+                >
                   Sign in to join
                 </Link>
               </Button>

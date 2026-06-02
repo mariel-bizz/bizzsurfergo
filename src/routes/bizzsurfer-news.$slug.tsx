@@ -17,12 +17,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trackEvent } from "@/lib/analytics";
 import { getMarketNewsBySlug } from "@/lib/market-news.functions";
-import { getMarketNewsBody } from "@/lib/market-news-body.functions";
+import { getMarketNewsPreview, getMarketNewsFullBody } from "@/lib/market-news-body.functions";
 import { getPremiumStatus } from "@/lib/premium.functions";
 import { verifyNewsPass } from "@/lib/news-pass.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import {
   getStoredNewsPassExpiry,
+  getStoredNewsPassSessionId,
   setStoredNewsPassExpiry,
 } from "@/lib/news-pass-storage";
 import { NewsPassCheckoutDialog } from "@/components/NewsPassCheckoutDialog";
@@ -145,6 +146,7 @@ function BizzSurferNewsPage() {
 
   // --- Access state ---------------------------------------------------------
   const [passExpiresAt, setPassExpiresAt] = useState<number | null>(null);
+  const [passSessionId, setPassSessionId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -152,6 +154,7 @@ function BizzSurferNewsPage() {
   // Hydrate pass + supabase user only on the client (avoids SSR mismatch).
   useEffect(() => {
     setPassExpiresAt(getStoredNewsPassExpiry());
+    setPassSessionId(getStoredNewsPassSessionId());
     supabase.auth.getSession().then(({ data }) => {
       setUserId(data.session?.user?.id ?? null);
     });
@@ -173,8 +176,9 @@ function BizzSurferNewsPage() {
     })
       .then((res) => {
         if (res.paid) {
-          setStoredNewsPassExpiry(res.expiresAt);
+          setStoredNewsPassExpiry(res.expiresAt, news_pass_session);
           setPassExpiresAt(res.expiresAt);
+          setPassSessionId(news_pass_session);
         }
       })
       .catch(() => {})
@@ -201,24 +205,49 @@ function BizzSurferNewsPage() {
   const hasAccess = isPremium || hasPass;
 
   // --- Body -----------------------------------------------------------------
-  const fetchBody = useServerFn(getMarketNewsBody);
-  const bodyQuery = useQuery({
-    queryKey: ["news-body", slug],
-    queryFn: () => fetchBody({ data: { slug } }),
+  // Preview (always safe, anonymous) — only ever returns the first 2 paragraphs.
+  const fetchPreview = useServerFn(getMarketNewsPreview);
+  const previewQuery = useQuery({
+    queryKey: ["news-preview", slug],
+    queryFn: () => fetchPreview({ data: { slug } }),
     staleTime: 5 * 60_000,
   });
-  const paragraphs = useMemo(() => {
-    const raw = bodyQuery.data?.body?.trim();
-    if (!raw) return [] as string[];
-    return raw
-      .split(/\n{2,}/g)
-      .map((p) => p.trim())
-      .filter(Boolean);
-  }, [bodyQuery.data]);
+
+  // Full body — only fetched when the user actually has access. The server
+  // re-verifies premium or a paid Stripe pass session before returning anything.
+  const fetchFullBody = useServerFn(getMarketNewsFullBody);
+  const fullBodyQuery = useQuery({
+    queryKey: ["news-full-body", slug, isPremium, passSessionId],
+    queryFn: () =>
+      fetchFullBody({
+        data: {
+          slug,
+          passSessionId: passSessionId ?? undefined,
+          environment: getStripeEnvironment(),
+        },
+      }),
+    enabled: hasAccess,
+    staleTime: 5 * 60_000,
+  });
+
+  const previewParagraphs = useMemo<string[]>(() => {
+    const raw = previewQuery.data?.preview?.trim();
+    if (!raw) return [];
+    return raw.split(/\n{2,}/g).map((p) => p.trim()).filter(Boolean);
+  }, [previewQuery.data]);
+
+  const fullParagraphs = useMemo<string[]>(() => {
+    const raw = fullBodyQuery.data?.body?.trim();
+    if (!raw) return [];
+    return raw.split(/\n{2,}/g).map((p) => p.trim()).filter(Boolean);
+  }, [fullBodyQuery.data]);
 
   const PREVIEW_COUNT = 2;
-  const previewParagraphs = paragraphs.slice(0, PREVIEW_COUNT);
-  const gatedParagraphs = paragraphs.slice(PREVIEW_COUNT);
+  const totalParagraphs = previewQuery.data?.totalParagraphs ?? 0;
+  // Gated content only exists in the DOM after a successful access check.
+  const gatedParagraphs = hasAccess ? fullParagraphs.slice(PREVIEW_COUNT) : [];
+  const hasGatedContent = totalParagraphs > PREVIEW_COUNT;
+  const bodyLoading = previewQuery.isLoading || (hasAccess && fullBodyQuery.isLoading);
 
   // --- Image --------------------------------------------------------------
   // Always use our branded cover. Many publisher image URLs are hotlink-blocked
@@ -233,8 +262,8 @@ function BizzSurferNewsPage() {
   useEffect(() => {
     if (
       !hasAccess &&
-      gatedParagraphs.length > 0 &&
-      !bodyQuery.isLoading &&
+      hasGatedContent &&
+      !previewQuery.isLoading &&
       !blurFiredRef.current
     ) {
       blurFiredRef.current = true;
@@ -243,10 +272,10 @@ function BizzSurferNewsPage() {
         source: item.source,
         category: item.category,
         preview_count: PREVIEW_COUNT,
-        gated_paragraphs: gatedParagraphs.length,
+        gated_paragraphs: Math.max(totalParagraphs - PREVIEW_COUNT, 0),
       });
     }
-  }, [hasAccess, gatedParagraphs.length, bodyQuery.isLoading, slug, item.source, item.category]);
+  }, [hasAccess, hasGatedContent, totalParagraphs, previewQuery.isLoading, slug, item.source, item.category]);
 
   const handleUnlockClick = () => {
     trackEvent("news_paywall_unlock_clicked", {
@@ -330,7 +359,7 @@ function BizzSurferNewsPage() {
 
       {/* Body */}
       <div className="mt-8 space-y-5">
-        {bodyQuery.isLoading && (
+        {bodyLoading && (
           <div className="space-y-3" aria-label="Loading article">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-11/12" />
@@ -346,7 +375,7 @@ function BizzSurferNewsPage() {
           </p>
         ))}
 
-        {gatedParagraphs.length > 0 && (
+        {hasGatedContent && (
           <div className="relative">
             <div
               className={
@@ -356,11 +385,29 @@ function BizzSurferNewsPage() {
               }
               aria-hidden={!hasAccess}
             >
-              {gatedParagraphs.map((p, i) => (
-                <p key={`gp-${i}`} className="text-base leading-relaxed text-foreground">
-                  {p}
-                </p>
-              ))}
+              {hasAccess
+                ? gatedParagraphs.map((p, i) => (
+                    <p
+                      key={`gp-${i}`}
+                      className="text-base leading-relaxed text-foreground"
+                    >
+                      {p}
+                    </p>
+                  ))
+                : // Visual-only placeholder — the real gated text never leaves the server
+                  // until access is verified. This keeps the paywall layout intact.
+                  Array.from({
+                    length: Math.min(Math.max(totalParagraphs - PREVIEW_COUNT, 1), 3),
+                  }).map((_, i) => (
+                    <p
+                      key={`gp-ph-${i}`}
+                      className="text-base leading-relaxed text-muted-foreground/60"
+                    >
+                      ████████ ████ ████████ ██████ ██ ████████ ██████ ████ ████████
+                      ██████ ████ ████████ ██████ ████ ████████ ██████ ████
+                      ████████ ██████ ████ ████████ ██████ ████ ████████.
+                    </p>
+                  ))}
 
               {/* Original-source CTA also gets blurred when locked */}
               <div className="mt-6 rounded-2xl border-2 border-solid border-[#02459c] bg-card p-5 shadow-elegant">
