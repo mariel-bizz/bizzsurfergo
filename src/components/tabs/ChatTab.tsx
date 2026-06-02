@@ -12,7 +12,16 @@ import {
   Download,
   Zap,
   Sparkle,
-} from "lucide-react";
+  Plus,
+  Mic,
+  StopCircle,
+  Image as ImageIcon,
+  FolderOpen,
+  Save,
+}  from "lucide-react";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { useServerFn } from "@tanstack/react-start";
+import { generateChatImage } from "@/lib/chat-image.functions";
 import { toast } from "sonner";
 import {
   GoChatSetup,
@@ -130,6 +139,18 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [submittedEmail, setSubmittedEmail] = useState<string>("");
   const fileRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [plusOpen, setPlusOpen] = useState(false);
+  const [recording, setRecording] = useState(false);
+  const recorderRef = useRef<MediaRecorder | null>(null);
+  const recordedChunksRef = useRef<Blob[]>([]);
+  const [imageDialogOpen, setImageDialogOpen] = useState(false);
+  const [imagePrompt, setImagePrompt] = useState("");
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [projectsDialogOpen, setProjectsDialogOpen] = useState(false);
+  const [savedProjects, setSavedProjects] = useState<
+    Array<{ id: string; name: string; messages: Msg[]; savedAt: string }>
+  >([]);
+  const generateImageFn = useServerFn(generateChatImage);
 
   useEffect(() => {
     try {
@@ -200,6 +221,115 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setConfig(null);
     setMessages([{ role: "assistant", content: "Let's reconfigure your BizzSurfer GO! chat." }]);
     setQuestionCount(0);
+  };
+
+  const PROJECTS_KEY = "bizzsurfer.chat.projects";
+  useEffect(() => {
+    try {
+      const raw = window.localStorage.getItem(PROJECTS_KEY);
+      if (raw) setSavedProjects(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const saveProjectsList = (
+    list: Array<{ id: string; name: string; messages: Msg[]; savedAt: string }>,
+  ) => {
+    setSavedProjects(list);
+    try {
+      window.localStorage.setItem(PROJECTS_KEY, JSON.stringify(list));
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const saveCurrentAsProject = () => {
+    const name = window.prompt("Name this project");
+    if (!name?.trim()) return;
+    const entry = {
+      id: crypto.randomUUID(),
+      name: name.trim(),
+      messages,
+      savedAt: new Date().toISOString(),
+    };
+    saveProjectsList([entry, ...savedProjects].slice(0, 20));
+    toast.success(`Saved project "${entry.name}"`);
+  };
+
+  const loadProject = (id: string) => {
+    const p = savedProjects.find((x) => x.id === id);
+    if (!p) return;
+    setMessages(p.messages);
+    setProjectsDialogOpen(false);
+    toast.success(`Loaded "${p.name}"`);
+  };
+
+  const deleteProject = (id: string) => {
+    saveProjectsList(savedProjects.filter((p) => p.id !== id));
+  };
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const rec = new MediaRecorder(stream);
+      recordedChunksRef.current = [];
+      rec.ondataavailable = (e) => {
+        if (e.data.size > 0) recordedChunksRef.current.push(e.data);
+      };
+      rec.onstop = async () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
+        if (blob.size > 5 * 1024 * 1024) {
+          toast.error("Recording over 5MB");
+          return;
+        }
+        const dataUrl: string = await new Promise((resolve, reject) => {
+          const r = new FileReader();
+          r.onload = () => resolve(r.result as string);
+          r.onerror = reject;
+          r.readAsDataURL(blob);
+        });
+        setAttachments((prev) =>
+          [
+            ...prev,
+            { name: `recording-${Date.now()}.webm`, type: "audio/webm", dataUrl },
+          ].slice(0, 4),
+        );
+      };
+      rec.start();
+      recorderRef.current = rec;
+      setRecording(true);
+    } catch {
+      toast.error("Microphone access denied");
+    }
+  };
+
+  const stopRecording = () => {
+    recorderRef.current?.stop();
+    recorderRef.current = null;
+    setRecording(false);
+  };
+
+  const runImageGen = async () => {
+    if (!imagePrompt.trim() || generatingImage) return;
+    setGeneratingImage(true);
+    try {
+      const { dataUrl } = await generateImageFn({ data: { prompt: imagePrompt.trim() } });
+      setAttachments((prev) =>
+        [
+          ...prev,
+          { name: `image-${Date.now()}.png`, type: "image/png", dataUrl },
+        ].slice(0, 4),
+      );
+      setImageDialogOpen(false);
+      setImagePrompt("");
+      toast.success("Image attached");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Image generation failed");
+    } finally {
+      setGeneratingImage(false);
+    }
   };
 
   const onPickFiles = async (files: FileList | null) => {
@@ -795,7 +925,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               <input
                 ref={fileRef}
                 type="file"
-                accept="image/*,.pdf,.txt,.csv,.doc,.docx"
+                accept="image/*,audio/*,.pdf,.txt,.csv,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.md,.json"
                 multiple
                 hidden
                 onChange={(e) => {
@@ -803,16 +933,93 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   e.target.value = "";
                 }}
               />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                disabled={streaming}
-                className="rounded-2xl w-11 h-11 bg-muted text-foreground flex items-center justify-center hover:bg-accent transition shrink-0"
-                aria-label="Attach file"
-                title="Attach image or file"
-              >
-                <Paperclip className="w-4 h-4" />
-              </button>
+              <Popover open={plusOpen} onOpenChange={setPlusOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    disabled={streaming}
+                    className="rounded-2xl w-11 h-11 bg-muted text-foreground flex items-center justify-center hover:bg-accent transition shrink-0"
+                    aria-label="Add"
+                    title="Add photos, files, audio, or create"
+                  >
+                    <Plus className="w-5 h-5" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" side="top" className="w-64 p-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      fileRef.current?.click();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <Paperclip className="w-4 h-4 text-muted-foreground" />
+                    Add photos &amp; files
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      if (recording) stopRecording();
+                      else startRecording();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    {recording ? (
+                      <StopCircle className="w-4 h-4 text-destructive" />
+                    ) : (
+                      <Mic className="w-4 h-4 text-muted-foreground" />
+                    )}
+                    {recording ? "Stop recording" : "Record audio"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      setImageDialogOpen(true);
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                    Create image
+                  </button>
+                  <div className="my-1 h-px bg-border" />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      saveCurrentAsProject();
+                    }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <Save className="w-4 h-4 text-muted-foreground" />
+                    Save as project
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setPlusOpen(false);
+                      setProjectsDialogOpen(true);
+                    }}
+                    className="w-full flex items-center justify-between gap-3 px-3 py-2.5 text-sm rounded-md hover:bg-accent text-left"
+                  >
+                    <span className="flex items-center gap-3">
+                      <FolderOpen className="w-4 h-4 text-muted-foreground" />
+                      My projects
+                    </span>
+                    <span className="text-[10px] text-muted-foreground">
+                      {savedProjects.length}
+                    </span>
+                  </button>
+                </PopoverContent>
+              </Popover>
+              {recording && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-destructive font-medium">
+                  <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
+                  REC
+                </span>
+              )}
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
@@ -836,6 +1043,79 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           </form>
         </>
       )}
+
+      {/* Create image dialog */}
+      <Dialog open={imageDialogOpen} onOpenChange={setImageDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Create an image</DialogTitle>
+            <DialogDescription>
+              Describe the image you want. It will be attached to your next message.
+            </DialogDescription>
+          </DialogHeader>
+          <textarea
+            value={imagePrompt}
+            onChange={(e) => setImagePrompt(e.target.value)}
+            placeholder="e.g. A boardroom diagram showing agentic AI handoffs"
+            className="w-full min-h-[100px] rounded-lg border border-border bg-background p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
+          />
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setImageDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              onClick={runImageGen}
+              disabled={!imagePrompt.trim() || generatingImage}
+              className="bg-gradient-primary"
+            >
+              {generatingImage ? "Generating…" : "Generate"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Projects dialog */}
+      <Dialog open={projectsDialogOpen} onOpenChange={setProjectsDialogOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>My projects</DialogTitle>
+            <DialogDescription>
+              Saved conversations stored on this device.
+            </DialogDescription>
+          </DialogHeader>
+          {savedProjects.length === 0 ? (
+            <p className="text-sm text-muted-foreground py-6 text-center">
+              No saved projects yet. Use “Save as project” from the + menu.
+            </p>
+          ) : (
+            <ul className="space-y-1 max-h-72 overflow-y-auto">
+              {savedProjects.map((p) => (
+                <li
+                  key={p.id}
+                  className="flex items-center justify-between gap-2 rounded-md border border-border px-3 py-2"
+                >
+                  <button
+                    onClick={() => loadProject(p.id)}
+                    className="flex-1 text-left"
+                  >
+                    <div className="text-sm font-medium">{p.name}</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      {new Date(p.savedAt).toLocaleString()} · {p.messages.length} msgs
+                    </div>
+                  </button>
+                  <button
+                    onClick={() => deleteProject(p.id)}
+                    aria-label="Delete"
+                    className="text-muted-foreground hover:text-destructive"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Email capture popup after 2 questions */}
       <Dialog
