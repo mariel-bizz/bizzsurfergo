@@ -17,12 +17,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { trackEvent } from "@/lib/analytics";
 import { getMarketNewsBySlug } from "@/lib/market-news.functions";
-import { getMarketNewsBody } from "@/lib/market-news-body.functions";
+import { getMarketNewsPreview, getMarketNewsFullBody } from "@/lib/market-news-body.functions";
 import { getPremiumStatus } from "@/lib/premium.functions";
 import { verifyNewsPass } from "@/lib/news-pass.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import {
   getStoredNewsPassExpiry,
+  getStoredNewsPassSessionId,
   setStoredNewsPassExpiry,
 } from "@/lib/news-pass-storage";
 import { NewsPassCheckoutDialog } from "@/components/NewsPassCheckoutDialog";
@@ -145,6 +146,7 @@ function BizzSurferNewsPage() {
 
   // --- Access state ---------------------------------------------------------
   const [passExpiresAt, setPassExpiresAt] = useState<number | null>(null);
+  const [passSessionId, setPassSessionId] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [paywallOpen, setPaywallOpen] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -152,6 +154,7 @@ function BizzSurferNewsPage() {
   // Hydrate pass + supabase user only on the client (avoids SSR mismatch).
   useEffect(() => {
     setPassExpiresAt(getStoredNewsPassExpiry());
+    setPassSessionId(getStoredNewsPassSessionId());
     supabase.auth.getSession().then(({ data }) => {
       setUserId(data.session?.user?.id ?? null);
     });
@@ -173,8 +176,9 @@ function BizzSurferNewsPage() {
     })
       .then((res) => {
         if (res.paid) {
-          setStoredNewsPassExpiry(res.expiresAt);
+          setStoredNewsPassExpiry(res.expiresAt, news_pass_session);
           setPassExpiresAt(res.expiresAt);
+          setPassSessionId(news_pass_session);
         }
       })
       .catch(() => {})
@@ -201,24 +205,49 @@ function BizzSurferNewsPage() {
   const hasAccess = isPremium || hasPass;
 
   // --- Body -----------------------------------------------------------------
-  const fetchBody = useServerFn(getMarketNewsBody);
-  const bodyQuery = useQuery({
-    queryKey: ["news-body", slug],
-    queryFn: () => fetchBody({ data: { slug } }),
+  // Preview (always safe, anonymous) — only ever returns the first 2 paragraphs.
+  const fetchPreview = useServerFn(getMarketNewsPreview);
+  const previewQuery = useQuery({
+    queryKey: ["news-preview", slug],
+    queryFn: () => fetchPreview({ data: { slug } }),
     staleTime: 5 * 60_000,
   });
-  const paragraphs = useMemo(() => {
-    const raw = bodyQuery.data?.body?.trim();
-    if (!raw) return [] as string[];
-    return raw
-      .split(/\n{2,}/g)
-      .map((p) => p.trim())
-      .filter(Boolean);
-  }, [bodyQuery.data]);
+
+  // Full body — only fetched when the user actually has access. The server
+  // re-verifies premium or a paid Stripe pass session before returning anything.
+  const fetchFullBody = useServerFn(getMarketNewsFullBody);
+  const fullBodyQuery = useQuery({
+    queryKey: ["news-full-body", slug, isPremium, passSessionId],
+    queryFn: () =>
+      fetchFullBody({
+        data: {
+          slug,
+          passSessionId: passSessionId ?? undefined,
+          environment: getStripeEnvironment(),
+        },
+      }),
+    enabled: hasAccess,
+    staleTime: 5 * 60_000,
+  });
+
+  const previewParagraphs = useMemo<string[]>(() => {
+    const raw = previewQuery.data?.preview?.trim();
+    if (!raw) return [];
+    return raw.split(/\n{2,}/g).map((p) => p.trim()).filter(Boolean);
+  }, [previewQuery.data]);
+
+  const fullParagraphs = useMemo<string[]>(() => {
+    const raw = fullBodyQuery.data?.body?.trim();
+    if (!raw) return [];
+    return raw.split(/\n{2,}/g).map((p) => p.trim()).filter(Boolean);
+  }, [fullBodyQuery.data]);
 
   const PREVIEW_COUNT = 2;
-  const previewParagraphs = paragraphs.slice(0, PREVIEW_COUNT);
-  const gatedParagraphs = paragraphs.slice(PREVIEW_COUNT);
+  const totalParagraphs = previewQuery.data?.totalParagraphs ?? 0;
+  // Gated content only exists in the DOM after a successful access check.
+  const gatedParagraphs = hasAccess ? fullParagraphs.slice(PREVIEW_COUNT) : [];
+  const hasGatedContent = totalParagraphs > PREVIEW_COUNT;
+  const bodyLoading = previewQuery.isLoading || (hasAccess && fullBodyQuery.isLoading);
 
   // --- Image --------------------------------------------------------------
   // Always use our branded cover. Many publisher image URLs are hotlink-blocked
