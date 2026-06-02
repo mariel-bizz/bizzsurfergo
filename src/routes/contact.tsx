@@ -329,31 +329,8 @@ function ContactPage() {
           )}
         </section>
 
-        <section className="mt-8">
-          <h2 className="text-sm font-bold text-primary uppercase tracking-wide">
-            Follow BizzSurfer
-          </h2>
-          <div className="mt-3 rounded-2xl border border-border bg-card p-6">
-            <div className="grid grid-cols-3 gap-6">
-              {SOCIALS.map(({ label, href, Icon, bg }) => (
-                <a
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex flex-col items-center gap-2 group"
-                >
-                  <div
-                    className={`w-14 h-14 rounded-full ${bg} flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform`}
-                  >
-                    <Icon className="w-7 h-7 text-white" strokeWidth={2.5} />
-                  </div>
-                  <span className="text-xs font-medium text-foreground">{label}</span>
-                </a>
-              ))}
-            </div>
-          </div>
-        </section>
+        {/* Follow section rendered globally at end of every page via AppShell */}
+
       </div>
     </main>
   );

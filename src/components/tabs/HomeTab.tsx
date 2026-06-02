@@ -256,8 +256,8 @@ export function HomeTab() {
         </div>
       </section>
 
-      {/* Social media */}
-      <FollowSection />
+      {/* Social media — rendered globally at end of every page via AppShell */}
+
 
       {/* CTA waitlist */}
       <section className="px-5">
