@@ -313,7 +313,11 @@ function BizzSurferNewsPage() {
                   This story was curated by BizzSurfer from {item.source}. Open
                   the full article on the publisher's site.
                 </p>
-                <Button asChild className="mt-4" disabled={!hasAccess}>
+                <Button
+                  asChild
+                  className="mt-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-[#ff6f00] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                  disabled={!hasAccess}
+                >
                   <a
                     href={hasAccess ? item.source_url : "#"}
                     target="_blank"
