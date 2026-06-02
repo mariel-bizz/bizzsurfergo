@@ -121,63 +121,63 @@ function InsightsPage() {
         </p>
       </header>
 
-      <nav aria-label="Insights sections" className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+      <nav aria-label="Insights sections" className="mb-6 grid grid-cols-3 gap-2 sm:grid-cols-6">
         <a
           href="#blog-articles"
-          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <BookOpen className="h-4 w-4" />
           </span>
-          <span className="text-sm font-bold text-foreground group-hover:text-primary">Blog Articles</span>
+          <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Blog<br />articles</span>
         </a>
         <a
           href="#video-content"
-          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <PlayCircle className="h-4 w-4" />
           </span>
-          <span className="text-sm font-bold text-foreground group-hover:text-primary">Video Content</span>
+          <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Video<br />content</span>
         </a>
         <a
           href="#download-resources"
-          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Download className="h-4 w-4" />
           </span>
-          <span className="text-sm font-bold text-foreground group-hover:text-primary">Downloads</span>
+          <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Downloads</span>
         </a>
         <Link
           to="/events"
           hash="past"
-          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Video className="h-4 w-4" />
           </span>
-          <span className="text-sm font-bold text-foreground group-hover:text-primary">Rewatch webinars</span>
+          <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Rewatch<br />webinars</span>
         </Link>
         <Link
           to="/podcast"
-          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Music2 className="h-4 w-4" />
           </span>
-          <span className="text-sm font-bold text-foreground group-hover:text-primary">Spotify</span>
+          <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Spotify</span>
         </Link>
         <a
           href="https://youtube.com/@bizzsurfer"
           target="_blank"
           rel="noopener noreferrer"
-          className="group flex items-center gap-2 rounded-2xl border border-border bg-card p-3 shadow-card transition hover:border-primary/40 hover:shadow-soft"
+          className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Youtube className="h-4 w-4" />
           </span>
-          <span className="text-sm font-bold text-foreground group-hover:text-primary">YouTube</span>
+          <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">YouTube</span>
         </a>
       </nav>
 
