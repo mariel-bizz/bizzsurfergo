@@ -389,7 +389,7 @@ function BizzSurferNewsPage() {
             {!hasAccess && (
               <PaywallOverlay
                 isPremiumUser={!!userId}
-                onUnlock={() => setPaywallOpen(true)}
+                onUnlock={handleUnlockClick}
                 verifying={verifying}
               />
             )}
