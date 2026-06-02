@@ -235,16 +235,18 @@ function NewsThumbnail({
 }) {
   const host = getHostname(href);
   const blocked = isBlockedHost(host);
+  const imageHost = getHostname(image || "");
+  const imageBlocked = !image || isBlockedHost(imageHost);
   const sources = useMemo(
     () =>
       [
-        image || "",
+        imageBlocked ? "" : (image || ""),
         blocked ? "" : `https://api.microlink.io/?url=${encodeURIComponent(href)}&embed=image.url`,
         blocked ? "" : `https://image.thum.io/get/width/800/crop/450/${href}`,
         host ? `https://logo.clearbit.com/${host}?size=256` : "",
         host ? `https://www.google.com/s2/favicons?domain=${host}&sz=256` : "",
       ].filter(Boolean),
-    [href, host, blocked, image],
+    [href, host, blocked, image, imageBlocked],
   );
   const [idx, setIdx] = useState(0);
   const [failed, setFailed] = useState(false);
@@ -252,7 +254,7 @@ function NewsThumbnail({
   const initial = (source || host || "?").charAt(0).toUpperCase();
   const showFallback = failed || sources.length === 0;
   // First entries are full-bleed photos; logo-style sources render contained.
-  const photoStages = (image ? 1 : 0) + (blocked ? 0 : 2);
+  const photoStages = (imageBlocked ? 0 : 1) + (blocked ? 0 : 2);
   const isLogoStage = !showFallback && idx >= photoStages;
 
   return (
