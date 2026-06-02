@@ -57,9 +57,19 @@ function MarketNewsAdminPage() {
   const triggerSync = async () => {
     setSyncing(true);
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      if (!token) {
+        toast.error("You must be signed in as an admin to trigger a sync.");
+        setSyncing(false);
+        return;
+      }
       const res = await fetch("/api/public/hooks/sync-market-news", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
       const json = (await res.json().catch(() => ({}))) as Partial<SyncResult> & { error?: string };
       if (!res.ok) {
