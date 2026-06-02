@@ -301,10 +301,10 @@ function IntegrationsPage() {
                   return (
                     <li
                       key={p.id}
-                      className="flex items-center justify-between rounded-lg border border-border px-3 py-2 bg-card"
+                      className="flex flex-col gap-2 rounded-lg border border-border px-3 py-2 bg-card"
                     >
                       <div className="min-w-0">
-                        <p className="text-sm font-medium text-foreground truncate">{p.name}</p>
+                        <p className="text-sm font-medium text-foreground">{p.name}</p>
                         {existing ? (
                           <p className="text-[11px] text-emerald-600 dark:text-emerald-400">Connected</p>
                         ) : (
@@ -315,6 +315,7 @@ function IntegrationsPage() {
                         size="sm"
                         variant={existing ? "outline" : "default"}
                         onClick={() => setConfig({ category: c, provider: p })}
+                        className="w-full"
                       >
                         {existing ? "Reconfigure" : (
                           <>
