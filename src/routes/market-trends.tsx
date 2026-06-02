@@ -618,25 +618,14 @@ function MarketTrendsPage() {
               );
               return (
                 <li key={item.id}>
-                  {isInternal ? (
-                    <Link
-                      to={item.href}
-                      onClick={() => trackOutbound(item)}
-                      className="block"
-                    >
-                      {inner}
-                    </Link>
-                  ) : (
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => trackOutbound(item)}
-                      className="block"
-                    >
-                      {inner}
-                    </a>
-                  )}
+                  <Link
+                    to="/bizzsurfer-news/$slug"
+                    params={{ slug: item.id }}
+                    onClick={() => trackOutbound(item)}
+                    className="block"
+                  >
+                    {inner}
+                  </Link>
                 </li>
               );
             })}
