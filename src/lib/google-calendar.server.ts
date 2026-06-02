@@ -33,6 +33,8 @@ export async function createCalendarEventWithMeet(params: {
   startISO: string;
   endISO: string;
   timeZone?: string;
+  sourceUrl?: string;
+  sourceTitle?: string;
 }): Promise<CalendarEventResult> {
   const calendarId = params.calendarId ?? "primary";
   const requestId = `bizzsurfer-${crypto.randomUUID()}`;
