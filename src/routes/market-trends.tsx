@@ -528,7 +528,7 @@ function MarketTrendsPage() {
         ) : (
           <ul className="mt-4 grid gap-3">
             {visibleItems.map((item) => {
-              const isInternal = item.href.startsWith("/");
+              const _unused = item; void _unused;
               const saved = bookmarks.has(item.id);
               const inner = (
                 <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm transition-all hover:-translate-y-0.5 hover:border-[#02459c] hover:shadow-elegant">
