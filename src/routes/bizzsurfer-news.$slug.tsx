@@ -138,7 +138,7 @@ function BizzSurferNewsPage() {
 
       <div className="mt-8 rounded-2xl border-2 border-solid border-[#02459c] bg-card p-5 shadow-elegant">
         <p className="text-xs font-bold uppercase tracking-widest text-primary">
-          Read the original
+          READ THE FULL ORIGINAL ARTICLE
         </p>
         <p className="mt-1 text-sm text-muted-foreground">
           This story was curated by BizzSurfer from {item.source}. Open the full
