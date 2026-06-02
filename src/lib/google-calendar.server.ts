@@ -39,7 +39,7 @@ export async function createCalendarEventWithMeet(params: {
   const calendarId = params.calendarId ?? "primary";
   const requestId = `bizzsurfer-${crypto.randomUUID()}`;
   const url = `${GATEWAY_URL}/calendars/${encodeURIComponent(calendarId)}/events?conferenceDataVersion=1&sendUpdates=all`;
-  const body = {
+  const body: Record<string, unknown> = {
     summary: params.summary,
     description: params.description,
     location: params.location,
@@ -54,6 +54,9 @@ export async function createCalendarEventWithMeet(params: {
     guestsCanSeeOtherGuests: false,
     guestsCanInviteOthers: false,
   };
+  if (params.sourceUrl) {
+    body.source = { url: params.sourceUrl, title: params.sourceTitle ?? params.summary };
+  }
   const res = await fetch(url, { method: "POST", headers: authHeaders(), body: JSON.stringify(body) });
   const data = (await res.json()) as CalendarEventResult & { error?: unknown };
   if (!res.ok) {
