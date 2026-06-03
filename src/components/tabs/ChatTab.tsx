@@ -985,19 +985,68 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   }`}
                 >
                   {m.attachments?.length ? (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
+                    <div className="flex flex-wrap gap-2 mb-2">
                       {m.attachments.map((a, j) =>
                         a.type.startsWith("image/") ? (
-                          <img
+                          <div key={j} className="relative group">
+                            <a
+                              href={a.dataUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Open image"
+                            >
+                              <img
+                                src={a.dataUrl}
+                                alt={a.name}
+                                className="max-w-[220px] max-h-[220px] rounded-lg object-cover border border-border cursor-zoom-in"
+                              />
+                            </a>
+                            <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                              <a
+                                href={a.dataUrl}
+                                download={a.name}
+                                className="rounded-md bg-black/60 text-white px-1.5 py-1"
+                                title="Download"
+                              >
+                                <Download className="w-3 h-3" />
+                              </a>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  void shareAttachment(a);
+                                }}
+                                className="rounded-md bg-black/60 text-white px-1.5 py-1"
+                                title="Share"
+                              >
+                                <Share2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ) : a.type.startsWith("audio/") ? (
+                          <div
                             key={j}
-                            src={a.dataUrl}
-                            alt={a.name}
-                            className="w-16 h-16 rounded-lg object-cover"
-                          />
+                            className="flex flex-col gap-1 rounded-lg bg-background/40 border border-border p-2 max-w-full"
+                          >
+                            <audio controls src={a.dataUrl} className="max-w-[260px]" />
+                            {a.transcript && (
+                              <p className="text-[11px] italic opacity-90 max-w-[260px] whitespace-pre-wrap">
+                                “{a.transcript}”
+                              </p>
+                            )}
+                          </div>
                         ) : (
-                          <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">
+                          <a
+                            key={j}
+                            href={a.dataUrl}
+                            download={a.name}
+                            className="inline-flex items-center gap-1.5 text-[11px] bg-white/30 rounded px-2 py-1 hover:bg-white/50"
+                            title="Download"
+                          >
+                            <FileText className="w-3 h-3" />
                             {a.name}
-                          </span>
+                            <Download className="w-3 h-3 opacity-70" />
+                          </a>
                         ),
                       )}
                     </div>
