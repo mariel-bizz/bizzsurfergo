@@ -212,6 +212,28 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
 
+  // Auto-save current chat to localStorage + keep up to 10 historical versions.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (messages.length === 0) return;
+    try {
+      window.localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(messages));
+      // Throttle version snapshots to one per ~30s of edits.
+      const versionsRaw = window.localStorage.getItem(AUTOSAVE_VERSIONS_KEY);
+      const versions = versionsRaw
+        ? (JSON.parse(versionsRaw) as Array<{ at: string; messages: Msg[] }>)
+        : [];
+      const last = versions[0];
+      const now = Date.now();
+      if (!last || now - new Date(last.at).getTime() > 30_000) {
+        const next = [{ at: new Date().toISOString(), messages }, ...versions].slice(0, 10);
+        window.localStorage.setItem(AUTOSAVE_VERSIONS_KEY, JSON.stringify(next));
+      }
+    } catch {
+      /* quota or serialization issue — ignore */
+    }
+  }, [messages]);
+
   const saveConfig = (cfg: GoChatConfig) => {
     try {
       window.localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg));
