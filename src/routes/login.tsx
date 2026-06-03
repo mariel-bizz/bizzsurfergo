@@ -42,13 +42,16 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { redirect } = useSearch({ from: "/login" });
+  const { redirect, error: searchError } = useSearch({ from: "/login" });
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(searchError || null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [linkedInLoading, setLinkedInLoading] = useState(false);
+  const [showDiag, setShowDiag] = useState(false);
+  const [sessionInfo, setSessionInfo] = useState<{ userId: string; email: string } | null>(null);
 
   const isUpgradeFlow = redirect.startsWith("/pricing");
   const notifySuccess = (mode: "signin" | "signup") => {
@@ -61,17 +64,28 @@ function LoginPage() {
     }
   };
 
+  // Computed once: the exact LinkedIn callback URL for the current host —
+  // shown in the diagnostics panel so you can paste it into the LinkedIn
+  // app's "Authorized redirect URLs" list when something is misconfigured.
+  const linkedInCallbackUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/auth/linkedin/callback`
+      : "";
+
   useEffect(() => {
     // Restore existing session on mount (handles OAuth redirect return).
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: redirect });
+      if (data.session) {
+        setSessionInfo({
+          userId: data.session.user.id,
+          email: data.session.user.email ?? "",
+        });
+        // Brief on-page confirmation, then navigate.
+        setTimeout(() => navigate({ to: redirect }), 600);
+      }
     });
-    // Subscribe to auth state changes so a session created by an OAuth
-    // redirect (Apple/Google) is picked up immediately on this page.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
-        // First sign-in on this device: reset the chat language-model setup
-        // so the user re-picks their preferred model.
         try {
           const flagKey = `bizzsurfer.reset.${session.user.id}`;
           if (!localStorage.getItem(flagKey)) {
@@ -79,12 +93,24 @@ function LoginPage() {
             localStorage.setItem(flagKey, "1");
           }
         } catch { /* ignore */ }
+        setSessionInfo({
+          userId: session.user.id,
+          email: session.user.email ?? "",
+        });
         notifySuccess("signin");
-        navigate({ to: redirect });
+        setTimeout(() => navigate({ to: redirect }), 600);
       }
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate, redirect]);
+
+  // Surface any error from the LinkedIn callback as a toast on mount.
+  useEffect(() => {
+    if (searchError) {
+      toast.error(`LinkedIn sign-in failed: ${searchError}`);
+      setShowDiag(true);
+    }
+  }, [searchError]);
 
   // Map raw OAuth/provider errors to actionable, user-friendly messages.
   const friendlyOAuthError = (provider: "google" | "apple", raw: unknown): string => {
