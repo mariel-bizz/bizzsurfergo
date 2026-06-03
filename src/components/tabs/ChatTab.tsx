@@ -81,10 +81,18 @@ async function getLogoDataUrl(): Promise<string | null> {
   }
 }
 
-type Attachment = { name: string; type: string; dataUrl: string };
+type Attachment = {
+  name: string;
+  type: string;
+  dataUrl: string;
+  progress?: number; // 0-100 while uploading; undefined when done
+  transcript?: string; // for audio attachments
+};
 type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
 
 const CONFIG_KEY = "bizzsurfer.gochat.config";
+const AUTOSAVE_KEY = "bizzsurfer.chat.autosave";
+const AUTOSAVE_VERSIONS_KEY = "bizzsurfer.chat.autosave.versions";
 const QUESTION_LIMIT = 5;
 
 const PRESETS = [
