@@ -191,9 +191,9 @@ export function PricingTab() {
                   <t.icon className={`w-5 h-5 ${t.highlighted ? "text-white" : "text-primary-foreground"}`} />
                 </div>
                 <div>
-                  <p className={`text-base font-bold ${t.highlighted ? "text-white" : "text-foreground"}`}>
+                  <h2 className={`text-base font-bold ${t.highlighted ? "text-white" : "text-foreground"}`}>
                     {t.name}
-                  </p>
+                  </h2>
                 </div>
               </div>
 
