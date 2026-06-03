@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles, BookOpen, Video, Music2, Youtube, Download, PlayCircle } from "lucide-react";
 import { DownloadResources } from "@/components/insights/DownloadResources";
 import { VideoContent } from "@/components/insights/VideoContent";
+import { WaitlistDialog } from "@/components/WaitlistDialog";
 
 export const Route = createFileRoute("/insights/")({
   head: () => {
