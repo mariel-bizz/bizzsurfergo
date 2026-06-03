@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Linkedin, MessageCircle, Mail, Link2, Check, FileText, Presentation } from "lucide-react";
 import { downloadResources, SITE_ORIGIN, type DownloadResource } from "@/lib/insights-media";
+import { SectionHeader } from "@/components/SectionHeader";
 import { toast } from "sonner";
 
-// Same-origin path for the download itself (avoids cross-origin/adblock issues
-// like ERR_BLOCKED_BY_CLIENT when the browser is on a different host).
-function localFileUrl(r: DownloadResource) {
-  return r.file;
+// Always use the production custom domain for downloads & previews so the
+// preview/sandbox host (which gates with a Lovable sign-in) is never hit.
+function fileUrl(r: DownloadResource) {
+  return `${SITE_ORIGIN}${r.file}`;
 }
 
-// Absolute URL only for share links so recipients land on the canonical host.
 function shareUrl(r: DownloadResource) {
   return `${SITE_ORIGIN}${r.file}`;
 }
@@ -40,7 +40,7 @@ function PreviewHeader({ r }: { r: DownloadResource }) {
     >
       {/* Embedded PDF first-page preview, same-origin so no auth gate. */}
       <object
-        data={`${localFileUrl(r)}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
+        data={`${fileUrl(r)}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
         type="application/pdf"
         className="absolute inset-0 h-full w-full opacity-90"
         aria-hidden="true"
@@ -137,7 +137,7 @@ function ShareRow({ r }: { r: DownloadResource }) {
 export function DownloadResources() {
   return (
     <section id="download-resources" className="mt-10 scroll-mt-20">
-      <h2 className="mb-3 text-lg font-bold text-[#ff6f00]">Download Resources</h2>
+      <SectionHeader className="mb-3">Download Resources</SectionHeader>
       <p className="mb-4 text-sm text-muted-foreground">
         Free PDFs and carousels. Download or share with your network in one tap.
       </p>
@@ -161,7 +161,7 @@ export function DownloadResources() {
                 size="sm"
                 className="mt-auto h-9 w-full bg-gradient-to-r from-[#ff6f00] to-[#ff8c1a] font-bold text-white shadow-soft hover:from-[#e66300] hover:to-[#ff6f00]"
               >
-                <a href={localFileUrl(r)} download rel="noopener">
+                <a href={fileUrl(r)} target="_blank" rel="noopener noreferrer" download>
                   <Download className="mr-1.5 h-3.5 w-3.5" /> Download PDF
                 </a>
               </Button>

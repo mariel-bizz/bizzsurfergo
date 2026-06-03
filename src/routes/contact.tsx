@@ -167,7 +167,7 @@ function ContactPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-xs uppercase tracking-wide text-muted-foreground">Email</div>
-                <div className="text-sm font-semibold text-foreground break-all">
+                <div className="text-sm font-semibold text-foreground truncate" title="hello@bizzsurfer.com">
                   hello@bizzsurfer.com
                 </div>
               </div>
