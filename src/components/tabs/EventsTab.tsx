@@ -406,3 +406,29 @@ function Meta({ icon: Icon, label }: { icon: typeof Calendar; label: string }) {
     </div>
   );
 }
+
+function AttendeeStrip({ summary }: { summary?: { count: number; avatars: string[] } }) {
+  if (!summary || summary.count === 0) return null;
+  const avatars = summary.avatars.slice(0, 5);
+  return (
+    <div className="flex items-center gap-2 pt-1">
+      {avatars.length > 0 && (
+        <div className="flex -space-x-2">
+          {avatars.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt=""
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className="w-6 h-6 rounded-full ring-2 ring-card object-cover bg-muted"
+            />
+          ))}
+        </div>
+      )}
+      <span className="text-xs text-muted-foreground">
+        {summary.count} {summary.count === 1 ? "person" : "people"} going
+      </span>
+    </div>
+  );
+}
