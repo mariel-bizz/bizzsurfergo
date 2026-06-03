@@ -272,9 +272,9 @@ export function HomeTab() {
         </div>
       </section>
 
-      {/* FollowSection moved up under ROI */}
-
       <TrustedPartnersSection />
+
+      <FollowSection />
 
       <ConnectApisSection />
 
