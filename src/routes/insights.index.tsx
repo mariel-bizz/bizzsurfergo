@@ -184,7 +184,9 @@ function InsightsPage() {
 
       <VideoContent />
 
-      <h2 id="blog-articles" className="mb-3 mt-10 scroll-mt-20 text-lg font-bold text-[#ff6f00]">Blog Articles</h2>
+      <SectionHeader as="h2" className="mb-3 mt-10 scroll-mt-20" >
+        <span id="blog-articles">Blog Articles</span>
+      </SectionHeader>
 
       <div className="mb-4 space-y-3">
         <div className="relative">
