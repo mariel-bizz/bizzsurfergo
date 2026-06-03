@@ -11,14 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>) => {
     const raw = typeof s.redirect === "string" ? s.redirect : "";
-    // Only accept same-origin relative paths. Reject protocol-relative ("//evil.com"),
-    // absolute URLs, and paths that try to break out via "\\" or backslash tricks.
     const safe =
       raw.startsWith("/") &&
       !raw.startsWith("//") &&
       !raw.startsWith("/\\") &&
       !raw.includes("\\");
-    return { redirect: safe ? raw : "/" };
+    const rawError = typeof s.error === "string" ? s.error.slice(0, 300) : "";
+    return { redirect: safe ? raw : "/", error: rawError };
   },
   head: () => ({
     meta: [
