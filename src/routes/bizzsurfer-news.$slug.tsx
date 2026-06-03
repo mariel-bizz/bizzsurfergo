@@ -381,7 +381,7 @@ function BizzSurferNewsPage() {
               className={
                 hasAccess
                   ? "space-y-5"
-                  : "space-y-5 pointer-events-none select-none [filter:blur(6px)] [transform:translateZ(0)]"
+                  : "space-y-5 pointer-events-none select-none blur-md [transform:translateZ(0)]"
               }
               aria-hidden={!hasAccess}
             >
