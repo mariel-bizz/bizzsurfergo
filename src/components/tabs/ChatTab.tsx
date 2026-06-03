@@ -1242,9 +1242,19 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 </PopoverContent>
               </Popover>
               {recording && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-destructive font-medium">
-                  <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
-                  REC
+                <button
+                  type="button"
+                  onClick={stopRecording}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-destructive text-destructive-foreground px-3 h-9 text-[11px] font-bold shrink-0"
+                  title="Stop recording"
+                >
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <StopCircle className="w-3.5 h-3.5" /> Stop
+                </button>
+              )}
+              {transcribing && !recording && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-primary font-medium">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Transcribing…
                 </span>
               )}
               <input
