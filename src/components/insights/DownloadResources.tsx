@@ -4,15 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Linkedin, MessageCircle, Mail, Link2, Check, FileText, Presentation } from "lucide-react";
 import { downloadResources, SITE_ORIGIN, type DownloadResource } from "@/lib/insights-media";
+import { SectionHeader } from "@/components/SectionHeader";
 import { toast } from "sonner";
 
-// Same-origin path for the download itself (avoids cross-origin/adblock issues
-// like ERR_BLOCKED_BY_CLIENT when the browser is on a different host).
-function localFileUrl(r: DownloadResource) {
-  return r.file;
+// Always use the production custom domain for downloads & previews so the
+// preview/sandbox host (which gates with a Lovable sign-in) is never hit.
+function fileUrl(r: DownloadResource) {
+  return `${SITE_ORIGIN}${r.file}`;
 }
 
-// Absolute URL only for share links so recipients land on the canonical host.
 function shareUrl(r: DownloadResource) {
   return `${SITE_ORIGIN}${r.file}`;
 }
