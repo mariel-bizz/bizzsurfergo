@@ -52,6 +52,25 @@ export function EventsTab() {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
   const [platform, setPlatform] = useState<"all" | "linkedin" | "youtube" | "spotify">("all");
+  const [attendeeSummary, setAttendeeSummary] = useState<Record<number, { count: number; avatars: string[] }>>({});
+
+  useEffect(() => {
+    const ids = eventsData.map((e) => e.id);
+    if (ids.length === 0) return;
+    supabase
+      .rpc("get_event_attendee_summary", { _event_ids: ids })
+      .then(({ data, error }) => {
+        if (error || !data) return;
+        const next: Record<number, { count: number; avatars: string[] }> = {};
+        for (const row of data as Array<{ event_id: number; attendee_count: number; avatars: string[] }>) {
+          next[row.event_id] = {
+            count: Number(row.attendee_count) || 0,
+            avatars: Array.isArray(row.avatars) ? row.avatars : [],
+          };
+        }
+        setAttendeeSummary(next);
+      });
+  }, [rsvpedIds]);
 
   const detectPlatform = (href: string): "linkedin" | "youtube" | "spotify" | "other" => {
     if (/linkedin\.com/.test(href)) return "linkedin";
