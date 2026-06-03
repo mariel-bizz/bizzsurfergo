@@ -251,7 +251,7 @@ export function FollowSection() {
                 <span className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-transform group-hover:scale-105 group-active:scale-95">
                   <img
                     src={s.image}
-                    alt={`${s.label} logo`}
+                    alt={`Follow BizzSurfer on ${s.label}`}
                     loading="lazy"
                     className="w-full h-full object-contain"
                   />
