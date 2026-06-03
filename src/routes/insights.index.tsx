@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles, BookOpen, Video, Music2, Youtube, Download, PlayCircle } from "lucide-react";
 import { DownloadResources } from "@/components/insights/DownloadResources";
 import { VideoContent } from "@/components/insights/VideoContent";
+import { WaitlistDialog } from "@/components/WaitlistDialog";
 
 export const Route = createFileRoute("/insights/")({
   head: () => {
@@ -323,18 +324,24 @@ function ListSkeleton() {
 }
 
 export function CtaBlock() {
+  const [waitOpen, setWaitOpen] = useState(false);
   return (
-    <div className="mt-8 grid gap-3 sm:grid-cols-2">
-      <Card className="bg-gradient-to-br from-primary to-primary/80 text-primary-foreground">
-        <CardContent className="flex flex-col items-start gap-3 p-5">
-          <h3 className="text-lg font-bold">Book a demo</h3>
-          <p className="text-sm opacity-90">
+    <div className="mx-auto mt-8 grid max-w-5xl gap-3 sm:grid-cols-2">
+      <Card className="relative overflow-hidden border-0 text-white shadow-elegant">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#7c3aed] via-[#a855f7] to-[#ff6f00]" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_60%)]" />
+        <CardContent className="relative flex flex-col items-start gap-3 p-5">
+          <h3 className="text-lg font-bold drop-shadow-sm">Book a demo</h3>
+          <p className="text-sm opacity-95">
             See how BizzSurfer accelerates Agentic AI transformation.
           </p>
-          <Button asChild variant="secondary" size="sm" className="mt-auto">
-            <a href="https://www.bizzsurfer.com" target="_blank" rel="noopener noreferrer">
-              Book a demo <ArrowRight className="ml-1 h-4 w-4" />
-            </a>
+          <Button
+            variant="secondary"
+            size="sm"
+            className="mt-auto bg-white text-[#7c3aed] hover:bg-white/90"
+            onClick={() => setWaitOpen(true)}
+          >
+            Join the waitlist <ArrowRight className="ml-1 h-4 w-4" />
           </Button>
         </CardContent>
       </Card>
@@ -345,12 +352,14 @@ export function CtaBlock() {
             Tools, calculators and resources for transformation leaders.
           </p>
           <Button asChild size="sm" className="mt-auto">
-            <Link to="/">
-              Explore <ArrowRight className="ml-1 h-4 w-4" />
+            <Link to="/marketplace">
+              Go Agentic! <ArrowRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
         </CardContent>
       </Card>
+      <WaitlistDialog open={waitOpen} onOpenChange={setWaitOpen} />
     </div>
   );
 }
+

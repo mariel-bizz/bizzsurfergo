@@ -6,9 +6,14 @@ import { Download, Linkedin, MessageCircle, Mail, Link2, Check, FileText, Presen
 import { downloadResources, SITE_ORIGIN, type DownloadResource } from "@/lib/insights-media";
 import { toast } from "sonner";
 
-function fileUrl(r: DownloadResource) {
-  // Always use the production origin so the link resolves outside the
-  // preview environment (which gates static files behind a Lovable login).
+// Same-origin path for the download itself (avoids cross-origin/adblock issues
+// like ERR_BLOCKED_BY_CLIENT when the browser is on a different host).
+function localFileUrl(r: DownloadResource) {
+  return r.file;
+}
+
+// Absolute URL only for share links so recipients land on the canonical host.
+function shareUrl(r: DownloadResource) {
   return `${SITE_ORIGIN}${r.file}`;
 }
 
@@ -30,22 +35,32 @@ function PreviewHeader({ r }: { r: DownloadResource }) {
   const Icon = meta.icon;
   return (
     <div
-      className={`relative h-32 w-full overflow-hidden bg-gradient-to-br ${meta.gradient}`}
+      className={`relative h-40 w-full overflow-hidden bg-gradient-to-br ${meta.gradient}`}
       aria-hidden="true"
     >
-      {/* faux page stack */}
-      <div className="absolute right-4 top-4 h-20 w-16 rotate-6 rounded-md bg-white/15 shadow-lg ring-1 ring-white/30 backdrop-blur-sm" />
-      <div className="absolute right-7 top-6 h-20 w-16 -rotate-3 rounded-md bg-white/90 shadow-xl ring-1 ring-white/60">
-        <div className="mx-2 mt-2 h-1.5 rounded-full bg-[#02459c]/70" />
-        <div className="mx-2 mt-1.5 h-1 rounded-full bg-[#02459c]/40" />
-        <div className="mx-2 mt-1.5 h-1 w-8 rounded-full bg-[#ff6f00]/80" />
-        <div className="mx-2 mt-2 h-6 rounded-sm bg-gradient-to-br from-[#02459c]/20 to-[#ff6f00]/20" />
-      </div>
-      <div className="absolute left-4 bottom-3 flex items-center gap-2 text-white">
-        <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/20 backdrop-blur ring-1 ring-white/40">
-          <Icon className="h-4.5 w-4.5" />
+      {/* Embedded PDF first-page preview, same-origin so no auth gate. */}
+      <object
+        data={`${localFileUrl(r)}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
+        type="application/pdf"
+        className="absolute inset-0 h-full w-full opacity-90"
+        aria-hidden="true"
+      >
+        {/* Fallback faux page stack */}
+        <div className="absolute right-5 top-5 h-24 w-20 rotate-6 rounded-md bg-white/15 shadow-lg ring-1 ring-white/30 backdrop-blur-sm" />
+        <div className="absolute right-8 top-7 h-24 w-20 -rotate-3 rounded-md bg-white/95 shadow-xl ring-1 ring-white/60">
+          <div className="mx-2 mt-2 h-1.5 rounded-full bg-[#02459c]/70" />
+          <div className="mx-2 mt-1.5 h-1 rounded-full bg-[#02459c]/40" />
+          <div className="mx-2 mt-1.5 h-1 w-10 rounded-full bg-[#ff6f00]/80" />
+          <div className="mx-2 mt-2 h-8 rounded-sm bg-gradient-to-br from-[#02459c]/20 to-[#ff6f00]/20" />
+        </div>
+      </object>
+      {/* Gradient overlay to keep the badge legible over any preview */}
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+      <div className="absolute left-3 bottom-3 flex items-center gap-2 text-white">
+        <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-white/25 backdrop-blur ring-1 ring-white/40">
+          <Icon className="h-4 w-4" />
         </span>
-        <span className="text-[11px] font-semibold uppercase tracking-wider drop-shadow">
+        <span className="text-[10px] font-semibold uppercase tracking-wider drop-shadow">
           {meta.label}
         </span>
       </div>
@@ -55,7 +70,7 @@ function PreviewHeader({ r }: { r: DownloadResource }) {
 
 function ShareRow({ r }: { r: DownloadResource }) {
   const [copied, setCopied] = useState(false);
-  const url = fileUrl(r);
+  const url = shareUrl(r);
   const text = `${r.title} — ${r.description}`;
 
   const linkedin = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
@@ -73,8 +88,8 @@ function ShareRow({ r }: { r: DownloadResource }) {
     }
   };
 
-  const iconBtn =
-    "inline-flex h-9 w-9 items-center justify-center rounded-full ring-1 ring-border/60 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background";
+  const pill =
+    "group/btn relative inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[11px] font-semibold text-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background";
 
   return (
     <div className="flex flex-wrap items-center gap-1.5">
@@ -83,37 +98,37 @@ function ShareRow({ r }: { r: DownloadResource }) {
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Share on LinkedIn"
-        title="Share on LinkedIn"
-        className={`${iconBtn} bg-[#0A66C2] text-white hover:bg-[#004182] focus-visible:ring-[#0A66C2]`}
+        className={`${pill} bg-gradient-to-br from-[#0A66C2] to-[#004182] focus-visible:ring-[#0A66C2]`}
       >
-        <Linkedin className="h-4 w-4" />
+        <Linkedin className="h-3.5 w-3.5" />
+        <span>In</span>
       </a>
       <a
         href={whatsapp}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Share on WhatsApp"
-        title="Share on WhatsApp"
-        className={`${iconBtn} bg-[#25D366] text-white hover:bg-[#1da851] focus-visible:ring-[#25D366]`}
+        className={`${pill} bg-gradient-to-br from-[#25D366] to-[#128C7E] focus-visible:ring-[#25D366]`}
       >
-        <MessageCircle className="h-4 w-4" />
+        <MessageCircle className="h-3.5 w-3.5" />
+        <span>WA</span>
       </a>
       <a
         href={email}
         aria-label="Share via email"
-        title="Share via email"
-        className={`${iconBtn} bg-[#ff6f00] text-white hover:bg-[#e66300] focus-visible:ring-[#ff6f00]`}
+        className={`${pill} bg-gradient-to-br from-[#ff6f00] to-[#e64a00] focus-visible:ring-[#ff6f00]`}
       >
-        <Mail className="h-4 w-4" />
+        <Mail className="h-3.5 w-3.5" />
+        <span>Email</span>
       </a>
       <button
         type="button"
         onClick={onCopy}
         aria-label="Copy link"
-        title="Copy link"
-        className={`${iconBtn} bg-card text-foreground hover:bg-muted focus-visible:ring-primary`}
+        className={`${pill} bg-gradient-to-br from-slate-700 to-slate-900 focus-visible:ring-slate-500`}
       >
-        {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Link2 className="h-4 w-4" />}
+        {copied ? <Check className="h-3.5 w-3.5" /> : <Link2 className="h-3.5 w-3.5" />}
+        <span>{copied ? "Copied" : "Copy"}</span>
       </button>
     </div>
   );
@@ -126,14 +141,14 @@ export function DownloadResources() {
       <p className="mb-4 text-sm text-muted-foreground">
         Free PDFs and carousels. Download or share with your network in one tap.
       </p>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="mx-auto grid max-w-5xl gap-4 sm:grid-cols-2 lg:gap-5">
         {downloadResources.map((r) => (
           <Card
             key={r.id}
-            className="group overflow-hidden border-2 border-[#02459c]/20 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-[#02459c]/60 hover:shadow-elegant"
+            className="group flex flex-col overflow-hidden border-2 border-[#02459c]/20 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:border-[#02459c]/60 hover:shadow-elegant"
           >
             <PreviewHeader r={r} />
-            <CardContent className="space-y-3 p-4">
+            <CardContent className="flex flex-1 flex-col gap-3 p-4">
               <div className="space-y-1.5">
                 <Badge variant="secondary" className="text-[10px] uppercase tracking-wide">
                   {r.category}
@@ -144,16 +159,13 @@ export function DownloadResources() {
               <Button
                 asChild
                 size="sm"
-                className="h-9 w-full bg-gradient-to-r from-[#ff6f00] to-[#ff8c1a] font-bold text-white shadow-soft hover:from-[#e66300] hover:to-[#ff6f00]"
+                className="mt-auto h-9 w-full bg-gradient-to-r from-[#ff6f00] to-[#ff8c1a] font-bold text-white shadow-soft hover:from-[#e66300] hover:to-[#ff6f00]"
               >
-                <a href={fileUrl(r)} target="_blank" rel="noopener noreferrer" download>
+                <a href={localFileUrl(r)} download rel="noopener">
                   <Download className="mr-1.5 h-3.5 w-3.5" /> Download PDF
                 </a>
               </Button>
-              <div className="flex items-center justify-between gap-2 border-t border-border/50 pt-3">
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-                  Share
-                </span>
+              <div className="border-t border-border/50 pt-3">
                 <ShareRow r={r} />
               </div>
             </CardContent>
