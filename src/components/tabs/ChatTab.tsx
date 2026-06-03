@@ -1311,6 +1311,62 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         </DialogContent>
       </Dialog>
 
+      {/* Image preview dialog */}
+      <Dialog open={!!imagePreview} onOpenChange={(o) => !o && setImagePreview(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Preview generated image</DialogTitle>
+            <DialogDescription>
+              {imagePreview?.prompt}
+            </DialogDescription>
+          </DialogHeader>
+          {imagePreview && (
+            <div className="space-y-3">
+              <a href={imagePreview.dataUrl} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={imagePreview.dataUrl}
+                  alt={imagePreview.prompt}
+                  className="w-full rounded-lg border border-border cursor-zoom-in"
+                />
+              </a>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={imagePreview.dataUrl}
+                  download={`image-${Date.now()}.png`}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </a>
+                <button
+                  type="button"
+                  onClick={() =>
+                    void shareAttachment({
+                      name: `image-${Date.now()}.png`,
+                      type: "image/png",
+                      dataUrl: imagePreview.dataUrl,
+                    })
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent"
+                >
+                  <Share2 className="w-3.5 h-3.5" /> Share
+                </button>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
+            <Button variant="ghost" onClick={() => setImagePreview(null)}>
+              Discard
+            </Button>
+            <Button variant="outline" onClick={attachImageFromPreview}>
+              Attach to next message
+            </Button>
+            <Button onClick={insertImageAsMessage} className="bg-gradient-primary">
+              Add to chat
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Projects dialog */}
       <Dialog open={projectsDialogOpen} onOpenChange={setProjectsDialogOpen}>
         <DialogContent className="max-w-sm">
