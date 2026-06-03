@@ -235,9 +235,6 @@ export function AppShell() {
 
         <main className="mx-auto max-w-md pb-28">
           <Outlet />
-          <div className="mt-10">
-            <FollowSection />
-          </div>
         </main>
 
         <FloatingChat />
