@@ -40,7 +40,7 @@ function PreviewHeader({ r }: { r: DownloadResource }) {
     >
       {/* Embedded PDF first-page preview, same-origin so no auth gate. */}
       <object
-        data={`${localFileUrl(r)}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
+        data={`${fileUrl(r)}#page=1&view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
         type="application/pdf"
         className="absolute inset-0 h-full w-full opacity-90"
         aria-hidden="true"
@@ -161,7 +161,7 @@ export function DownloadResources() {
                 size="sm"
                 className="mt-auto h-9 w-full bg-gradient-to-r from-[#ff6f00] to-[#ff8c1a] font-bold text-white shadow-soft hover:from-[#e66300] hover:to-[#ff6f00]"
               >
-                <a href={localFileUrl(r)} download rel="noopener">
+                <a href={fileUrl(r)} download rel="noopener">
                   <Download className="mr-1.5 h-3.5 w-3.5" /> Download PDF
                 </a>
               </Button>
