@@ -1105,25 +1105,39 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {attachments.length > 0 && (
             <div className="px-4 pb-1 flex gap-1.5 flex-wrap">
-              {attachments.map((a, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-[11px]"
-                >
-                  {a.type.startsWith("image/") ? (
-                    <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
-                  ) : (
-                    <Paperclip className="w-3 h-3" />
-                  )}
-                  {a.name}
-                  <button
-                    onClick={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
-                    aria-label="Remove"
+              {attachments.map((a, i) => {
+                const uploading = a.progress !== undefined;
+                return (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2 py-1 text-[11px] max-w-full"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    {uploading ? (
+                      <Loader2 className="w-3 h-3 animate-spin text-primary" />
+                    ) : a.type.startsWith("image/") ? (
+                      <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
+                    ) : a.type.startsWith("audio/") ? (
+                      <Mic className="w-3 h-3" />
+                    ) : (
+                      <Paperclip className="w-3 h-3" />
+                    )}
+                    <span className="truncate max-w-[140px]">{a.name}</span>
+                    {uploading && (
+                      <span className="text-muted-foreground">{a.progress}%</span>
+                    )}
+                    {!uploading && a.transcript && (
+                      <span className="text-primary font-semibold">✓ transcribed</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
+                      aria-label="Remove"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
             </div>
           )}
 
