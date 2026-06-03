@@ -345,6 +345,7 @@ export function MarketplaceTab() {
                 onClick={() => setManageOpen(true)}
                 className="inline-flex items-center gap-1 rounded-full h-8 px-2 text-[11px] font-bold text-muted-foreground hover:text-foreground"
                 title="Manage saved presets"
+                aria-label="Manage saved marketplace presets"
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
