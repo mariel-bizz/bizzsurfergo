@@ -23,11 +23,34 @@ const painPoints: PainItem[] = [
 ];
 
 const faqs = [
-  { q: "What's the difference between Agentic AI and AI agents?", a: "AI agents handle specific tasks under human direction. Agentic AI is designed to act more autonomously, coordinating decisions and actions across connected systems." },
-  { q: "How fast can we deploy BizzSurfer in our enterprise?", a: "Timelines depend on which systems are connected and the scope of the rollout. Workflows can be introduced incrementally rather than as a single large programme." },
-  { q: "Is it secure for regulated industries?", a: "BizzSurfer is built with role-based access, audit logging, and support for private deployments, so it can fit within governed enterprise environments." },
-  { q: "Will it replace our transformation team?", a: "No. BizzSurfer is built to support transformation teams — people stay in control of decisions while agents help with coordination and execution work." },
-  { q: "What ROI should leaders expect?", a: "Outcomes vary by organisation and use case. The platform is designed to shorten execution cycles, speed up decisions, and improve adoption of change initiatives." },
+  {
+    q: "What's the difference between Agentic AI and AI agents?",
+    a: "AI agents are narrow assistants that wait for prompts and execute a single task — drafting an email, summarising a report, querying a database. Agentic AI is the orchestration layer above them: it sets goals, sequences multiple agents and tools, monitors outcomes, and adapts in real time across enterprise systems (ERP, CRM, HRIS, BI). Think of AI agents as workers and Agentic AI as the autonomous manager coordinating them toward measurable business outcomes.",
+  },
+  {
+    q: "How fast can we deploy BizzSurfer Agentic AI in our enterprise?",
+    a: "Most transformation teams ship their first orchestrated workflow in 2–6 weeks. We deploy incrementally — start with one high-value use case (finance close, sales handover, onboarding), connect 2–3 systems, then expand. A typical 90-day plan moves from connected systems → first autonomous workflow → measurable ROI, without a multi-quarter programme.",
+  },
+  {
+    q: "Is BizzSurfer secure and compliant for regulated industries?",
+    a: "Yes. BizzSurfer ships with role-based access control, full audit logging, SSO/SAML, encryption in transit and at rest, and support for private/VPC deployments. It is designed to align with SOC 2, GDPR, HIPAA, and ISO 27001 controls, making it suitable for finance, healthcare, insurance, and the public sector.",
+  },
+  {
+    q: "Will Agentic AI replace our transformation team?",
+    a: "No — it amplifies them. BizzSurfer is a co-pilot for transformation leaders: humans set strategy, approve key decisions, and own outcomes, while agents handle coordination, status-chasing, data wrangling, and execution. Teams typically reclaim 30–50% of their time and redirect it to higher-leverage strategic work.",
+  },
+  {
+    q: "What ROI should executives expect from Agentic AI?",
+    a: "Customers commonly report 3–6 month payback on initial workflows: 40–70% faster decision cycles, 25–40% reduction in change-management overhead, and double-digit lift in adoption of transformation initiatives. Use the ROI Calculator above to model your own numbers based on team size and initiative scope.",
+  },
+  {
+    q: "Which enterprise systems does BizzSurfer connect to?",
+    a: "BizzSurfer integrates with the systems transformation programmes actually run on: SAP, Oracle, Microsoft Dynamics, Salesforce, Workday, SuccessFactors, ServiceNow, Snowflake, Databricks, Jira, Confluence, Slack, Microsoft 365, and Google Workspace — plus REST, GraphQL, and webhook APIs for anything custom. New connectors are typically added in days, not quarters.",
+  },
+  {
+    q: "How is Agentic AI different from RPA or traditional automation?",
+    a: "RPA follows hard-coded rules and breaks when a screen or process changes. Agentic AI reasons about goals, handles ambiguity, calls tools and APIs dynamically, and learns from feedback. Where RPA automates a known task, Agentic AI orchestrates an outcome — even when the path to get there shifts.",
+  },
 ];
 
 export function HomeTab() {
@@ -254,7 +277,24 @@ export function HomeTab() {
             );
           })}
         </div>
+
+        {/* Lead capture under FAQs */}
+        <div className="mt-5 rounded-2xl border border-border bg-gradient-to-br from-primary/5 via-card to-accent/10 p-4 shadow-card">
+          <p className="text-sm font-bold text-foreground">Still have questions?</p>
+          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+            Get a tailored 90-day Agentic AI plan for your enterprise — no slides, just a roadmap.
+          </p>
+          <div className="mt-3 flex flex-col sm:flex-row gap-2">
+            <Button size="sm" className="bg-gradient-agentic text-white font-bold flex-1" onClick={() => navigate({ to: "/chat" })}>
+              Ask BizzSurfer Go!
+            </Button>
+            <Button size="sm" variant="outline" className="font-bold flex-1" onClick={() => setWaitOpen(true)}>
+              Get the 90-day plan
+            </Button>
+          </div>
+        </div>
       </section>
+
 
       {/* Social media — rendered globally at end of every page via AppShell */}
 
