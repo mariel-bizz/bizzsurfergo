@@ -271,15 +271,24 @@ function LoginPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                disabled={loading}
+                disabled={loading || linkedInLoading}
                 onClick={() => {
                   setError(null);
+                  setInfo("Redirecting you to LinkedIn…");
+                  setLinkedInLoading(true);
                   setLoading(true);
                   window.location.href = `/api/auth/linkedin/start?redirect=${encodeURIComponent(redirect)}`;
                 }}
               >
-                Continue with LinkedIn
+                {linkedInLoading ? "Connecting to LinkedIn…" : "Continue with LinkedIn"}
               </Button>
+              {sessionInfo && (
+                <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-xs text-foreground">
+                  <p className="font-semibold text-primary">✓ Signed in — session active</p>
+                  <p className="mt-1 truncate text-muted-foreground">{sessionInfo.email}</p>
+                  <p className="truncate font-mono text-[10px] text-muted-foreground">id: {sessionInfo.userId}</p>
+                </div>
+              )}
             </>
           )}
           <button
@@ -297,6 +306,41 @@ function LoginPage() {
                 ? "Need an account? Sign up"
                 : "Have an account? Sign in"}
           </button>
+
+          {/* OAuth diagnostics panel — surfaces the exact LinkedIn callback
+              URL we use for this host, plus the most recent error returned
+              by /api/auth/linkedin/callback (passed via ?error=). */}
+          <div className="border-t border-border pt-3">
+            <button
+              type="button"
+              className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+              onClick={() => setShowDiag((v) => !v)}
+            >
+              {showDiag ? "Hide" : "Show"} OAuth diagnostics
+            </button>
+            {showDiag && (
+              <div className="mt-2 space-y-2 rounded-md border border-border bg-muted/40 p-3 text-xs">
+                <div>
+                  <p className="font-semibold text-foreground">Expected LinkedIn redirect URL</p>
+                  <p className="break-all font-mono text-[11px] text-muted-foreground">
+                    {linkedInCallbackUrl || "(unavailable)"}
+                  </p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    This exact URL must be listed in your LinkedIn app's
+                    Authorized redirect URLs.
+                  </p>
+                </div>
+                {searchError && (
+                  <div>
+                    <p className="font-semibold text-destructive">Last callback error</p>
+                    <p className="break-words font-mono text-[11px] text-destructive/90">
+                      {searchError}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </main>
