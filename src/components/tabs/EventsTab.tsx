@@ -8,6 +8,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Calendar, Clock, MapPin, Users, Mic, Linkedin, CalendarPlus, Check, X, Video, Youtube, Music2 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { useNavigate } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import event1 from "@/assets/event-mariel.png";
@@ -408,27 +409,72 @@ function Meta({ icon: Icon, label }: { icon: typeof Calendar; label: string }) {
 }
 
 function AttendeeStrip({ summary }: { summary?: { count: number; avatars: string[] } }) {
+  const [open, setOpen] = useState(false);
   if (!summary || summary.count === 0) return null;
   const avatars = summary.avatars.slice(0, 5);
+  const label = `${summary.count} ${summary.count === 1 ? "person" : "people"} going`;
   return (
-    <div className="flex items-center gap-2 pt-1">
-      {avatars.length > 0 && (
-        <div className="flex -space-x-2">
-          {avatars.map((src, i) => (
-            <img
-              key={i}
-              src={src}
-              alt=""
-              loading="lazy"
-              referrerPolicy="no-referrer"
-              className="w-6 h-6 rounded-full ring-2 ring-card object-cover bg-muted"
-            />
-          ))}
-        </div>
-      )}
-      <span className="text-xs text-muted-foreground">
-        {summary.count} {summary.count === 1 ? "person" : "people"} going
-      </span>
-    </div>
+    <>
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        title={label}
+        aria-label={`Show attendees — ${label}`}
+        className="group flex items-center gap-2 pt-1 text-left hover:opacity-90 transition-opacity"
+      >
+        {avatars.length > 0 && (
+          <div className="flex -space-x-2">
+            {avatars.map((src, i) => (
+              <img
+                key={i}
+                src={src}
+                alt=""
+                loading="lazy"
+                referrerPolicy="no-referrer"
+                className="w-6 h-6 rounded-full ring-2 ring-card object-cover bg-muted"
+              />
+            ))}
+          </div>
+        )}
+        <span className="text-xs text-muted-foreground group-hover:text-foreground">
+          {label}
+        </span>
+      </button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Attendees</DialogTitle>
+            <DialogDescription>{label}</DialogDescription>
+          </DialogHeader>
+          {avatars.length > 0 ? (
+            <div className="flex flex-wrap gap-3 pt-2">
+              {avatars.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                  className="w-12 h-12 rounded-full ring-2 ring-card object-cover bg-muted"
+                />
+              ))}
+              {summary.count > avatars.length && (
+                <div className="flex h-12 min-w-12 items-center justify-center rounded-full bg-muted px-3 text-xs font-semibold text-muted-foreground">
+                  +{summary.count - avatars.length}
+                </div>
+              )}
+            </div>
+          ) : (
+            <p className="text-sm text-muted-foreground">
+              Attendees are keeping their profile private.
+            </p>
+          )}
+          <p className="pt-3 text-xs text-muted-foreground">
+            Avatars are shown for people who chose to share their profile
+            picture. Names and emails stay private.
+          </p>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

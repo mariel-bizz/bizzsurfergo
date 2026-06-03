@@ -11,14 +11,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>) => {
     const raw = typeof s.redirect === "string" ? s.redirect : "";
-    // Only accept same-origin relative paths. Reject protocol-relative ("//evil.com"),
-    // absolute URLs, and paths that try to break out via "\\" or backslash tricks.
     const safe =
       raw.startsWith("/") &&
       !raw.startsWith("//") &&
       !raw.startsWith("/\\") &&
       !raw.includes("\\");
-    return { redirect: safe ? raw : "/" };
+    const rawError = typeof s.error === "string" ? s.error.slice(0, 300) : "";
+    return { redirect: safe ? raw : "/", error: rawError };
   },
   head: () => ({
     meta: [
@@ -43,13 +42,16 @@ export const Route = createFileRoute("/login")({
 
 function LoginPage() {
   const navigate = useNavigate();
-  const { redirect } = useSearch({ from: "/login" });
+  const { redirect, error: searchError } = useSearch({ from: "/login" });
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(searchError || null);
   const [info, setInfo] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [linkedInLoading, setLinkedInLoading] = useState(false);
+  const [showDiag, setShowDiag] = useState(false);
+  const [sessionInfo, setSessionInfo] = useState<{ userId: string; email: string } | null>(null);
 
   const isUpgradeFlow = redirect.startsWith("/pricing");
   const notifySuccess = (mode: "signin" | "signup") => {
@@ -62,17 +64,28 @@ function LoginPage() {
     }
   };
 
+  // Computed once: the exact LinkedIn callback URL for the current host —
+  // shown in the diagnostics panel so you can paste it into the LinkedIn
+  // app's "Authorized redirect URLs" list when something is misconfigured.
+  const linkedInCallbackUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/api/auth/linkedin/callback`
+      : "";
+
   useEffect(() => {
     // Restore existing session on mount (handles OAuth redirect return).
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: redirect });
+      if (data.session) {
+        setSessionInfo({
+          userId: data.session.user.id,
+          email: data.session.user.email ?? "",
+        });
+        // Brief on-page confirmation, then navigate.
+        setTimeout(() => navigate({ to: redirect }), 600);
+      }
     });
-    // Subscribe to auth state changes so a session created by an OAuth
-    // redirect (Apple/Google) is picked up immediately on this page.
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
       if (session && event === "SIGNED_IN") {
-        // First sign-in on this device: reset the chat language-model setup
-        // so the user re-picks their preferred model.
         try {
           const flagKey = `bizzsurfer.reset.${session.user.id}`;
           if (!localStorage.getItem(flagKey)) {
@@ -80,12 +93,24 @@ function LoginPage() {
             localStorage.setItem(flagKey, "1");
           }
         } catch { /* ignore */ }
+        setSessionInfo({
+          userId: session.user.id,
+          email: session.user.email ?? "",
+        });
         notifySuccess("signin");
-        navigate({ to: redirect });
+        setTimeout(() => navigate({ to: redirect }), 600);
       }
     });
     return () => sub.subscription.unsubscribe();
   }, [navigate, redirect]);
+
+  // Surface any error from the LinkedIn callback as a toast on mount.
+  useEffect(() => {
+    if (searchError) {
+      toast.error(`LinkedIn sign-in failed: ${searchError}`);
+      setShowDiag(true);
+    }
+  }, [searchError]);
 
   // Map raw OAuth/provider errors to actionable, user-friendly messages.
   const friendlyOAuthError = (provider: "google" | "apple", raw: unknown): string => {
@@ -246,15 +271,24 @@ function LoginPage() {
               <Button
                 variant="outline"
                 className="w-full"
-                disabled={loading}
+                disabled={loading || linkedInLoading}
                 onClick={() => {
                   setError(null);
+                  setInfo("Redirecting you to LinkedIn…");
+                  setLinkedInLoading(true);
                   setLoading(true);
                   window.location.href = `/api/auth/linkedin/start?redirect=${encodeURIComponent(redirect)}`;
                 }}
               >
-                Continue with LinkedIn
+                {linkedInLoading ? "Connecting to LinkedIn…" : "Continue with LinkedIn"}
               </Button>
+              {sessionInfo && (
+                <div className="rounded-md border border-primary/30 bg-primary/5 px-3 py-2 text-xs text-foreground">
+                  <p className="font-semibold text-primary">✓ Signed in — session active</p>
+                  <p className="mt-1 truncate text-muted-foreground">{sessionInfo.email}</p>
+                  <p className="truncate font-mono text-[10px] text-muted-foreground">id: {sessionInfo.userId}</p>
+                </div>
+              )}
             </>
           )}
           <button
@@ -272,6 +306,41 @@ function LoginPage() {
                 ? "Need an account? Sign up"
                 : "Have an account? Sign in"}
           </button>
+
+          {/* OAuth diagnostics panel — surfaces the exact LinkedIn callback
+              URL we use for this host, plus the most recent error returned
+              by /api/auth/linkedin/callback (passed via ?error=). */}
+          <div className="border-t border-border pt-3">
+            <button
+              type="button"
+              className="text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+              onClick={() => setShowDiag((v) => !v)}
+            >
+              {showDiag ? "Hide" : "Show"} OAuth diagnostics
+            </button>
+            {showDiag && (
+              <div className="mt-2 space-y-2 rounded-md border border-border bg-muted/40 p-3 text-xs">
+                <div>
+                  <p className="font-semibold text-foreground">Expected LinkedIn redirect URL</p>
+                  <p className="break-all font-mono text-[11px] text-muted-foreground">
+                    {linkedInCallbackUrl || "(unavailable)"}
+                  </p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">
+                    This exact URL must be listed in your LinkedIn app's
+                    Authorized redirect URLs.
+                  </p>
+                </div>
+                {searchError && (
+                  <div>
+                    <p className="font-semibold text-destructive">Last callback error</p>
+                    <p className="break-words font-mono text-[11px] text-destructive/90">
+                      {searchError}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
     </main>
