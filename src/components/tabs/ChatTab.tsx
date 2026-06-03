@@ -18,10 +18,14 @@ import {
   Image as ImageIcon,
   FolderOpen,
   Save,
+  Share2,
+  FileText,
+  Loader2,
 }  from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useServerFn } from "@tanstack/react-start";
 import { generateChatImage } from "@/lib/chat-image.functions";
+import { transcribeChatAudio } from "@/lib/chat-audio.functions";
 import { toast } from "sonner";
 import {
   GoChatSetup,
@@ -77,10 +81,18 @@ async function getLogoDataUrl(): Promise<string | null> {
   }
 }
 
-type Attachment = { name: string; type: string; dataUrl: string };
+type Attachment = {
+  name: string;
+  type: string;
+  dataUrl: string;
+  progress?: number; // 0-100 while uploading; undefined when done
+  transcript?: string; // for audio attachments
+};
 type Msg = { role: "user" | "assistant"; content: string; attachments?: Attachment[] };
 
 const CONFIG_KEY = "bizzsurfer.gochat.config";
+const AUTOSAVE_KEY = "bizzsurfer.chat.autosave";
+const AUTOSAVE_VERSIONS_KEY = "bizzsurfer.chat.autosave.versions";
 const QUESTION_LIMIT = 5;
 
 const PRESETS = [
@@ -117,9 +129,21 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const contextPreamble = config
     ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in short paragraphs separated by blank lines. Use markdown **bold** to highlight the key terms, metrics and frameworks. Use simple "-" bullets for short lists. Never use markdown headings.`
     : "";
-  const [messages, setMessages] = useState<Msg[]>(() => [
-    { role: "assistant", content: buildInitialAssistant(null) },
-  ]);
+  const [messages, setMessages] = useState<Msg[]>(() => {
+    if (typeof window === "undefined") {
+      return [{ role: "assistant", content: buildInitialAssistant(null) }];
+    }
+    try {
+      const raw = window.localStorage.getItem(AUTOSAVE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Msg[];
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      /* ignore */
+    }
+    return [{ role: "assistant", content: buildInitialAssistant(null) }];
+  });
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -141,16 +165,20 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [plusOpen, setPlusOpen] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
+  const recorderMimeRef = useRef<string>("audio/webm");
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<{ dataUrl: string; prompt: string } | null>(null);
   const [projectsDialogOpen, setProjectsDialogOpen] = useState(false);
   const [savedProjects, setSavedProjects] = useState<
     Array<{ id: string; name: string; messages: Msg[]; savedAt: string }>
   >([]);
   const generateImageFn = useServerFn(generateChatImage);
+  const transcribeAudioFn = useServerFn(transcribeChatAudio);
 
   useEffect(() => {
     try {
@@ -183,6 +211,28 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
   }, [messages, streaming]);
+
+  // Auto-save current chat to localStorage + keep up to 10 historical versions.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (messages.length === 0) return;
+    try {
+      window.localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(messages));
+      // Throttle version snapshots to one per ~30s of edits.
+      const versionsRaw = window.localStorage.getItem(AUTOSAVE_VERSIONS_KEY);
+      const versions = versionsRaw
+        ? (JSON.parse(versionsRaw) as Array<{ at: string; messages: Msg[] }>)
+        : [];
+      const last = versions[0];
+      const now = Date.now();
+      if (!last || now - new Date(last.at).getTime() > 30_000) {
+        const next = [{ at: new Date().toISOString(), messages }, ...versions].slice(0, 10);
+        window.localStorage.setItem(AUTOSAVE_VERSIONS_KEY, JSON.stringify(next));
+      }
+    } catch {
+      /* quota or serialization issue — ignore */
+    }
+  }, [messages]);
 
   const saveConfig = (cfg: GoChatConfig) => {
     try {
@@ -272,16 +322,28 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const rec = new MediaRecorder(stream);
+      const mime =
+        typeof MediaRecorder !== "undefined" &&
+        MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ? "audio/webm;codecs=opus"
+          : typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : "audio/webm";
+      recorderMimeRef.current = mime;
+      const rec = new MediaRecorder(stream, { mimeType: mime });
       recordedChunksRef.current = [];
       rec.ondataavailable = (e) => {
         if (e.data.size > 0) recordedChunksRef.current.push(e.data);
       };
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
-        if (blob.size > 5 * 1024 * 1024) {
-          toast.error("Recording over 5MB");
+        const blob = new Blob(recordedChunksRef.current, { type: mime });
+        if (blob.size === 0) {
+          toast.error("Empty recording");
+          return;
+        }
+        if (blob.size > 10 * 1024 * 1024) {
+          toast.error("Recording over 10MB");
           return;
         }
         const dataUrl: string = await new Promise((resolve, reject) => {
@@ -290,12 +352,33 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           r.onerror = reject;
           r.readAsDataURL(blob);
         });
+        const ext = mime.includes("mp4") ? "m4a" : "webm";
+        const name = `recording-${Date.now()}.${ext}`;
+        // Insert as attachment with "transcribing" progress.
         setAttachments((prev) =>
-          [
-            ...prev,
-            { name: `recording-${Date.now()}.webm`, type: "audio/webm", dataUrl },
-          ].slice(0, 4),
+          [...prev, { name, type: mime, dataUrl, progress: 0 }].slice(0, 4),
         );
+        setTranscribing(true);
+        try {
+          const { transcript } = await transcribeAudioFn({
+            data: { audioBase64: dataUrl, mimeType: mime },
+          });
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.name === name ? { ...a, progress: undefined, transcript } : a,
+            ),
+          );
+          // Pre-fill the input with the transcript so the user can edit + send.
+          setInput((cur) => (cur.trim() ? `${cur}\n\n${transcript}` : transcript));
+          toast.success("Transcription ready");
+        } catch (err) {
+          setAttachments((prev) =>
+            prev.map((a) => (a.name === name ? { ...a, progress: undefined } : a)),
+          );
+          toast.error(err instanceof Error ? err.message : "Transcription failed");
+        } finally {
+          setTranscribing(false);
+        }
       };
       rec.start();
       recorderRef.current = rec;
@@ -306,7 +389,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   };
 
   const stopRecording = () => {
-    recorderRef.current?.stop();
+    try {
+      recorderRef.current?.stop();
+    } catch {
+      /* ignore */
+    }
     recorderRef.current = null;
     setRecording(false);
   };
@@ -316,15 +403,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setGeneratingImage(true);
     try {
       const { dataUrl } = await generateImageFn({ data: { prompt: imagePrompt.trim() } });
-      setAttachments((prev) =>
-        [
-          ...prev,
-          { name: `image-${Date.now()}.png`, type: "image/png", dataUrl },
-        ].slice(0, 4),
-      );
+      setImagePreview({ dataUrl, prompt: imagePrompt.trim() });
       setImageDialogOpen(false);
-      setImagePrompt("");
-      toast.success("Image attached");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Image generation failed");
     } finally {
@@ -332,23 +412,107 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     }
   };
 
+  const insertImageAsMessage = () => {
+    if (!imagePreview) return;
+    const att: Attachment = {
+      name: `image-${Date.now()}.png`,
+      type: "image/png",
+      dataUrl: imagePreview.dataUrl,
+    };
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: `🎨 Generated image — *${imagePreview.prompt}*`,
+        attachments: [att],
+      },
+    ]);
+    setImagePreview(null);
+    setImagePrompt("");
+    toast.success("Image added to chat");
+  };
+
+  const attachImageFromPreview = () => {
+    if (!imagePreview) return;
+    setAttachments((prev) =>
+      [
+        ...prev,
+        {
+          name: `image-${Date.now()}.png`,
+          type: "image/png",
+          dataUrl: imagePreview.dataUrl,
+        },
+      ].slice(0, 4),
+    );
+    setImagePreview(null);
+    setImagePrompt("");
+    toast.success("Attached to next message");
+  };
+
+  const shareAttachment = async (a: Attachment) => {
+    try {
+      const blob = await (await fetch(a.dataUrl)).blob();
+      const file = new File([blob], a.name, { type: a.type });
+      const nav = navigator as Navigator & {
+        canShare?: (data: { files: File[] }) => boolean;
+        share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+      };
+      if (nav.canShare?.({ files: [file] }) && nav.share) {
+        await nav.share({ files: [file], title: a.name });
+      } else {
+        // Fallback: copy data URL
+        await navigator.clipboard.writeText(a.dataUrl);
+        toast.success("Image link copied");
+      }
+    } catch (e) {
+      if ((e as DOMException)?.name !== "AbortError") {
+        toast.error("Couldn't share");
+      }
+    }
+  };
+
   const onPickFiles = async (files: FileList | null) => {
     if (!files) return;
-    const items: Attachment[] = [];
-    for (const f of Array.from(files).slice(0, 4)) {
-      if (f.size > 5 * 1024 * 1024) {
-        toast.error(`${f.name} is over 5MB`);
+    const slots = Math.max(0, 4 - attachments.length);
+    const list = Array.from(files).slice(0, slots);
+    for (const f of list) {
+      if (f.size > 10 * 1024 * 1024) {
+        toast.error(`${f.name} is over 10MB`);
         continue;
       }
-      const dataUrl: string = await new Promise((resolve, reject) => {
+      // Insert placeholder chip with 0% progress immediately.
+      setAttachments((prev) =>
+        [...prev, { name: f.name, type: f.type, dataUrl: "", progress: 0 }].slice(0, 4),
+      );
+      await new Promise<void>((resolve, reject) => {
         const r = new FileReader();
-        r.onload = () => resolve(r.result as string);
-        r.onerror = reject;
+        r.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            const pct = Math.min(99, Math.round((ev.loaded / ev.total) * 100));
+            setAttachments((prev) =>
+              prev.map((a) => (a.name === f.name && a.progress !== undefined ? { ...a, progress: pct } : a)),
+            );
+          }
+        };
+        r.onload = () => {
+          const dataUrl = r.result as string;
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.name === f.name && a.progress !== undefined
+                ? { ...a, dataUrl, progress: undefined }
+                : a,
+            ),
+          );
+          resolve();
+        };
+        r.onerror = () => {
+          setAttachments((prev) => prev.filter((a) => !(a.name === f.name && a.progress !== undefined)));
+          toast.error(`Couldn't read ${f.name}`);
+          reject(r.error);
+        };
         r.readAsDataURL(f);
-      });
-      items.push({ name: f.name, type: f.type, dataUrl });
+      }).catch(() => {});
     }
-    setAttachments((prev) => [...prev, ...items].slice(0, 4));
   };
 
   const send = async (text: string) => {
@@ -821,19 +985,68 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                   }`}
                 >
                   {m.attachments?.length ? (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
+                    <div className="flex flex-wrap gap-2 mb-2">
                       {m.attachments.map((a, j) =>
                         a.type.startsWith("image/") ? (
-                          <img
+                          <div key={j} className="relative group">
+                            <a
+                              href={a.dataUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              title="Open image"
+                            >
+                              <img
+                                src={a.dataUrl}
+                                alt={a.name}
+                                className="max-w-[220px] max-h-[220px] rounded-lg object-cover border border-border cursor-zoom-in"
+                              />
+                            </a>
+                            <div className="absolute bottom-1 right-1 flex gap-1 opacity-0 group-hover:opacity-100 transition">
+                              <a
+                                href={a.dataUrl}
+                                download={a.name}
+                                className="rounded-md bg-black/60 text-white px-1.5 py-1"
+                                title="Download"
+                              >
+                                <Download className="w-3 h-3" />
+                              </a>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  void shareAttachment(a);
+                                }}
+                                className="rounded-md bg-black/60 text-white px-1.5 py-1"
+                                title="Share"
+                              >
+                                <Share2 className="w-3 h-3" />
+                              </button>
+                            </div>
+                          </div>
+                        ) : a.type.startsWith("audio/") ? (
+                          <div
                             key={j}
-                            src={a.dataUrl}
-                            alt={a.name}
-                            className="w-16 h-16 rounded-lg object-cover"
-                          />
+                            className="flex flex-col gap-1 rounded-lg bg-background/40 border border-border p-2 max-w-full"
+                          >
+                            <audio controls src={a.dataUrl} className="max-w-[260px]" />
+                            {a.transcript && (
+                              <p className="text-[11px] italic opacity-90 max-w-[260px] whitespace-pre-wrap">
+                                “{a.transcript}”
+                              </p>
+                            )}
+                          </div>
                         ) : (
-                          <span key={j} className="text-[10px] bg-white/30 rounded px-1.5 py-0.5">
+                          <a
+                            key={j}
+                            href={a.dataUrl}
+                            download={a.name}
+                            className="inline-flex items-center gap-1.5 text-[11px] bg-white/30 rounded px-2 py-1 hover:bg-white/50"
+                            title="Download"
+                          >
+                            <FileText className="w-3 h-3" />
                             {a.name}
-                          </span>
+                            <Download className="w-3 h-3 opacity-70" />
+                          </a>
                         ),
                       )}
                     </div>
@@ -892,25 +1105,39 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
           {attachments.length > 0 && (
             <div className="px-4 pb-1 flex gap-1.5 flex-wrap">
-              {attachments.map((a, i) => (
-                <span
-                  key={i}
-                  className="inline-flex items-center gap-1 rounded-full bg-muted px-2 py-1 text-[11px]"
-                >
-                  {a.type.startsWith("image/") ? (
-                    <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
-                  ) : (
-                    <Paperclip className="w-3 h-3" />
-                  )}
-                  {a.name}
-                  <button
-                    onClick={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
-                    aria-label="Remove"
+              {attachments.map((a, i) => {
+                const uploading = a.progress !== undefined;
+                return (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2 py-1 text-[11px] max-w-full"
                   >
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
+                    {uploading ? (
+                      <Loader2 className="w-3 h-3 animate-spin text-primary" />
+                    ) : a.type.startsWith("image/") ? (
+                      <img src={a.dataUrl} alt="" className="w-4 h-4 rounded object-cover" />
+                    ) : a.type.startsWith("audio/") ? (
+                      <Mic className="w-3 h-3" />
+                    ) : (
+                      <Paperclip className="w-3 h-3" />
+                    )}
+                    <span className="truncate max-w-[140px]">{a.name}</span>
+                    {uploading && (
+                      <span className="text-muted-foreground">{a.progress}%</span>
+                    )}
+                    {!uploading && a.transcript && (
+                      <span className="text-primary font-semibold">✓ transcribed</span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setAttachments((prev) => prev.filter((_, j) => j !== i))}
+                      aria-label="Remove"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                );
+              })}
             </div>
           )}
 
@@ -1015,9 +1242,19 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 </PopoverContent>
               </Popover>
               {recording && (
-                <span className="inline-flex items-center gap-1 text-[11px] text-destructive font-medium">
-                  <span className="w-2 h-2 rounded-full bg-destructive animate-pulse" />
-                  REC
+                <button
+                  type="button"
+                  onClick={stopRecording}
+                  className="inline-flex items-center gap-1.5 rounded-full bg-destructive text-destructive-foreground px-3 h-9 text-[11px] font-bold shrink-0"
+                  title="Stop recording"
+                >
+                  <span className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                  <StopCircle className="w-3.5 h-3.5" /> Stop
+                </button>
+              )}
+              {transcribing && !recording && (
+                <span className="inline-flex items-center gap-1 text-[11px] text-primary font-medium">
+                  <Loader2 className="w-3 h-3 animate-spin" /> Transcribing…
                 </span>
               )}
               <input
@@ -1069,6 +1306,62 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
               className="bg-gradient-primary"
             >
               {generatingImage ? "Generating…" : "Generate"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Image preview dialog */}
+      <Dialog open={!!imagePreview} onOpenChange={(o) => !o && setImagePreview(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Preview generated image</DialogTitle>
+            <DialogDescription>
+              {imagePreview?.prompt}
+            </DialogDescription>
+          </DialogHeader>
+          {imagePreview && (
+            <div className="space-y-3">
+              <a href={imagePreview.dataUrl} target="_blank" rel="noopener noreferrer">
+                <img
+                  src={imagePreview.dataUrl}
+                  alt={imagePreview.prompt}
+                  className="w-full rounded-lg border border-border cursor-zoom-in"
+                />
+              </a>
+              <div className="flex flex-wrap gap-2">
+                <a
+                  href={imagePreview.dataUrl}
+                  download={`image-${Date.now()}.png`}
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent"
+                >
+                  <Download className="w-3.5 h-3.5" /> Download
+                </a>
+                <button
+                  type="button"
+                  onClick={() =>
+                    void shareAttachment({
+                      name: `image-${Date.now()}.png`,
+                      type: "image/png",
+                      dataUrl: imagePreview.dataUrl,
+                    })
+                  }
+                  className="inline-flex items-center gap-1.5 rounded-md border border-border px-3 py-1.5 text-xs font-semibold hover:bg-accent"
+                >
+                  <Share2 className="w-3.5 h-3.5" /> Share
+                </button>
+              </div>
+            </div>
+          )}
+          <DialogFooter className="gap-2 flex-col sm:flex-row">
+            <Button variant="ghost" onClick={() => setImagePreview(null)}>
+              Discard
+            </Button>
+            <Button variant="outline" onClick={attachImageFromPreview}>
+              Attach to next message
+            </Button>
+            <Button onClick={insertImageAsMessage} className="bg-gradient-primary">
+              Add to chat
             </Button>
           </DialogFooter>
         </DialogContent>
