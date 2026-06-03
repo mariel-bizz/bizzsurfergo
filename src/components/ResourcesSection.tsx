@@ -251,7 +251,7 @@ export function FollowSection() {
                 <span className="w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center transition-transform group-hover:scale-105 group-active:scale-95">
                   <img
                     src={s.image}
-                    alt={`${s.label} logo`}
+                    alt={`Follow BizzSurfer on ${s.label}`}
                     loading="lazy"
                     className="w-full h-full object-contain"
                   />
@@ -312,7 +312,7 @@ export function PoweredBySection() {
             >
               <img
                 src={p.src}
-                alt={`${p.name} logo`}
+                alt={`BizzSurfer GO! is backed by ${p.name}`}
                 loading="lazy"
                 decoding="async"
                 className="max-h-8 max-w-full object-contain opacity-90"
@@ -339,7 +339,7 @@ export function TrustedPartnersSection() {
             >
               <img
                 src={p.src}
-                alt={`${p.name} logo`}
+                alt={`Trusted partner of BizzSurfer: ${p.name}`}
                 loading="lazy"
                 decoding="async"
                 className="max-h-8 max-w-full object-contain"

@@ -7,6 +7,7 @@ type Entry = { path: string; priority: string; changefreq?: string; lastmod?: st
 
 const STATIC: Entry[] = [
   { path: "/", priority: "1.0", changefreq: "weekly" },
+  { path: "/contact", priority: "0.6", changefreq: "monthly" },
   { path: "/chat", priority: "0.8", changefreq: "weekly" },
   { path: "/events", priority: "0.8", changefreq: "weekly" },
   { path: "/pricing", priority: "0.8", changefreq: "weekly" },
