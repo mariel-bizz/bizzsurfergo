@@ -62,12 +62,24 @@ const TOPIC_OPTIONS = [
 ];
 
 const LANGUAGE_OPTIONS = [
-  { code: "en", label: "English" },
-  { code: "es", label: "Español" },
-  { code: "pt", label: "Português" },
-  { code: "fr", label: "Français" },
-  { code: "de", label: "Deutsch" },
-  { code: "it", label: "Italiano" },
+  { code: "en", label: "English", flag: "🇬🇧" },
+  { code: "es", label: "Spanish", flag: "🇪🇸" },
+  { code: "nl", label: "Dutch", flag: "🇳🇱" },
+  { code: "zh", label: "Mandarin", flag: "🇨🇳" },
+  { code: "hi", label: "Hindi", flag: "🇮🇳" },
+  { code: "ar", label: "Arabic", flag: "🇸🇦" },
+  { code: "fr", label: "French", flag: "🇫🇷" },
+  { code: "de", label: "German", flag: "🇩🇪" },
+  { code: "pt", label: "Portuguese", flag: "🇵🇹" },
+  { code: "bn", label: "বাংলা (Bengali)", flag: "🇧🇩" },
+  { code: "ru", label: "Русский (Russian)", flag: "🇷🇺" },
+  { code: "ur", label: "اردو (Urdu)", flag: "🇵🇰" },
+  { code: "id", label: "Bahasa Indonesia", flag: "🇮🇩" },
+  { code: "ja", label: "日本語 (Japanese)", flag: "🇯🇵" },
+  { code: "sw", label: "Kiswahili", flag: "🇰🇪" },
+  { code: "tr", label: "Türkçe (Turkish)", flag: "🇹🇷" },
+  { code: "it", label: "Italiano (Italian)", flag: "🇮🇹" },
+  { code: "ko", label: "한국어 (Korean)", flag: "🇰🇷" },
 ];
 
 type TeamRow = {
