@@ -137,7 +137,7 @@ function ShareRow({ r }: { r: DownloadResource }) {
 export function DownloadResources() {
   return (
     <section id="download-resources" className="mt-10 scroll-mt-20">
-      <h2 className="mb-3 text-lg font-bold text-[#ff6f00]">Download Resources</h2>
+      <SectionHeader className="mb-3">Download Resources</SectionHeader>
       <p className="mb-4 text-sm text-muted-foreground">
         Free PDFs and carousels. Download or share with your network in one tap.
       </p>
