@@ -13,6 +13,7 @@ import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles, BookOpen, 
 import { DownloadResources } from "@/components/insights/DownloadResources";
 import { VideoContent } from "@/components/insights/VideoContent";
 import { WaitlistDialog } from "@/components/WaitlistDialog";
+import { SectionHeader } from "@/components/SectionHeader";
 
 export const Route = createFileRoute("/insights/")({
   head: () => {
