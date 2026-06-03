@@ -117,8 +117,9 @@ export const Route = createFileRoute("/api/auth/linkedin/callback")({
           (u) => (u.email || "").toLowerCase() === emailLower,
         );
 
+        let userId: string | undefined = existing?.id;
         if (!existing) {
-          const { error: createErr } = await supabaseAdmin.auth.admin.createUser({
+          const { data: created, error: createErr } = await supabaseAdmin.auth.admin.createUser({
             email: info.email,
             email_confirm: true,
             user_metadata: userMeta,
@@ -127,10 +128,28 @@ export const Route = createFileRoute("/api/auth/linkedin/callback")({
             console.error("createUser failed:", createErr);
             return errorRedirect(origin, "Could not create account");
           }
+          userId = created.user?.id;
         } else {
           await supabaseAdmin.auth.admin.updateUserById(existing.id, {
             user_metadata: { ...(existing.user_metadata || {}), ...userMeta },
           });
+        }
+
+        // Sync LinkedIn name + avatar into user_preferences so the app has a
+        // stable profile row (display_name + avatar_url) usable across the UI
+        // (e.g. attendee mini-photos on the Events page).
+        if (userId) {
+          const { error: prefErr } = await supabaseAdmin
+            .from("user_preferences")
+            .upsert(
+              {
+                user_id: userId,
+                display_name: info.name ?? null,
+                avatar_url: info.picture ?? null,
+              },
+              { onConflict: "user_id" },
+            );
+          if (prefErr) console.error("user_preferences upsert failed:", prefErr);
         }
 
         // 4. Generate a magic link the browser can follow to establish a session
