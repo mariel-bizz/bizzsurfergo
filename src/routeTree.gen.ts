@@ -61,6 +61,8 @@ import { Route as ApiPublicHooksSyncMarketNewsRouteImport } from './routes/api/p
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
 import { Route as ApiPublicChatEmailSummaryRouteImport } from './routes/api/public/chat/email-summary'
+import { Route as ApiAuthLinkedinStartRouteImport } from './routes/api/auth.linkedin.start'
+import { Route as ApiAuthLinkedinCallbackRouteImport } from './routes/api/auth.linkedin.callback'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -332,6 +334,16 @@ const ApiPublicChatEmailSummaryRoute =
     path: '/api/public/chat/email-summary',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiAuthLinkedinStartRoute = ApiAuthLinkedinStartRouteImport.update({
+  id: '/api/auth/linkedin/start',
+  path: '/api/auth/linkedin/start',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLinkedinCallbackRoute = ApiAuthLinkedinCallbackRouteImport.update({
+  id: '/api/auth/linkedin/callback',
+  path: '/api/auth/linkedin/callback',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -376,6 +388,8 @@ export interface FileRoutesByFullPath {
   '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
+  '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
+  '/api/auth/linkedin/start': typeof ApiAuthLinkedinStartRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -430,6 +444,8 @@ export interface FileRoutesByTo {
   '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
+  '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
+  '/api/auth/linkedin/start': typeof ApiAuthLinkedinStartRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -485,6 +501,8 @@ export interface FileRoutesById {
   '/api/public/contact': typeof ApiPublicContactRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
+  '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
+  '/api/auth/linkedin/start': typeof ApiAuthLinkedinStartRoute
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
@@ -541,6 +559,8 @@ export interface FileRouteTypes {
     | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
+    | '/api/auth/linkedin/callback'
+    | '/api/auth/linkedin/start'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -595,6 +615,8 @@ export interface FileRouteTypes {
     | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
+    | '/api/auth/linkedin/callback'
+    | '/api/auth/linkedin/start'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -649,6 +671,8 @@ export interface FileRouteTypes {
     | '/api/public/contact'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
+    | '/api/auth/linkedin/callback'
+    | '/api/auth/linkedin/start'
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
@@ -704,6 +728,8 @@ export interface RootRouteChildren {
   ApiPublicContactRoute: typeof ApiPublicContactRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   MarketplaceApplicationTokenRoute: typeof MarketplaceApplicationTokenRoute
+  ApiAuthLinkedinCallbackRoute: typeof ApiAuthLinkedinCallbackRoute
+  ApiAuthLinkedinStartRoute: typeof ApiAuthLinkedinStartRoute
   ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
@@ -1082,6 +1108,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicChatEmailSummaryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/linkedin/start': {
+      id: '/api/auth/linkedin/start'
+      path: '/api/auth/linkedin/start'
+      fullPath: '/api/auth/linkedin/start'
+      preLoaderRoute: typeof ApiAuthLinkedinStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/linkedin/callback': {
+      id: '/api/auth/linkedin/callback'
+      path: '/api/auth/linkedin/callback'
+      fullPath: '/api/auth/linkedin/callback'
+      preLoaderRoute: typeof ApiAuthLinkedinCallbackRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1128,6 +1168,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicContactRoute: ApiPublicContactRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   MarketplaceApplicationTokenRoute: MarketplaceApplicationTokenRoute,
+  ApiAuthLinkedinCallbackRoute: ApiAuthLinkedinCallbackRoute,
+  ApiAuthLinkedinStartRoute: ApiAuthLinkedinStartRoute,
   ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
@@ -1142,13 +1184,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

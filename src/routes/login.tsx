@@ -243,6 +243,18 @@ function LoginPage() {
               <Button variant="outline" className="w-full" onClick={() => oauth("apple")} disabled={loading}>
                 Continue with Apple
               </Button>
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={loading}
+                onClick={() => {
+                  setError(null);
+                  setLoading(true);
+                  window.location.href = `/api/auth/linkedin/start?redirect=${encodeURIComponent(redirect)}`;
+                }}
+              >
+                Continue with LinkedIn
+              </Button>
             </>
           )}
           <button
