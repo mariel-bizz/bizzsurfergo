@@ -322,16 +322,28 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const rec = new MediaRecorder(stream);
+      const mime =
+        typeof MediaRecorder !== "undefined" &&
+        MediaRecorder.isTypeSupported("audio/webm;codecs=opus")
+          ? "audio/webm;codecs=opus"
+          : typeof MediaRecorder !== "undefined" && MediaRecorder.isTypeSupported("audio/mp4")
+            ? "audio/mp4"
+            : "audio/webm";
+      recorderMimeRef.current = mime;
+      const rec = new MediaRecorder(stream, { mimeType: mime });
       recordedChunksRef.current = [];
       rec.ondataavailable = (e) => {
         if (e.data.size > 0) recordedChunksRef.current.push(e.data);
       };
       rec.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
-        const blob = new Blob(recordedChunksRef.current, { type: "audio/webm" });
-        if (blob.size > 5 * 1024 * 1024) {
-          toast.error("Recording over 5MB");
+        const blob = new Blob(recordedChunksRef.current, { type: mime });
+        if (blob.size === 0) {
+          toast.error("Empty recording");
+          return;
+        }
+        if (blob.size > 10 * 1024 * 1024) {
+          toast.error("Recording over 10MB");
           return;
         }
         const dataUrl: string = await new Promise((resolve, reject) => {
@@ -340,12 +352,33 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           r.onerror = reject;
           r.readAsDataURL(blob);
         });
+        const ext = mime.includes("mp4") ? "m4a" : "webm";
+        const name = `recording-${Date.now()}.${ext}`;
+        // Insert as attachment with "transcribing" progress.
         setAttachments((prev) =>
-          [
-            ...prev,
-            { name: `recording-${Date.now()}.webm`, type: "audio/webm", dataUrl },
-          ].slice(0, 4),
+          [...prev, { name, type: mime, dataUrl, progress: 0 }].slice(0, 4),
         );
+        setTranscribing(true);
+        try {
+          const { transcript } = await transcribeAudioFn({
+            data: { audioBase64: dataUrl, mimeType: mime },
+          });
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.name === name ? { ...a, progress: undefined, transcript } : a,
+            ),
+          );
+          // Pre-fill the input with the transcript so the user can edit + send.
+          setInput((cur) => (cur.trim() ? `${cur}\n\n${transcript}` : transcript));
+          toast.success("Transcription ready");
+        } catch (err) {
+          setAttachments((prev) =>
+            prev.map((a) => (a.name === name ? { ...a, progress: undefined } : a)),
+          );
+          toast.error(err instanceof Error ? err.message : "Transcription failed");
+        } finally {
+          setTranscribing(false);
+        }
       };
       rec.start();
       recorderRef.current = rec;
@@ -356,7 +389,11 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   };
 
   const stopRecording = () => {
-    recorderRef.current?.stop();
+    try {
+      recorderRef.current?.stop();
+    } catch {
+      /* ignore */
+    }
     recorderRef.current = null;
     setRecording(false);
   };
@@ -366,15 +403,8 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     setGeneratingImage(true);
     try {
       const { dataUrl } = await generateImageFn({ data: { prompt: imagePrompt.trim() } });
-      setAttachments((prev) =>
-        [
-          ...prev,
-          { name: `image-${Date.now()}.png`, type: "image/png", dataUrl },
-        ].slice(0, 4),
-      );
+      setImagePreview({ dataUrl, prompt: imagePrompt.trim() });
       setImageDialogOpen(false);
-      setImagePrompt("");
-      toast.success("Image attached");
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Image generation failed");
     } finally {
@@ -382,23 +412,107 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     }
   };
 
+  const insertImageAsMessage = () => {
+    if (!imagePreview) return;
+    const att: Attachment = {
+      name: `image-${Date.now()}.png`,
+      type: "image/png",
+      dataUrl: imagePreview.dataUrl,
+    };
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content: `🎨 Generated image — *${imagePreview.prompt}*`,
+        attachments: [att],
+      },
+    ]);
+    setImagePreview(null);
+    setImagePrompt("");
+    toast.success("Image added to chat");
+  };
+
+  const attachImageFromPreview = () => {
+    if (!imagePreview) return;
+    setAttachments((prev) =>
+      [
+        ...prev,
+        {
+          name: `image-${Date.now()}.png`,
+          type: "image/png",
+          dataUrl: imagePreview.dataUrl,
+        },
+      ].slice(0, 4),
+    );
+    setImagePreview(null);
+    setImagePrompt("");
+    toast.success("Attached to next message");
+  };
+
+  const shareAttachment = async (a: Attachment) => {
+    try {
+      const blob = await (await fetch(a.dataUrl)).blob();
+      const file = new File([blob], a.name, { type: a.type });
+      const nav = navigator as Navigator & {
+        canShare?: (data: { files: File[] }) => boolean;
+        share?: (data: { files?: File[]; title?: string; text?: string }) => Promise<void>;
+      };
+      if (nav.canShare?.({ files: [file] }) && nav.share) {
+        await nav.share({ files: [file], title: a.name });
+      } else {
+        // Fallback: copy data URL
+        await navigator.clipboard.writeText(a.dataUrl);
+        toast.success("Image link copied");
+      }
+    } catch (e) {
+      if ((e as DOMException)?.name !== "AbortError") {
+        toast.error("Couldn't share");
+      }
+    }
+  };
+
   const onPickFiles = async (files: FileList | null) => {
     if (!files) return;
-    const items: Attachment[] = [];
-    for (const f of Array.from(files).slice(0, 4)) {
-      if (f.size > 5 * 1024 * 1024) {
-        toast.error(`${f.name} is over 5MB`);
+    const slots = Math.max(0, 4 - attachments.length);
+    const list = Array.from(files).slice(0, slots);
+    for (const f of list) {
+      if (f.size > 10 * 1024 * 1024) {
+        toast.error(`${f.name} is over 10MB`);
         continue;
       }
-      const dataUrl: string = await new Promise((resolve, reject) => {
+      // Insert placeholder chip with 0% progress immediately.
+      setAttachments((prev) =>
+        [...prev, { name: f.name, type: f.type, dataUrl: "", progress: 0 }].slice(0, 4),
+      );
+      await new Promise<void>((resolve, reject) => {
         const r = new FileReader();
-        r.onload = () => resolve(r.result as string);
-        r.onerror = reject;
+        r.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            const pct = Math.min(99, Math.round((ev.loaded / ev.total) * 100));
+            setAttachments((prev) =>
+              prev.map((a) => (a.name === f.name && a.progress !== undefined ? { ...a, progress: pct } : a)),
+            );
+          }
+        };
+        r.onload = () => {
+          const dataUrl = r.result as string;
+          setAttachments((prev) =>
+            prev.map((a) =>
+              a.name === f.name && a.progress !== undefined
+                ? { ...a, dataUrl, progress: undefined }
+                : a,
+            ),
+          );
+          resolve();
+        };
+        r.onerror = () => {
+          setAttachments((prev) => prev.filter((a) => !(a.name === f.name && a.progress !== undefined)));
+          toast.error(`Couldn't read ${f.name}`);
+          reject(r.error);
+        };
         r.readAsDataURL(f);
-      });
-      items.push({ name: f.name, type: f.type, dataUrl });
+      }).catch(() => {});
     }
-    setAttachments((prev) => [...prev, ...items].slice(0, 4));
   };
 
   const send = async (text: string) => {
