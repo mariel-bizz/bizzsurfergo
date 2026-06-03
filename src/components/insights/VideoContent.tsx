@@ -3,13 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { ArrowRight, PlayCircle, Sparkles } from "lucide-react";
 import { videos, featuredVideo } from "@/lib/insights-media";
+import { SectionHeader } from "@/components/SectionHeader";
 
 export function VideoContent() {
   const others = videos.filter((v) => v.id !== featuredVideo.id);
 
   return (
     <section id="video-content" className="mt-10 scroll-mt-20">
-      <h2 className="mb-3 text-lg font-bold text-[#ff6f00]">Video Content</h2>
+      <SectionHeader className="mb-3">Video Content</SectionHeader>
 
       {/* Featured */}
       <Card className="overflow-hidden border-2 border-primary/20 bg-gradient-to-br from-primary/5 to-card">
