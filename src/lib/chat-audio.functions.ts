@@ -1,5 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 const Input = z.object({
   // base64 (no data URL prefix) OR full data URL
@@ -14,6 +15,7 @@ function stripDataUrl(s: string): { data: string; mime?: string } {
 }
 
 export const transcribeChatAudio = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((input: unknown) => Input.parse(input))
   .handler(async ({ data }) => {
     const key = process.env.LOVABLE_API_KEY;

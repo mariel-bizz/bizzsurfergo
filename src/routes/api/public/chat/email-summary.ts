@@ -57,11 +57,34 @@ export const Route = createFileRoute('/api/public/chat/email-summary')({
           return Response.json({ error: 'Forbidden' }, { status: 403 })
         }
 
+        // Require an authenticated Supabase user. The endpoint must only send
+        // summary emails to the signed-in user's own address — never to an
+        // arbitrary recipient supplied by the caller (open-relay abuse).
+        const authHeader = request.headers.get('authorization') || ''
+        const token = authHeader.startsWith('Bearer ')
+          ? authHeader.slice('Bearer '.length).trim()
+          : ''
+        if (!token) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        const { data: userData, error: userErr } = await supabaseAdmin.auth.getUser(token)
+        if (userErr || !userData?.user?.email) {
+          return Response.json({ error: 'Unauthorized' }, { status: 401 })
+        }
+        const authedEmail = userData.user.email.toLowerCase()
+
         let parsed
         try {
           parsed = BodySchema.parse(await request.json())
         } catch (err) {
           return Response.json({ error: 'Invalid request body' }, { status: 400 })
+        }
+
+        if (parsed.recipientEmail.toLowerCase() !== authedEmail) {
+          return Response.json(
+            { error: 'Recipient must match the signed-in account' },
+            { status: 403 },
+          )
         }
 
         const supabase = supabaseAdmin

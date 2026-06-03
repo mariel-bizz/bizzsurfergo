@@ -88,6 +88,12 @@ export const verifyNewsPass = createServerFn({ method: "POST" })
     const paid =
       session.payment_status === "paid" ||
       session.status === "complete";
+    // Only honour sessions that were created for the News Day Pass product.
+    // Without this guard, any other recent paid Stripe session id (e.g. a
+    // marketplace purchase) would unlock the premium news body.
+    if (session.metadata?.product !== "news_day_pass") {
+      return { paid: false as const };
+    }
     if (!paid) return { paid: false as const };
     const created = (session.created ?? Math.floor(Date.now() / 1000)) * 1000;
     const expiresAt = created + PASS_DURATION_HOURS * 60 * 60 * 1000;

@@ -103,19 +103,26 @@ export const Route = createFileRoute("/api/auth/linkedin/callback")({
           linkedin_sub: info.sub,
         };
 
-        // Look up by email
-        const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
-          page: 1,
-          perPage: 200,
-        });
-        if (listErr) {
-          console.error("listUsers failed:", listErr);
-          return errorRedirect(origin, "Auth lookup failed");
-        }
+        // Look up by email — paginate through ALL users to avoid silently
+        // creating duplicate accounts when the project exceeds one page.
         const emailLower = info.email.toLowerCase();
-        const existing = list.users.find(
-          (u) => (u.email || "").toLowerCase() === emailLower,
-        );
+        let existing: { id: string; user_metadata?: Record<string, unknown>; email?: string } | undefined;
+        const PER_PAGE = 1000;
+        for (let page = 1; page <= 50; page++) {
+          const { data: list, error: listErr } = await supabaseAdmin.auth.admin.listUsers({
+            page,
+            perPage: PER_PAGE,
+          });
+          if (listErr) {
+            console.error("listUsers failed:", listErr);
+            return errorRedirect(origin, "Auth lookup failed");
+          }
+          existing = list.users.find(
+            (u) => (u.email || "").toLowerCase() === emailLower,
+          );
+          if (existing) break;
+          if (!list.users.length || list.users.length < PER_PAGE) break;
+        }
 
         let userId: string | undefined = existing?.id;
         if (!existing) {

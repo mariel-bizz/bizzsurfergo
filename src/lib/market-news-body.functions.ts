@@ -191,6 +191,8 @@ async function checkAccess(
     try {
       const stripe = createStripeClient(environment);
       const session = await stripe.checkout.sessions.retrieve(passSessionId);
+      // Only honour sessions that were explicitly created for the News Day Pass.
+      if (session.metadata?.product !== "news_day_pass") return false;
       const paid = session.payment_status === "paid" || session.status === "complete";
       const createdMs = (session.created ?? 0) * 1000;
       if (paid && createdMs > 0 && Date.now() - createdMs < PASS_DURATION_MS) {
