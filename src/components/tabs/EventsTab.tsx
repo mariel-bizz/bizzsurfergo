@@ -236,6 +236,7 @@ export function EventsTab() {
                 <Mic className="w-4 h-4 text-primary" />
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
+              <AttendeeStrip summary={attendeeSummary[e.id]} />
               {isRsvped && meetLinks[e.id] && (
                 <a
                   href={meetLinks[e.id]}
