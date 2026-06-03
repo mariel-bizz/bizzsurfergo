@@ -52,6 +52,25 @@ export function EventsTab() {
     return () => window.removeEventListener("hashchange", sync);
   }, []);
   const [platform, setPlatform] = useState<"all" | "linkedin" | "youtube" | "spotify">("all");
+  const [attendeeSummary, setAttendeeSummary] = useState<Record<number, { count: number; avatars: string[] }>>({});
+
+  useEffect(() => {
+    const ids = eventsData.map((e) => e.id);
+    if (ids.length === 0) return;
+    supabase
+      .rpc("get_event_attendee_summary", { _event_ids: ids })
+      .then(({ data, error }) => {
+        if (error || !data) return;
+        const next: Record<number, { count: number; avatars: string[] }> = {};
+        for (const row of data as Array<{ event_id: number; attendee_count: number; avatars: string[] }>) {
+          next[row.event_id] = {
+            count: Number(row.attendee_count) || 0,
+            avatars: Array.isArray(row.avatars) ? row.avatars : [],
+          };
+        }
+        setAttendeeSummary(next);
+      });
+  }, [rsvpedIds]);
 
   const detectPlatform = (href: string): "linkedin" | "youtube" | "spotify" | "other" => {
     if (/linkedin\.com/.test(href)) return "linkedin";
@@ -217,6 +236,7 @@ export function EventsTab() {
                 <Mic className="w-4 h-4 text-primary" />
                 <p className="text-xs font-medium text-foreground">{e.speaker}</p>
               </div>
+              <AttendeeStrip summary={attendeeSummary[e.id]} />
               {isRsvped && meetLinks[e.id] && (
                 <a
                   href={meetLinks[e.id]}
@@ -383,6 +403,32 @@ function Meta({ icon: Icon, label }: { icon: typeof Calendar; label: string }) {
     <div className="flex items-start gap-2">
       <Icon className="w-3.5 h-3.5 text-primary mt-0.5 shrink-0" />
       <span className="text-xs text-muted-foreground leading-snug">{label}</span>
+    </div>
+  );
+}
+
+function AttendeeStrip({ summary }: { summary?: { count: number; avatars: string[] } }) {
+  if (!summary || summary.count === 0) return null;
+  const avatars = summary.avatars.slice(0, 5);
+  return (
+    <div className="flex items-center gap-2 pt-1">
+      {avatars.length > 0 && (
+        <div className="flex -space-x-2">
+          {avatars.map((src, i) => (
+            <img
+              key={i}
+              src={src}
+              alt=""
+              loading="lazy"
+              referrerPolicy="no-referrer"
+              className="w-6 h-6 rounded-full ring-2 ring-card object-cover bg-muted"
+            />
+          ))}
+        </div>
+      )}
+      <span className="text-xs text-muted-foreground">
+        {summary.count} {summary.count === 1 ? "person" : "people"} going
+      </span>
     </div>
   );
 }
