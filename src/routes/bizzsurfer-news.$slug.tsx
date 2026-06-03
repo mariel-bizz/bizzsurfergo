@@ -420,7 +420,7 @@ function BizzSurferNewsPage() {
                 </p>
                 <Button
                   asChild
-                  className="mt-4 bg-gradient-to-r from-indigo-500 via-purple-500 to-[#ff6f00] text-white hover:opacity-90 transition-opacity disabled:opacity-50"
+                  className="mt-4 bg-gradient-agentic text-white hover:opacity-90 transition-opacity disabled:opacity-50"
                   disabled={!hasAccess}
                 >
                   <a
