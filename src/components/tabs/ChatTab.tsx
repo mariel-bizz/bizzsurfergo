@@ -129,9 +129,21 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const contextPreamble = config
     ? `${gemPersona ? gemPersona + "\n\n" : ""}Context: the leader is exploring an Agentic AI transformation in ${config.departments.join(", ")} for the ${config.industries.join(", ")} industry. Tailor every answer to that scope. Reply in short paragraphs separated by blank lines. Use markdown **bold** to highlight the key terms, metrics and frameworks. Use simple "-" bullets for short lists. Never use markdown headings.`
     : "";
-  const [messages, setMessages] = useState<Msg[]>(() => [
-    { role: "assistant", content: buildInitialAssistant(null) },
-  ]);
+  const [messages, setMessages] = useState<Msg[]>(() => {
+    if (typeof window === "undefined") {
+      return [{ role: "assistant", content: buildInitialAssistant(null) }];
+    }
+    try {
+      const raw = window.localStorage.getItem(AUTOSAVE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as Msg[];
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch {
+      /* ignore */
+    }
+    return [{ role: "assistant", content: buildInitialAssistant(null) }];
+  });
   const [input, setInput] = useState(seedPrompt ?? "");
   const [streaming, setStreaming] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
@@ -153,16 +165,20 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [plusOpen, setPlusOpen] = useState(false);
   const [recording, setRecording] = useState(false);
+  const [transcribing, setTranscribing] = useState(false);
   const recorderRef = useRef<MediaRecorder | null>(null);
   const recordedChunksRef = useRef<Blob[]>([]);
+  const recorderMimeRef = useRef<string>("audio/webm");
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [imagePrompt, setImagePrompt] = useState("");
   const [generatingImage, setGeneratingImage] = useState(false);
+  const [imagePreview, setImagePreview] = useState<{ dataUrl: string; prompt: string } | null>(null);
   const [projectsDialogOpen, setProjectsDialogOpen] = useState(false);
   const [savedProjects, setSavedProjects] = useState<
     Array<{ id: string; name: string; messages: Msg[]; savedAt: string }>
   >([]);
   const generateImageFn = useServerFn(generateChatImage);
+  const transcribeAudioFn = useServerFn(transcribeChatAudio);
 
   useEffect(() => {
     try {
