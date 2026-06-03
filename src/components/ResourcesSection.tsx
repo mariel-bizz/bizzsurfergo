@@ -339,7 +339,7 @@ export function TrustedPartnersSection() {
             >
               <img
                 src={p.src}
-                alt={`${p.name} logo`}
+                alt={`Trusted partner of BizzSurfer: ${p.name}`}
                 loading="lazy"
                 decoding="async"
                 className="max-h-8 max-w-full object-contain"
