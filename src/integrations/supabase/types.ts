@@ -804,6 +804,7 @@ export type Database = {
       }
       user_preferences: {
         Row: {
+          avatar_url: string | null
           company: string | null
           created_at: string
           display_name: string | null
@@ -818,6 +819,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          avatar_url?: string | null
           company?: string | null
           created_at?: string
           display_name?: string | null
@@ -832,6 +834,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          avatar_url?: string | null
           company?: string | null
           created_at?: string
           display_name?: string | null
@@ -942,6 +945,14 @@ export type Database = {
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
+      }
+      get_event_attendee_summary: {
+        Args: { _event_ids: number[] }
+        Returns: {
+          attendee_count: number
+          avatars: string[]
+          event_id: number
+        }[]
       }
       get_insights_like_count: { Args: { _slug: string }; Returns: number }
       get_listing_application_status: {
