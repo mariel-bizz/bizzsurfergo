@@ -312,7 +312,7 @@ export function PoweredBySection() {
             >
               <img
                 src={p.src}
-                alt={`${p.name} logo`}
+                alt={`BizzSurfer GO! is backed by ${p.name}`}
                 loading="lazy"
                 decoding="async"
                 className="max-h-8 max-w-full object-contain opacity-90"
