@@ -7,7 +7,7 @@ import { NewsletterDialog } from "./NewsletterDialog";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
-import { FollowSection } from "./ResourcesSection";
+
 import logo from "@/assets/bizzsurfer-logo.png";
 import headerLogo from "@/assets/bizzsurfer-go-logo-horizontal.png";
 
