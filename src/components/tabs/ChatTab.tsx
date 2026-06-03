@@ -18,10 +18,14 @@ import {
   Image as ImageIcon,
   FolderOpen,
   Save,
+  Share2,
+  FileText,
+  Loader2,
 }  from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useServerFn } from "@tanstack/react-start";
 import { generateChatImage } from "@/lib/chat-image.functions";
+import { transcribeChatAudio } from "@/lib/chat-audio.functions";
 import { toast } from "sonner";
 import {
   GoChatSetup,
