@@ -528,7 +528,7 @@ function PaywallOverlay({
             <Button
               type="button"
               onClick={onUnlock}
-              className="mt-4 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-[#ff6f00] text-white hover:opacity-90 transition-opacity"
+              className="mt-4 w-full bg-gradient-agentic text-white hover:opacity-90 transition-opacity"
             >
               <Heart className="w-4 h-4 mr-1.5" />
               Unlock for €1 — donate &amp; read
