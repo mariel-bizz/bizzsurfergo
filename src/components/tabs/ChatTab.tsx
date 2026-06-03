@@ -893,7 +893,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)] max-h-full">
       <div className="px-4 pt-2 pb-1.5 pr-12">
-        <div className="rounded-xl text-primary-foreground px-3 py-2 shadow-soft flex items-center gap-2 bg-[linear-gradient(135deg,#2563eb_0%,#7c3aed_50%,#f97316_100%)]">
+        <div className="rounded-xl text-white px-3 py-2 shadow-soft flex items-center gap-2 bg-gradient-agentic">
           <div className="w-7 h-7 rounded-lg bg-white/20 backdrop-blur flex items-center justify-center shrink-0">
             {providerMeta ? (
               <img
