@@ -277,7 +277,24 @@ export function HomeTab() {
             );
           })}
         </div>
+
+        {/* Lead capture under FAQs */}
+        <div className="mt-5 rounded-2xl border border-border bg-gradient-to-br from-primary/5 via-card to-accent/10 p-4 shadow-card">
+          <p className="text-sm font-bold text-foreground">Still have questions?</p>
+          <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+            Get a tailored 90-day Agentic AI plan for your enterprise — no slides, just a roadmap.
+          </p>
+          <div className="mt-3 flex flex-col sm:flex-row gap-2">
+            <Button size="sm" className="bg-gradient-agentic text-white font-bold flex-1" onClick={() => navigate({ to: "/chat" })}>
+              Ask BizzSurfer Go!
+            </Button>
+            <Button size="sm" variant="outline" className="font-bold flex-1" onClick={() => setWaitOpen(true)}>
+              Get the 90-day plan
+            </Button>
+          </div>
+        </div>
       </section>
+
 
       {/* Social media — rendered globally at end of every page via AppShell */}
 
