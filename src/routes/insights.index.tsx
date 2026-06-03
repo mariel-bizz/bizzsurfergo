@@ -331,7 +331,7 @@ export function CtaBlock() {
   return (
     <div className="mx-auto mt-8 grid max-w-5xl gap-3 sm:grid-cols-2">
       <Card className="relative overflow-hidden border-0 text-white shadow-elegant">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#7c3aed] via-[#a855f7] to-[#ff6f00]" />
+        <div className="absolute inset-0 bg-gradient-agentic" />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.25),transparent_60%)]" />
         <CardContent className="relative flex flex-col items-start gap-3 p-5">
           <h3 className="text-lg font-bold drop-shadow-sm">Book a demo</h3>
@@ -341,7 +341,7 @@ export function CtaBlock() {
           <Button
             variant="secondary"
             size="sm"
-            className="mt-auto bg-white text-[#7c3aed] hover:bg-white/90"
+            className="mt-auto bg-white text-[#3b4a9e] hover:bg-white/90"
             onClick={() => setWaitOpen(true)}
           >
             Join the waitlist <ArrowRight className="ml-1 h-4 w-4" />
@@ -354,10 +354,10 @@ export function CtaBlock() {
           <p className="text-sm text-muted-foreground">
             Tools, calculators and resources for transformation leaders.
           </p>
-          <Button asChild size="sm" className="mt-auto">
-            <Link to="/marketplace">
+          <Button asChild size="sm" className="mt-auto bg-gradient-agentic text-white hover:opacity-95">
+            <a href="https://go.bizzsurfer.ai/marketplace" rel="noopener">
               Go Agentic! <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
+            </a>
           </Button>
         </CardContent>
       </Card>
