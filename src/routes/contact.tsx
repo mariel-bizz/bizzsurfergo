@@ -363,7 +363,7 @@ function GoBadge() {
   return (
     <span
       className="ml-auto shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold text-white shadow-sm transition-all duration-200 group-hover:translate-x-0.5 group-hover:shadow-md group-hover:scale-[1.03] group-active:scale-95"
-      style={{ background: "linear-gradient(135deg, #7c3aed 0%, #ff8a1f 100%)" }}
+      style={{ background: "linear-gradient(90deg, #3b5bdb 0%, #d94f04 55%, #ff8a1f 100%)" }}
     >
       GO <span aria-hidden>➜</span>
     </span>
