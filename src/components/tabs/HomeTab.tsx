@@ -130,6 +130,13 @@ export function HomeTab() {
       {/* Onboarding checklist */}
       <OnboardingChecklist />
 
+      {/* Event quota widget */}
+      <section className="px-5">
+        <EventQuotaWidget />
+      </section>
+
+
+
 
       {/* Go Agentic! */}
       <section className="px-5">
