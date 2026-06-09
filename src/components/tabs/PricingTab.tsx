@@ -14,7 +14,7 @@ import { trackEvent } from "@/lib/analytics";
 import { useServerFn } from "@tanstack/react-start";
 import { createPortalSession } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const HERO_MONTHLY = 14.99;
 const HERO_YEARLY = 149;
