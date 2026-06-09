@@ -22,7 +22,10 @@ function validateReturnUrl(raw: string): string {
   if (u.protocol !== "https:" && !(isLocal && u.protocol === "http:")) {
     throw new Error("returnUrl must use https");
   }
-  const isLovable = host.endsWith(".lovable.app") || host.endsWith(".lovable.dev");
+  const isLovable =
+    host.endsWith(".lovable.app") ||
+    host.endsWith(".lovable.dev") ||
+    host.endsWith(".lovableproject.com");
   if (!ALLOWED_RETURN_HOSTS.has(host) && !isLovable && !isLocal) {
     throw new Error("returnUrl host not allowed");
   }
