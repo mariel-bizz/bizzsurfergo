@@ -34,6 +34,7 @@ export function EventsTab() {
   const rsvp = useServerFn(rsvpToEvent);
   const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
+  const quota = useEventQuota();
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
   const [authed, setAuthed] = useState(false);
