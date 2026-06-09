@@ -98,7 +98,9 @@ export function PricingTab() {
   const [seats, setSeats] = useState(2);
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
-  const { tier: currentTier, isActive } = useSubscription(user?.id ?? null);
+  const { tier: currentTier, isActive, billingPeriod: currentBilling } = useSubscription(user?.id ?? null);
+  const openPortal = useServerFn(createPortalSession);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -110,17 +112,66 @@ export function PricingTab() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Funnel: view event once per (yearly) toggle state
+  useEffect(() => {
+    trackEvent("pricing_view", {
+      billing_period: yearly ? "yearly" : "monthly",
+      authed: !!user,
+      current_tier: currentTier,
+    });
+  }, [yearly, user, currentTier]);
+
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    setPortalLoading(true);
+    trackEvent("pricing_manage_subscription_click", { current_tier: currentTier });
+    try {
+      const url = await openPortal({
+        data: {
+          environment: getStripeEnvironment(),
+          returnUrl: `${window.location.origin}/profile`,
+        },
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not open the billing portal. Please try again.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
   const handleSubscribe = (tierId: string) => {
     if (tierId === "go") return;
+    const billingPeriod = yearly ? "yearly" : "monthly";
+    trackEvent("pricing_cta_click", {
+      tier_id: tierId,
+      billing_period: billingPeriod,
+      quantity: tierId === "team" ? seats : 1,
+      authed: !!user,
+      current_tier: currentTier,
+    });
     if (!user) {
       window.location.href = "/login?redirect=/pricing";
       return;
     }
-    const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
+    // If already subscribed, send the user to the Stripe portal to switch
+    // plans / billing period — Stripe handles proration and seat changes.
+    if (isActive) {
+      handleManageSubscription();
+      return;
+    }
+    const priceId = `${tierId}_${billingPeriod}`;
+    trackEvent("checkout_start", {
+      tier_id: tierId,
+      billing_period: billingPeriod,
+      price_id: priceId,
+      quantity: tierId === "team" ? seats : 1,
+    });
     openCheckout({
       priceId,
       quantity: tierId === "team" ? seats : 1,
-      returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+      returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&tier=${tierId}&billing=${billingPeriod}`,
     });
   };
 
