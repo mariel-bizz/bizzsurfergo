@@ -115,6 +115,28 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
     if (!event) throw new Error("Event not found");
     const email = (claims as { email?: string }).email;
     if (!email) throw new Error("No email on account");
+
+    // Enforce per-tier event quota. Re-RSVPing to an event the user is
+    // already on does NOT consume a new slot (upsert is idempotent).
+    const tier = await resolveUserTier(userId);
+    const quota = getEventQuota(tier);
+    if (quota.limit !== null) {
+      const { data: existing } = await supabaseAdmin
+        .from("event_rsvps")
+        .select("event_id")
+        .eq("user_id", userId)
+        .eq("event_id", data.eventId)
+        .maybeSingle();
+      if (!existing) {
+        const used = await countUserRsvpsInPeriod(userId, tier);
+        if (used >= quota.limit) {
+          throw new Error(
+            `You've used all ${quota.limit} event RSVPs for this ${quota.period}. Upgrade your plan to register for more.`,
+          );
+        }
+      }
+    }
+
     const { error } = await supabase.from("event_rsvps").upsert(
       {
         user_id: userId,
@@ -128,6 +150,7 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
       { onConflict: "user_id,event_id" }
     );
     if (error) throw new Error(error.message);
+
 
     // Best-effort calendar invite + Meet link. Never break RSVP if Calendar fails.
     let meet_link: string | null = null;
