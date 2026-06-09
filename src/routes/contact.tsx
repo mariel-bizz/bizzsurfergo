@@ -156,7 +156,7 @@ function ContactPage() {
           anything Agentic AI.
         </p>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 grid gap-4 grid-cols-1 md:grid-cols-2">
           <a
             href="mailto:hello@bizzsurfer.com"
             title="Email"
@@ -171,7 +171,7 @@ function ContactPage() {
                 <Mail className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-foreground truncate">
+                <div className="text-sm font-semibold text-foreground break-all">
                   hello@bizzsurfer.com
                 </div>
               </div>
