@@ -120,9 +120,12 @@ function CheckoutReturn() {
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-5">
-        <div className="text-center space-y-3">
+        <div className="text-center space-y-3 max-w-sm">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">Confirming your payment…</p>
+          <p className="text-sm font-medium text-foreground">Confirming your payment…</p>
+          <p className="text-xs text-muted-foreground">
+            This usually takes a few seconds. Don't close this page.
+          </p>
         </div>
       </div>
     );
@@ -135,11 +138,17 @@ function CheckoutReturn() {
           <AlertCircle className="w-10 h-10 mx-auto text-destructive" />
           <h1 className="text-xl font-semibold text-foreground">Could not load your receipt</h1>
           <p className="text-sm text-muted-foreground">
-            Your payment may still have succeeded. Please check your email or contact support.
+            Your payment may still have succeeded — Stripe will email you a receipt directly.
+            Check your inbox, or contact <a href="mailto:support@bizzsurfer.com" className="underline">support@bizzsurfer.com</a> with order ID <span className="font-mono">{session_id}</span>.
           </p>
-          <Button asChild variant="outline">
-            <Link to="/profile">Go to Profile</Link>
-          </Button>
+          <div className="flex gap-2 justify-center">
+            <Button asChild variant="outline">
+              <Link to="/orders">Order history</Link>
+            </Button>
+            <Button asChild>
+              <Link to="/profile">Go to Profile</Link>
+            </Button>
+          </div>
         </div>
       </div>
     );
@@ -149,6 +158,12 @@ function CheckoutReturn() {
     data.paymentStatus === "paid" || data.status === "complete" || data.status === "completed";
   const confirmed = data.webhookConfirmed && stripeSaysPaid;
   const processing = stripeSaysPaid && !data.webhookConfirmed;
+  // If the order was created more than ~60s ago and the webhook still
+  // hasn't landed, the user has been staring at "processing" too long —
+  // surface a softer fallback message and stop implying it's imminent.
+  const createdMs = data.createdAt ? new Date(data.createdAt).getTime() : Date.now();
+  const stuckProcessing = processing && Date.now() - createdMs > 60_000;
+  const missingTierMeta = data.mode === "subscription" && (!tier || !TIER_META[tier] || !billing);
 
   return (
     <div className="min-h-[60vh] flex items-center justify-center px-5 py-10">
@@ -168,6 +183,8 @@ function CheckoutReturn() {
           <h1 className="text-2xl font-bold text-foreground">
             {confirmed
               ? "Payment confirmed"
+              : stuckProcessing
+              ? "Still finalising your order"
               : processing
               ? "Confirming your payment…"
               : "Payment processing"}
@@ -175,11 +192,21 @@ function CheckoutReturn() {
           <p className="text-sm text-muted-foreground">
             {confirmed
               ? "Thank you for your purchase. A receipt has been sent to your email."
+              : stuckProcessing
+              ? "Stripe accepted your payment but our system hasn't finalised the order yet. You can safely leave this page — we'll email you once it's complete. If nothing arrives within 10 minutes, contact support."
               : processing
               ? "Stripe accepted your payment. Waiting for our system to finalise the order — this usually takes a few seconds."
               : "Your payment is still being processed. We'll email you once it's complete."}
           </p>
         </div>
+
+        {missingTierMeta && confirmed && (
+          <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-4 text-xs text-amber-900 dark:text-amber-200">
+            We couldn't read the plan details from your checkout link, but your subscription is active.
+            Visit your <Link to="/profile" className="underline font-semibold">profile</Link> to review your plan.
+          </div>
+        )}
+
 
         {tier && TIER_META[tier] && (
           <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
@@ -247,7 +274,9 @@ function CheckoutReturn() {
               <dd className="font-bold text-foreground">
                 {formatAmount(data.amountTotal, data.currency)}
                 {data.mode === "subscription" && (
-                  <span className="text-muted-foreground font-normal"> /mo</span>
+                  <span className="text-muted-foreground font-normal">
+                    {billing === "yearly" ? " /yr" : billing === "monthly" ? " /mo" : ""}
+                  </span>
                 )}
               </dd>
             </div>
