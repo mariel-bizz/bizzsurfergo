@@ -20,25 +20,8 @@ function detectEnv(): "sandbox" | "live" {
   return token.startsWith("pk_test_") ? "sandbox" : "live";
 }
 
-async function resolveUserTier(
-  supabase: Parameters<Parameters<typeof createServerFn>[0] extends never ? never : never>[0] extends never ? never : never,
-  userId: string,
-): Promise<Tier> {
-  // Loose type to avoid pulling the full supabase client generic in here.
-  const sb = supabase as unknown as {
-    from: (t: string) => {
-      select: (s: string) => {
-        eq: (c: string, v: string) => {
-          eq: (c: string, v: string) => {
-            order: (c: string, o: { ascending: boolean }) => {
-              limit: (n: number) => { maybeSingle: () => Promise<{ data: { tier_id: string | null; price_id: string | null; status: string; current_period_end: string | null } | null }> };
-            };
-          };
-        };
-      };
-    };
-  };
-  const { data } = await sb
+async function resolveUserTier(userId: string): Promise<Tier> {
+  const { data } = await supabaseAdmin
     .from("subscriptions")
     .select("tier_id,price_id,status,current_period_end")
     .eq("user_id", userId)
@@ -55,6 +38,18 @@ async function resolveUserTier(
   if (!active) return "free";
   return ((data.tier_id as Tier) ?? TIER_BY_PRICE[data.price_id ?? ""] ?? "free") as Tier;
 }
+
+async function countUserRsvpsInPeriod(userId: string, tier: Tier): Promise<number> {
+  const { startISO, endISO } = getCurrentPeriodBounds(tier);
+  const { count } = await supabaseAdmin
+    .from("event_rsvps")
+    .select("event_id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startISO)
+    .lt("created_at", endISO);
+  return count ?? 0;
+}
+
 
 
 // Default 90 minutes if no end time defined
