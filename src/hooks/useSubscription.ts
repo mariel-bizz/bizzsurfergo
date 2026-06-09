@@ -56,6 +56,8 @@ function computeIsActive(sub: SubscriptionRow | null): boolean {
   return false;
 }
 
+const TIER_RANK: Record<string, number> = { free: 0, go: 0, hero: 1, champion: 2, team: 3 };
+
 export function useSubscription(userId: string | null | undefined): SubscriptionState {
   const [state, setState] = useState<SubscriptionState>({
     loading: true,
@@ -65,6 +67,10 @@ export function useSubscription(userId: string | null | undefined): Subscription
     billingPeriod: null,
     quantity: 1,
   });
+  // Snapshot of last-observed tier/period/seats so we can fire a single
+  // analytics event when Stripe Billing Portal changes propagate via the
+  // webhook → realtime → refetch path. Skipped on the first load.
+  const prev = useRef<{ tier: Tier; billing: BillingPeriod; quantity: number } | null>(null);
 
   useEffect(() => {
     if (!userId) {
@@ -76,6 +82,7 @@ export function useSubscription(userId: string | null | undefined): Subscription
         billingPeriod: null,
         quantity: 1,
       });
+      prev.current = null;
       return;
     }
     const env = getStripeEnvironment();
@@ -96,13 +103,42 @@ export function useSubscription(userId: string | null | undefined): Subscription
       const tier: Tier = active && sub
         ? ((sub.tier_id as Tier) ?? TIER_BY_PRICE[sub.price_id] ?? "free")
         : "free";
+      const billingPeriod = active ? billingPeriodFromPriceId(sub?.price_id) : null;
+      const quantity = sub?.quantity ?? 1;
+
+      // Diff against last snapshot and emit analytics only on actual change.
+      const last = prev.current;
+      if (last && (last.tier !== tier || last.billing !== billingPeriod || last.quantity !== quantity)) {
+        const tierChanged = last.tier !== tier;
+        const direction = tierChanged
+          ? (TIER_RANK[tier] ?? 0) > (TIER_RANK[last.tier] ?? 0)
+            ? "upgrade"
+            : "downgrade"
+          : last.billing !== billingPeriod
+          ? "billing_period_change"
+          : quantity > last.quantity
+          ? "seats_increase"
+          : "seats_decrease";
+        trackEvent("subscription_changed", {
+          direction,
+          from_tier: last.tier,
+          to_tier: tier,
+          from_billing: last.billing,
+          to_billing: billingPeriod,
+          from_seats: last.quantity,
+          to_seats: quantity,
+          seat_delta: quantity - last.quantity,
+        });
+      }
+      prev.current = { tier, billing: billingPeriod, quantity };
+
       setState({
         loading: false,
         subscription: sub,
         isActive: active,
         tier,
-        billingPeriod: active ? billingPeriodFromPriceId(sub?.price_id) : null,
-        quantity: sub?.quantity ?? 1,
+        billingPeriod,
+        quantity,
       });
     };
 
