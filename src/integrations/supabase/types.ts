@@ -623,9 +623,11 @@ export type Database = {
           id: string
           price_id: string
           product_id: string
+          quantity: number
           status: string
           stripe_customer_id: string
           stripe_subscription_id: string
+          tier_id: string | null
           updated_at: string | null
           user_id: string
         }
@@ -638,9 +640,11 @@ export type Database = {
           id?: string
           price_id: string
           product_id: string
+          quantity?: number
           status?: string
           stripe_customer_id: string
           stripe_subscription_id: string
+          tier_id?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -653,9 +657,11 @@ export type Database = {
           id?: string
           price_id?: string
           product_id?: string
+          quantity?: number
           status?: string
           stripe_customer_id?: string
           stripe_subscription_id?: string
+          tier_id?: string | null
           updated_at?: string | null
           user_id?: string
         }
