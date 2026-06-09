@@ -87,6 +87,10 @@ const EMPTY: FormState = {
   message: "",
 };
 
+const FIELD_CLASS =
+  "border-[#ff8a1f]/40 focus-visible:border-[#ff8a1f] focus-visible:ring-[#ff8a1f]/30";
+
+
 const SOCIALS: { label: string; href: string; Icon: typeof Linkedin; bg: string }[] = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer", Icon: Linkedin, bg: "bg-[#0A66C2]" },
   { label: "YouTube", href: "https://www.youtube.com/@bizzsurfer", Icon: Youtube, bg: "bg-[#FF0000]" },
@@ -202,7 +206,10 @@ function ContactPage() {
           </a>
         </div>
 
-        <section className="mt-8 rounded-2xl border border-border bg-card p-6">
+        <section
+          className="mt-8 rounded-2xl border-2 border-[#ff8a1f]/40 bg-card p-6"
+          style={{ boxShadow: "0 0 0 1px rgba(255,138,31,0.15), 0 10px 40px -10px rgba(255,138,31,0.35), 0 0 60px -20px rgba(217,79,4,0.25)" }}
+        >
           <h2 className="text-lg font-semibold text-foreground">Send us a message</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             All fields are required. We'll get back within one business day.
@@ -253,6 +260,7 @@ function ContactPage() {
                     onChange={(e) => update("name", e.target.value)}
                     placeholder="Jane Doe"
                     aria-invalid={!!errors.name}
+                    className={FIELD_CLASS}
                   />
                 </Field>
                 <Field id="role" label="Role" error={errors.role}>
@@ -262,6 +270,7 @@ function ContactPage() {
                     onChange={(e) => update("role", e.target.value)}
                     placeholder="COO, Founder…"
                     aria-invalid={!!errors.role}
+                    className={FIELD_CLASS}
                   />
                 </Field>
               </div>
@@ -274,6 +283,7 @@ function ContactPage() {
                     onChange={(e) => update("company", e.target.value)}
                     placeholder="Acme Inc."
                     aria-invalid={!!errors.company}
+                    className={FIELD_CLASS}
                   />
                 </Field>
                 <Field id="email" label="Email" error={errors.email}>
@@ -284,6 +294,7 @@ function ContactPage() {
                     onChange={(e) => update("email", e.target.value)}
                     placeholder="jane@company.com"
                     aria-invalid={!!errors.email}
+                    className={FIELD_CLASS}
                   />
                 </Field>
               </div>
@@ -302,11 +313,12 @@ function ContactPage() {
                     onChange={(e) => update("phone", e.target.value)}
                     placeholder="+1 555 123 4567"
                     aria-invalid={!!errors.phone}
+                    className={FIELD_CLASS}
                   />
                 </Field>
                 <Field id="topic" label="Preferred topic" error={errors.topic}>
                   <Select value={form.topic} onValueChange={(v) => update("topic", v)}>
-                    <SelectTrigger id="topic" aria-invalid={!!errors.topic}>
+                    <SelectTrigger id="topic" aria-invalid={!!errors.topic} className={FIELD_CLASS}>
                       <SelectValue placeholder="Pick a topic" />
                     </SelectTrigger>
                     <SelectContent>
@@ -328,6 +340,7 @@ function ContactPage() {
                   onChange={(e) => update("message", e.target.value)}
                   placeholder="Tell us a bit about what you're looking for…"
                   aria-invalid={!!errors.message}
+                    className={FIELD_CLASS}
                 />
               </Field>
 
@@ -349,9 +362,8 @@ function ContactPage() {
 function GoBadge() {
   return (
     <span
-      className="ml-auto shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold text-white shadow-sm transition-transform group-hover:translate-x-0.5"
+      className="ml-auto shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-xs font-semibold text-white shadow-sm transition-all duration-200 group-hover:translate-x-0.5 group-hover:shadow-md group-hover:scale-[1.03] group-active:scale-95"
       style={{ background: "linear-gradient(135deg, #7c3aed 0%, #ff8a1f 100%)" }}
-      aria-hidden
     >
       GO <span aria-hidden>➜</span>
     </span>
