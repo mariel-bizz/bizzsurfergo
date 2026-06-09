@@ -47,7 +47,7 @@ function formatAmount(cents: number | null, currency: string | null): string {
 }
 
 function CheckoutReturn() {
-  const { session_id, clear_cart } = Route.useSearch();
+  const { session_id, clear_cart, tier, billing } = Route.useSearch();
   const fetchReceipt = useServerFn(getCheckoutReceipt);
 
   const { data, isLoading, error } = useQuery({
@@ -64,6 +64,34 @@ function CheckoutReturn() {
         ? false
         : 2500,
   });
+
+  // Funnel analytics: emit a single success/failure event once we know.
+  const tracked = useRef(false);
+  useEffect(() => {
+    if (tracked.current || !data) return;
+    const stripeSaysPaid =
+      data.paymentStatus === "paid" || data.status === "complete" || data.status === "completed";
+    if (data.webhookConfirmed && stripeSaysPaid) {
+      tracked.current = true;
+      trackEvent("checkout_success", {
+        session_id,
+        tier_id: tier ?? null,
+        billing_period: billing ?? null,
+        amount_total: data.amountTotal,
+        currency: data.currency,
+        mode: data.mode,
+      });
+    } else if (data.status && !stripeSaysPaid && !data.webhookConfirmed) {
+      tracked.current = true;
+      trackEvent("checkout_failure", {
+        session_id,
+        tier_id: tier ?? null,
+        billing_period: billing ?? null,
+        status: data.status,
+        payment_status: data.paymentStatus,
+      });
+    }
+  }, [data, session_id, tier, billing]);
 
   // After a successful purchase, remove the item(s) from the local cart.
   useEffect(() => {
