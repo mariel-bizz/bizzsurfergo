@@ -175,6 +175,7 @@ function ContactPage() {
                   hello@bizzsurfer.com
                 </div>
               </div>
+              <GoBadge />
             </div>
           </a>
 
@@ -196,6 +197,7 @@ function ContactPage() {
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold text-foreground truncate">@bizzsurfer</div>
               </div>
+              <GoBadge />
             </div>
           </a>
         </div>
@@ -341,6 +343,18 @@ function ContactPage() {
 
       </div>
     </main>
+  );
+}
+
+function GoBadge() {
+  return (
+    <span
+      className="ml-auto shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold text-white shadow-sm transition-transform group-hover:translate-x-0.5"
+      style={{ background: "linear-gradient(135deg, #7c3aed 0%, #ff8a1f 100%)" }}
+      aria-hidden
+    >
+      GO <span aria-hidden>➜</span>
+    </span>
   );
 }
 
