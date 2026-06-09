@@ -31,7 +31,7 @@ export interface SubscriptionState {
   quantity: number;
 }
 
-const TIER_BY_PRICE: Record<string, Exclude<Tier, "free">> = {
+export const TIER_BY_PRICE: Record<string, Exclude<Tier, "free">> = {
   hero_monthly: "hero",
   hero_yearly: "hero",
   champion_monthly: "champion",
