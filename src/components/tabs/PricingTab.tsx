@@ -406,10 +406,36 @@ export function PricingTab() {
       </div>
 
       {isActive && (
-        <p className="text-center text-xs text-muted-foreground">
-          Manage your subscription on your <Link to="/profile" className="underline">Profile</Link>.
-        </p>
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3 text-center">
+          <p className="text-sm text-foreground">
+            You're on the <span className="font-bold capitalize">{currentTier}</span> plan
+            {currentBilling ? ` (${currentBilling})` : ""}.
+          </p>
+          <Button
+            variant="outline"
+            className="w-full h-11"
+            onClick={handleManageSubscription}
+            disabled={portalLoading}
+          >
+            {portalLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <ExternalLink className="w-4 h-4 mr-2" />
+            )}
+            Manage subscription / change plan
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Update billing period, change seats, switch tier, or cancel — handled by Stripe.
+          </p>
+        </div>
       )}
+
+      <PricingComparisonTable />
+
+      <p className="text-center text-xs text-muted-foreground">
+        Need a custom enterprise plan?{" "}
+        <Link to="/contact" className="underline">Contact us</Link>.
+      </p>
 
       <Dialog open={isOpen} onOpenChange={(o) => { if (!o) closeCheckout(); }}>
         <DialogContent className="max-w-lg p-0 overflow-hidden">
