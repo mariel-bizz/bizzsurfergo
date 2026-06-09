@@ -346,6 +346,18 @@ function ContactPage() {
   );
 }
 
+function GoBadge() {
+  return (
+    <span
+      className="ml-auto shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold text-white shadow-sm transition-transform group-hover:translate-x-0.5"
+      style={{ background: "linear-gradient(135deg, #7c3aed 0%, #ff8a1f 100%)" }}
+      aria-hidden
+    >
+      GO <span aria-hidden>➜</span>
+    </span>
+  );
+}
+
 function Field({
   id,
   label,
