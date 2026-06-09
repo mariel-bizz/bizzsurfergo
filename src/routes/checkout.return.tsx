@@ -274,7 +274,9 @@ function CheckoutReturn() {
               <dd className="font-bold text-foreground">
                 {formatAmount(data.amountTotal, data.currency)}
                 {data.mode === "subscription" && (
-                  <span className="text-muted-foreground font-normal"> /mo</span>
+                  <span className="text-muted-foreground font-normal">
+                    {billing === "yearly" ? " /yr" : billing === "monthly" ? " /mo" : ""}
+                  </span>
                 )}
               </dd>
             </div>
