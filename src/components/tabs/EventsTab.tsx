@@ -113,6 +113,18 @@ export function EventsTab() {
       navigate({ to: "/login", search: { redirect: "/events" } });
       return;
     }
+    // Client-side pre-check; server enforces authoritatively.
+    if (
+      !rsvpedIds.includes(id) &&
+      quota.limit !== null &&
+      (quota.remaining ?? 0) <= 0
+    ) {
+      toast.error(
+        `You've used all ${quota.limit} event RSVPs for this ${quota.period}. Upgrade for more.`,
+      );
+      navigate({ to: "/pricing" });
+      return;
+    }
     try {
       const res = await rsvp({ data: { eventId: id } });
       setRsvpedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -128,6 +140,7 @@ export function EventsTab() {
       const ev = eventsData.find((x) => x.id === id);
       if (ev) setConfirmation({ event: ev, meetLink: meet });
       toast.success("You're in! +25 XP");
+      quota.refetch();
       const target = meet || (href !== "#" ? href : null);
       if (target) window.open(target, "_blank");
     } catch (err) {
