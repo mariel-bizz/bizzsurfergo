@@ -156,7 +156,7 @@ function ContactPage() {
           anything Agentic AI.
         </p>
 
-        <div className="mt-8 grid gap-4 grid-cols-1 md:grid-cols-2">
+        <div className="mt-8 grid gap-4 grid-cols-1">
           <a
             href="mailto:hello@bizzsurfer.com"
             title="Email"
@@ -243,7 +243,7 @@ function ContactPage() {
                 />
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1">
                 <Field id="name" label="Name" error={errors.name}>
                   <Input
                     id="name"
@@ -264,7 +264,7 @@ function ContactPage() {
                 </Field>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1">
                 <Field id="company" label="Company" error={errors.company}>
                   <Input
                     id="company"
@@ -286,7 +286,7 @@ function ContactPage() {
                 </Field>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-4 grid-cols-1">
                 <Field
                   id="phone"
                   label="Phone (with international prefix)"
@@ -329,7 +329,7 @@ function ContactPage() {
                 />
               </Field>
 
-              <Button type="submit" disabled={submitting} className="w-full sm:w-auto">
+              <Button type="submit" disabled={submitting} className="w-full">
                 <Send className="w-4 h-4 mr-2" />
                 {submitting ? "Sending…" : "Send message"}
               </Button>
