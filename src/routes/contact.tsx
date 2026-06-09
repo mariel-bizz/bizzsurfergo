@@ -87,6 +87,17 @@ const EMPTY: FormState = {
   message: "",
 };
 
+const FIELD_CLASS =
+  "border-[#ff8a1f]/40 focus-visible:border-[#ff8a1f] focus-visible:ring-[#ff8a1f]/30";
+  name: "",
+  role: "",
+  company: "",
+  email: "",
+  phone: "",
+  topic: "",
+  message: "",
+};
+
 const SOCIALS: { label: string; href: string; Icon: typeof Linkedin; bg: string }[] = [
   { label: "LinkedIn", href: "https://www.linkedin.com/company/bizzsurfer", Icon: Linkedin, bg: "bg-[#0A66C2]" },
   { label: "YouTube", href: "https://www.youtube.com/@bizzsurfer", Icon: Youtube, bg: "bg-[#FF0000]" },
