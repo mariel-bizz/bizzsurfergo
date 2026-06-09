@@ -318,7 +318,7 @@ function ContactPage() {
                 </Field>
                 <Field id="topic" label="Preferred topic" error={errors.topic}>
                   <Select value={form.topic} onValueChange={(v) => update("topic", v)}>
-                    <SelectTrigger id="topic" aria-invalid={!!errors.topic}>
+                    <SelectTrigger id="topic" aria-invalid={!!errors.topic} className={FIELD_CLASS}>
                       <SelectValue placeholder="Pick a topic" />
                     </SelectTrigger>
                     <SelectContent>
