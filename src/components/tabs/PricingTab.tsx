@@ -88,7 +88,7 @@ const tiers = [
 ];
 
 export function PricingTab() {
-  const [yearly, setYearly] = useState(false);
+  const [yearly, setYearly] = useState(true);
   const [seats, setSeats] = useState(2);
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
