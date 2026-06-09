@@ -171,7 +171,7 @@ function ContactPage() {
                 <Mail className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-semibold text-foreground truncate">
+                <div className="text-sm font-semibold text-foreground break-all">
                   hello@bizzsurfer.com
                 </div>
               </div>
