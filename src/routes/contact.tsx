@@ -159,15 +159,19 @@ function ContactPage() {
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           <a
             href="mailto:hello@bizzsurfer.com"
-            className="rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors min-w-0"
+            title="Email"
+            aria-label="Email hello@bizzsurfer.com"
+            className="group rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors min-w-0"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
-                <Mail className="w-5 h-5 text-primary-foreground" />
+              <div
+                className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-md transition-transform group-hover:scale-105"
+                style={{ background: "linear-gradient(135deg, #d94f04 0%, #ff8a1f 100%)" }}
+              >
+                <Mail className="w-5 h-5 text-white" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">Email</div>
-                <div className="text-sm font-semibold text-foreground truncate" title="hello@bizzsurfer.com">
+                <div className="text-sm font-semibold text-foreground truncate">
                   hello@bizzsurfer.com
                 </div>
               </div>
@@ -178,14 +182,18 @@ function ContactPage() {
             href="https://www.linkedin.com/company/bizzsurfer"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors min-w-0"
+            title="LinkedIn"
+            aria-label="LinkedIn @bizzsurfer"
+            className="group rounded-2xl border border-border bg-card p-5 hover:border-primary/40 transition-colors min-w-0"
           >
             <div className="flex items-center gap-3 min-w-0">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center shrink-0">
-                <Linkedin className="w-5 h-5 text-primary-foreground" />
+              <div
+                className="w-11 h-11 rounded-full flex items-center justify-center shrink-0 shadow-md transition-transform group-hover:scale-105"
+                style={{ background: "linear-gradient(135deg, #d94f04 0%, #ff8a1f 100%)" }}
+              >
+                <Linkedin className="w-5 h-5 text-white" fill="currentColor" />
               </div>
               <div className="min-w-0 flex-1">
-                <div className="text-xs uppercase tracking-wide text-muted-foreground">LinkedIn</div>
                 <div className="text-sm font-semibold text-foreground truncate">@bizzsurfer</div>
               </div>
             </div>
