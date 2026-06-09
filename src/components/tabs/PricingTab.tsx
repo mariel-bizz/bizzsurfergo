@@ -297,18 +297,25 @@ export function PricingTab() {
               </ul>
 
               {(() => {
-                const isCurrent = isActive && currentTier === t.id;
+                const isCurrent =
+                  isActive && currentTier === t.id && currentBilling === (yearly ? "yearly" : "monthly");
+                const isUpgradeOrDowngrade = isActive && !isCurrent && t.id !== "go";
+                const label = isCurrent
+                  ? "Current plan"
+                  : isUpgradeOrDowngrade
+                    ? "Switch to this plan"
+                    : t.cta;
                 return (
                   <Button
                     onClick={() => handleSubscribe(t.id)}
-                    disabled={isCurrent || t.id === "go"}
+                    disabled={isCurrent || t.id === "go" || portalLoading}
                     className={`mt-5 w-full h-11 font-bold ${
                       t.highlighted
                         ? "bg-white text-primary hover:bg-white/90"
                         : "bg-gradient-agentic text-white"
                     }`}
                   >
-                    {isCurrent ? "Current plan" : t.cta}
+                    {label}
                   </Button>
                 );
               })()}
