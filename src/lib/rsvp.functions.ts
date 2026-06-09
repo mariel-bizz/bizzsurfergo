@@ -230,3 +230,22 @@ export const listMyRsvps = createServerFn({ method: "GET" })
     }
     return { eventIds, meetLinks };
   });
+
+export const getEventQuotaStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
+    const tier = await resolveUserTier(userId);
+    const quota = getEventQuota(tier);
+    const used = quota.limit === null ? 0 : await countUserRsvpsInPeriod(userId, tier);
+    const { endISO, period } = getCurrentPeriodBounds(tier);
+    return {
+      tier,
+      limit: quota.limit,
+      period,
+      used,
+      remaining: quota.limit === null ? null : Math.max(0, quota.limit - used),
+      resetsAt: endISO,
+    };
+  });
+
