@@ -66,7 +66,9 @@ function validateReturnUrl(raw: string): string {
   // Allow lovable preview/published subdomains for the project.
   const host = u.hostname.toLowerCase();
   const isLovablePreview =
-    host.endsWith(".lovable.app") || host.endsWith(".lovable.dev");
+    host.endsWith(".lovable.app") ||
+    host.endsWith(".lovable.dev") ||
+    host.endsWith(".lovableproject.com");
   if (!ALLOWED_RETURN_HOSTS.has(host) && !isLovablePreview) {
     throw new Error("returnUrl host not allowed");
   }
