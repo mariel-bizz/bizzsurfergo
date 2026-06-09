@@ -1,13 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Loader2, AlertCircle, Download } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Download, Crown, Rocket, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { getCheckoutReceipt, type CheckoutReceipt } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { removeFromCart, clearCart } from "@/lib/marketplace-cart";
+import { trackEvent } from "@/lib/analytics";
+
+const TIER_META: Record<string, { label: string; icon: typeof Crown }> = {
+  hero: { label: "BizzSurfer Go! Hero", icon: Rocket },
+  champion: { label: "BizzSurfer Go! Champion", icon: Crown },
+  team: { label: "BizzSurfer Team", icon: Users },
+};
 
 export const Route = createFileRoute("/checkout/return")({
   head: () =>
@@ -17,9 +24,16 @@ export const Route = createFileRoute("/checkout/return")({
       description: "Your order receipt and payment confirmation.",
       breadcrumbName: "Checkout",
     }),
-  validateSearch: (search: Record<string, unknown>): { session_id?: string; clear_cart?: number } => ({
+  validateSearch: (search: Record<string, unknown>): {
+    session_id?: string;
+    clear_cart?: number;
+    tier?: string;
+    billing?: string;
+  } => ({
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
     clear_cart: search.clear_cart === 1 || search.clear_cart === "1" ? 1 : undefined,
+    tier: typeof search.tier === "string" ? search.tier : undefined,
+    billing: typeof search.billing === "string" ? search.billing : undefined,
   }),
   component: CheckoutReturn,
 });
