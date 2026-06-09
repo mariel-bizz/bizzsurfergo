@@ -9,9 +9,48 @@ import {
   removeAttendeeFromEvent,
   extractMeetLink,
 } from "@/lib/google-calendar.server";
+import { getCurrentPeriodBounds, getEventQuota } from "@/lib/entitlements";
+import { TIER_BY_PRICE, type Tier } from "@/hooks/useSubscription";
 
 const rsvpInput = z.object({ eventId: z.number().int().positive() });
 const CALENDAR_ID = "primary";
+
+function detectEnv(): "sandbox" | "live" {
+  const token = process.env.VITE_PAYMENTS_CLIENT_TOKEN ?? "";
+  return token.startsWith("pk_test_") ? "sandbox" : "live";
+}
+
+async function resolveUserTier(userId: string): Promise<Tier> {
+  const { data } = await supabaseAdmin
+    .from("subscriptions")
+    .select("tier_id,price_id,status,current_period_end")
+    .eq("user_id", userId)
+    .eq("environment", detectEnv())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return "free";
+  const end = data.current_period_end ? new Date(data.current_period_end).getTime() : null;
+  const future = end === null || end > Date.now();
+  const active =
+    (["active", "trialing", "past_due"].includes(data.status) && future) ||
+    (data.status === "canceled" && end !== null && end > Date.now());
+  if (!active) return "free";
+  return ((data.tier_id as Tier) ?? TIER_BY_PRICE[data.price_id ?? ""] ?? "free") as Tier;
+}
+
+async function countUserRsvpsInPeriod(userId: string, tier: Tier): Promise<number> {
+  const { startISO, endISO } = getCurrentPeriodBounds(tier);
+  const { count } = await supabaseAdmin
+    .from("event_rsvps")
+    .select("event_id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .gte("created_at", startISO)
+    .lt("created_at", endISO);
+  return count ?? 0;
+}
+
+
 
 // Default 90 minutes if no end time defined
 function endISOFor(startISO: string): string {
@@ -76,6 +115,28 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
     if (!event) throw new Error("Event not found");
     const email = (claims as { email?: string }).email;
     if (!email) throw new Error("No email on account");
+
+    // Enforce per-tier event quota. Re-RSVPing to an event the user is
+    // already on does NOT consume a new slot (upsert is idempotent).
+    const tier = await resolveUserTier(userId);
+    const quota = getEventQuota(tier);
+    if (quota.limit !== null) {
+      const { data: existing } = await supabaseAdmin
+        .from("event_rsvps")
+        .select("event_id")
+        .eq("user_id", userId)
+        .eq("event_id", data.eventId)
+        .maybeSingle();
+      if (!existing) {
+        const used = await countUserRsvpsInPeriod(userId, tier);
+        if (used >= quota.limit) {
+          throw new Error(
+            `You've used all ${quota.limit} event RSVPs for this ${quota.period}. Upgrade your plan to register for more.`,
+          );
+        }
+      }
+    }
+
     const { error } = await supabase.from("event_rsvps").upsert(
       {
         user_id: userId,
@@ -89,6 +150,7 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
       { onConflict: "user_id,event_id" }
     );
     if (error) throw new Error(error.message);
+
 
     // Best-effort calendar invite + Meet link. Never break RSVP if Calendar fails.
     let meet_link: string | null = null;
@@ -168,3 +230,22 @@ export const listMyRsvps = createServerFn({ method: "GET" })
     }
     return { eventIds, meetLinks };
   });
+
+export const getEventQuotaStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { userId } = context;
+    const tier = await resolveUserTier(userId);
+    const quota = getEventQuota(tier);
+    const used = quota.limit === null ? 0 : await countUserRsvpsInPeriod(userId, tier);
+    const { endISO, period } = getCurrentPeriodBounds(tier);
+    return {
+      tier,
+      limit: quota.limit,
+      period,
+      used,
+      remaining: quota.limit === null ? null : Math.max(0, quota.limit - used),
+      resetsAt: endISO,
+    };
+  });
+

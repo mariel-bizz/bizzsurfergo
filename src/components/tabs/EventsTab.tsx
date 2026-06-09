@@ -21,6 +21,7 @@ import { events as eventsData, pastEvents } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
 import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
 import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDialog";
+import { EventQuotaWidget, useEventQuota } from "@/components/events/EventQuotaWidget";
 import type { FeedEvent } from "@/lib/events-data";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
@@ -33,6 +34,7 @@ export function EventsTab() {
   const rsvp = useServerFn(rsvpToEvent);
   const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
+  const quota = useEventQuota();
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
   const [authed, setAuthed] = useState(false);
@@ -111,6 +113,18 @@ export function EventsTab() {
       navigate({ to: "/login", search: { redirect: "/events" } });
       return;
     }
+    // Client-side pre-check; server enforces authoritatively.
+    if (
+      !rsvpedIds.includes(id) &&
+      quota.limit !== null &&
+      (quota.remaining ?? 0) <= 0
+    ) {
+      toast.error(
+        `You've used all ${quota.limit} event RSVPs for this ${quota.period}. Upgrade for more.`,
+      );
+      navigate({ to: "/pricing" });
+      return;
+    }
     try {
       const res = await rsvp({ data: { eventId: id } });
       setRsvpedIds((prev) => (prev.includes(id) ? prev : [...prev, id]));
@@ -126,6 +140,7 @@ export function EventsTab() {
       const ev = eventsData.find((x) => x.id === id);
       if (ev) setConfirmation({ event: ev, meetLink: meet });
       toast.success("You're in! +25 XP");
+      quota.refetch();
       const target = meet || (href !== "#" ? href : null);
       if (target) window.open(target, "_blank");
     } catch (err) {
@@ -143,6 +158,7 @@ export function EventsTab() {
         return next;
       });
       toast.success("RSVP cancelled. No more reminders for this event.");
+      quota.refetch();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
     }
@@ -156,6 +172,9 @@ export function EventsTab() {
           Live conversations shaping Agentic AI for business transformation.
         </p>
       </div>
+
+      <EventQuotaWidget />
+
 
 
       {/* View toggle: Upcoming / Past */}

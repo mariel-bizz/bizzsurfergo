@@ -47,6 +47,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import bizzsurferGoLogo from "@/assets/bizzsurfer-go-logo.png";
 import { trackEvent } from "@/lib/analytics";
+import { usePremium } from "@/hooks/usePremium";
+import { canUsePremiumAi } from "@/lib/entitlements";
 
 // Strict RFC-5322-ish email check + length cap.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
@@ -121,6 +123,8 @@ function buildInitialAssistant(cfg: GoChatConfig | null): string {
 
 export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const game = useGame();
+  const { tier } = usePremium();
+  const premiumAllowed = canUsePremiumAi(tier);
   const [config, setConfig] = useState<GoChatConfig | null>(null);
   const gemPersona =
     config?.provider === "gemini"
@@ -252,6 +256,10 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   const switchProvider = (provider: Provider) => {
     if (!config) return;
+    if (!premiumAllowed) {
+      toast.error("Premium AI providers are included with Champion & Team plans.");
+      return;
+    }
     const next = { ...config, provider };
     try {
       window.localStorage.setItem(CONFIG_KEY, JSON.stringify(next));
@@ -942,7 +950,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
         </div>
       </div>
 
-      {!config && <GoChatSetup onComplete={saveConfig} />}
+      {!config && <GoChatSetup onComplete={saveConfig} canUsePremium={premiumAllowed} />}
 
       {config && (
         <>

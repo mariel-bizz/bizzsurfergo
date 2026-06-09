@@ -11,6 +11,7 @@ import { ResourcesSection, TrustedPartnersSection, PoweredBySection, FollowSecti
 import { OnboardingChecklist } from "../OnboardingChecklist";
 import { PainTracker, type PainItem } from "../PainTracker";
 import { FeaturedVideoHome } from "../insights/VideoContent";
+import { EventQuotaWidget } from "../events/EventQuotaWidget";
 
 import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
 import { pastEvents, eventLink } from "@/lib/events-data";
@@ -128,6 +129,13 @@ export function HomeTab() {
 
       {/* Onboarding checklist */}
       <OnboardingChecklist />
+
+      {/* Event quota widget */}
+      <section className="px-5">
+        <EventQuotaWidget />
+      </section>
+
+
 
 
       {/* Go Agentic! */}

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, X, Plus } from "lucide-react";
+import { Check, X, Plus, Lock, Crown } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import logoOpenAI from "@/assets/llm-openai.png";
 import logoClaude from "@/assets/llm-claude.png";
 import logoMistral from "@/assets/llm-mistral.png";
@@ -43,7 +44,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
   );
 }
 
-export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) => void }) {
+export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: (cfg: GoChatConfig) => void; canUsePremium?: boolean }) {
   const [step, setStep] = useState<1 | 2 | 3>(1);
   const [provider, setProvider] = useState<Provider | null>(null);
   const [departments, setDepartments] = useState<string[]>([]);
@@ -74,30 +75,65 @@ export function GoChatSetup({ onComplete }: { onComplete: (cfg: GoChatConfig) =>
         <section className="space-y-3">
           <div>
             <h2 className="text-lg font-bold text-foreground">Choose your Language Model</h2>
-            <p className="text-xs text-muted-foreground">All five are <span className="font-extrabold bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent">FREE</span> with BizzSurfer GO!</p>
+            {canUsePremium ? (
+              <p className="text-xs text-muted-foreground">All five are included with your Champion / Team plan.</p>
+            ) : (
+              <div className="mt-2 rounded-xl border border-primary/30 bg-primary/5 p-3 flex items-start gap-2">
+                <Crown className="w-4 h-4 text-primary mt-0.5 shrink-0" />
+                <div className="text-xs text-foreground">
+                  <p className="font-bold">Premium AI is a Champion & Team perk.</p>
+                  <p className="text-muted-foreground mt-1">
+                    Upgrade to unlock Claude, Gemini, OpenAI, Mistral and Perplexity.{" "}
+                    <Link to="/pricing" className="text-primary font-bold underline">See plans</Link>
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
           <div className="grid grid-cols-1 gap-2">
-            {PROVIDERS.map((p) => (
-              <button
-                key={p.id}
-                onClick={() => setProvider(p.id)}
-                className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                  provider === p.id ? "border-primary bg-primary/5 shadow-soft" : "border-border bg-card hover:border-primary/40"
-                }`}
-              >
-                <div className="w-11 h-11 rounded-xl bg-transparent flex items-center justify-center shrink-0">
-                  <img src={p.logo} alt={`${p.name} logo`} className="w-8 h-8 object-contain" loading="lazy" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-foreground">{p.name}</p>
-                </div>
-                <span className="text-[11px] font-extrabold uppercase tracking-widest bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent drop-shadow-sm">FREE</span>
-              </button>
-            ))}
+            {PROVIDERS.map((p) => {
+              const locked = !canUsePremium;
+              return (
+                <button
+                  key={p.id}
+                  disabled={locked}
+                  onClick={() => !locked && setProvider(p.id)}
+                  className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
+                    locked
+                      ? "border-border bg-muted/40 opacity-70 cursor-not-allowed"
+                      : provider === p.id
+                        ? "border-primary bg-primary/5 shadow-soft"
+                        : "border-border bg-card hover:border-primary/40"
+                  }`}
+                >
+                  <div className="w-11 h-11 rounded-xl bg-transparent flex items-center justify-center shrink-0">
+                    <img src={p.logo} alt={`${p.name} logo`} className="w-8 h-8 object-contain" loading="lazy" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-bold text-foreground">{p.name}</p>
+                  </div>
+                  {locked ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
+                      <Lock className="w-3 h-3" /> Champion
+                    </span>
+                  ) : (
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent drop-shadow-sm">INCLUDED</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-          <Button disabled={!provider} onClick={() => setStep(2)} className="w-full rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid">
-            Continue
-          </Button>
+          {canUsePremium ? (
+            <Button disabled={!provider} onClick={() => setStep(2)} className="w-full rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid">
+              Continue
+            </Button>
+          ) : (
+            <Link to="/pricing" className="block">
+              <Button className="w-full rounded-md bg-gradient-agentic text-white shadow-soft h-12 text-base font-extrabold">
+                <Crown className="w-4 h-4 mr-2" /> Upgrade to unlock Premium AI
+              </Button>
+            </Link>
+          )}
         </section>
       )}
 
