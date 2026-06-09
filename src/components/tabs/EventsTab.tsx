@@ -158,6 +158,7 @@ export function EventsTab() {
         return next;
       });
       toast.success("RSVP cancelled. No more reminders for this event.");
+      quota.refetch();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Cancel failed");
     }
@@ -171,6 +172,9 @@ export function EventsTab() {
           Live conversations shaping Agentic AI for business transformation.
         </p>
       </div>
+
+      <EventQuotaWidget />
+
 
 
       {/* View toggle: Upcoming / Past */}
