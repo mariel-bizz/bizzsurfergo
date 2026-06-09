@@ -175,6 +175,7 @@ function ContactPage() {
                   hello@bizzsurfer.com
                 </div>
               </div>
+              <GoBadge />
             </div>
           </a>
 
@@ -196,6 +197,7 @@ function ContactPage() {
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold text-foreground truncate">@bizzsurfer</div>
               </div>
+              <GoBadge />
             </div>
           </a>
         </div>
