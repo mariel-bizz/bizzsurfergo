@@ -202,7 +202,10 @@ function ContactPage() {
           </a>
         </div>
 
-        <section className="mt-8 rounded-2xl border border-border bg-card p-6">
+        <section
+          className="mt-8 rounded-2xl border-2 border-[#ff8a1f]/40 bg-card p-6"
+          style={{ boxShadow: "0 0 0 1px rgba(255,138,31,0.15), 0 10px 40px -10px rgba(255,138,31,0.35), 0 0 60px -20px rgba(217,79,4,0.25)" }}
+        >
           <h2 className="text-lg font-semibold text-foreground">Send us a message</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             All fields are required. We'll get back within one business day.
