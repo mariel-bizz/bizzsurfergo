@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Crown, Rocket, Sparkles, Users, X, Loader2, Minus, Plus } from "lucide-react";
+import { Check, Crown, Rocket, Sparkles, Users, X, Loader2, Minus, Plus, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -9,6 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "@tanstack/react-router";
+import { PricingComparisonTable } from "@/components/pricing/PricingComparisonTable";
+import { trackEvent } from "@/lib/analytics";
+import { useServerFn } from "@tanstack/react-start";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { toast } from "sonner";
 
 const HERO_MONTHLY = 14.99;
 const HERO_YEARLY = 149;
@@ -92,7 +98,9 @@ export function PricingTab() {
   const [seats, setSeats] = useState(2);
   const { openCheckout, closeCheckout, isOpen, checkoutElement } = useStripeCheckout();
   const [user, setUser] = useState<{ id: string; email?: string } | null>(null);
-  const { tier: currentTier, isActive } = useSubscription(user?.id ?? null);
+  const { tier: currentTier, isActive, billingPeriod: currentBilling } = useSubscription(user?.id ?? null);
+  const openPortal = useServerFn(createPortalSession);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -104,17 +112,66 @@ export function PricingTab() {
     return () => sub.subscription.unsubscribe();
   }, []);
 
+  // Funnel: view event once per (yearly) toggle state
+  useEffect(() => {
+    trackEvent("pricing_view", {
+      billing_period: yearly ? "yearly" : "monthly",
+      authed: !!user,
+      current_tier: currentTier,
+    });
+  }, [yearly, user, currentTier]);
+
+  const handleManageSubscription = async () => {
+    if (!user) return;
+    setPortalLoading(true);
+    trackEvent("pricing_manage_subscription_click", { current_tier: currentTier });
+    try {
+      const url = await openPortal({
+        data: {
+          environment: getStripeEnvironment(),
+          returnUrl: `${window.location.origin}/profile`,
+        },
+      });
+      window.open(url, "_blank", "noopener,noreferrer");
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not open the billing portal. Please try again.");
+    } finally {
+      setPortalLoading(false);
+    }
+  };
+
   const handleSubscribe = (tierId: string) => {
     if (tierId === "go") return;
+    const billingPeriod = yearly ? "yearly" : "monthly";
+    trackEvent("pricing_cta_click", {
+      tier_id: tierId,
+      billing_period: billingPeriod,
+      quantity: tierId === "team" ? seats : 1,
+      authed: !!user,
+      current_tier: currentTier,
+    });
     if (!user) {
       window.location.href = "/login?redirect=/pricing";
       return;
     }
-    const priceId = `${tierId}_${yearly ? "yearly" : "monthly"}`;
+    // If already subscribed, send the user to the Stripe portal to switch
+    // plans / billing period — Stripe handles proration and seat changes.
+    if (isActive) {
+      handleManageSubscription();
+      return;
+    }
+    const priceId = `${tierId}_${billingPeriod}`;
+    trackEvent("checkout_start", {
+      tier_id: tierId,
+      billing_period: billingPeriod,
+      price_id: priceId,
+      quantity: tierId === "team" ? seats : 1,
+    });
     openCheckout({
       priceId,
       quantity: tierId === "team" ? seats : 1,
-      returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}`,
+      returnUrl: `${window.location.origin}/checkout/return?session_id={CHECKOUT_SESSION_ID}&tier=${tierId}&billing=${billingPeriod}`,
     });
   };
 
@@ -240,18 +297,25 @@ export function PricingTab() {
               </ul>
 
               {(() => {
-                const isCurrent = isActive && currentTier === t.id;
+                const isCurrent =
+                  isActive && currentTier === t.id && currentBilling === (yearly ? "yearly" : "monthly");
+                const isUpgradeOrDowngrade = isActive && !isCurrent && t.id !== "go";
+                const label = isCurrent
+                  ? "Current plan"
+                  : isUpgradeOrDowngrade
+                    ? "Switch to this plan"
+                    : t.cta;
                 return (
                   <Button
                     onClick={() => handleSubscribe(t.id)}
-                    disabled={isCurrent || t.id === "go"}
+                    disabled={isCurrent || t.id === "go" || portalLoading}
                     className={`mt-5 w-full h-11 font-bold ${
                       t.highlighted
                         ? "bg-white text-primary hover:bg-white/90"
                         : "bg-gradient-agentic text-white"
                     }`}
                   >
-                    {isCurrent ? "Current plan" : t.cta}
+                    {label}
                   </Button>
                 );
               })()}
@@ -342,10 +406,36 @@ export function PricingTab() {
       </div>
 
       {isActive && (
-        <p className="text-center text-xs text-muted-foreground">
-          Manage your subscription on your <Link to="/profile" className="underline">Profile</Link>.
-        </p>
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-3 text-center">
+          <p className="text-sm text-foreground">
+            You're on the <span className="font-bold capitalize">{currentTier}</span> plan
+            {currentBilling ? ` (${currentBilling})` : ""}.
+          </p>
+          <Button
+            variant="outline"
+            className="w-full h-11"
+            onClick={handleManageSubscription}
+            disabled={portalLoading}
+          >
+            {portalLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : (
+              <ExternalLink className="w-4 h-4 mr-2" />
+            )}
+            Manage subscription / change plan
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Update billing period, change seats, switch tier, or cancel — handled by Stripe.
+          </p>
+        </div>
       )}
+
+      <PricingComparisonTable />
+
+      <p className="text-center text-xs text-muted-foreground">
+        Need a custom enterprise plan?{" "}
+        <Link to="/contact" className="underline">Contact us</Link>.
+      </p>
 
       <Dialog open={isOpen} onOpenChange={(o) => { if (!o) closeCheckout(); }}>
         <DialogContent className="max-w-lg p-0 overflow-hidden">

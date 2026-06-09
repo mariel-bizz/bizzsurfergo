@@ -7,7 +7,7 @@ export interface PremiumState {
   authed: boolean;
   userId: string | null;
   isPremium: boolean;
-  tier: "free" | "hero" | "champion";
+  tier: "free" | "hero" | "champion" | "team";
 }
 
 /**

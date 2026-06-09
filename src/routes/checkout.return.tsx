@@ -1,13 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { CheckCircle2, Loader2, AlertCircle, Download } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Download, Crown, Rocket, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageHead } from "@/lib/page-head";
 import { getCheckoutReceipt, type CheckoutReceipt } from "@/lib/payments.functions";
 import { getStripeEnvironment } from "@/lib/stripe";
 import { removeFromCart, clearCart } from "@/lib/marketplace-cart";
+import { trackEvent } from "@/lib/analytics";
+
+const TIER_META: Record<string, { label: string; icon: typeof Crown }> = {
+  hero: { label: "BizzSurfer Go! Hero", icon: Rocket },
+  champion: { label: "BizzSurfer Go! Champion", icon: Crown },
+  team: { label: "BizzSurfer Team", icon: Users },
+};
 
 export const Route = createFileRoute("/checkout/return")({
   head: () =>
@@ -17,9 +24,16 @@ export const Route = createFileRoute("/checkout/return")({
       description: "Your order receipt and payment confirmation.",
       breadcrumbName: "Checkout",
     }),
-  validateSearch: (search: Record<string, unknown>): { session_id?: string; clear_cart?: number } => ({
+  validateSearch: (search: Record<string, unknown>): {
+    session_id?: string;
+    clear_cart?: number;
+    tier?: string;
+    billing?: string;
+  } => ({
     session_id: typeof search.session_id === "string" ? search.session_id : undefined,
     clear_cart: search.clear_cart === 1 || search.clear_cart === "1" ? 1 : undefined,
+    tier: typeof search.tier === "string" ? search.tier : undefined,
+    billing: typeof search.billing === "string" ? search.billing : undefined,
   }),
   component: CheckoutReturn,
 });
@@ -33,7 +47,7 @@ function formatAmount(cents: number | null, currency: string | null): string {
 }
 
 function CheckoutReturn() {
-  const { session_id, clear_cart } = Route.useSearch();
+  const { session_id, clear_cart, tier, billing } = Route.useSearch();
   const fetchReceipt = useServerFn(getCheckoutReceipt);
 
   const { data, isLoading, error } = useQuery({
@@ -50,6 +64,34 @@ function CheckoutReturn() {
         ? false
         : 2500,
   });
+
+  // Funnel analytics: emit a single success/failure event once we know.
+  const tracked = useRef(false);
+  useEffect(() => {
+    if (tracked.current || !data) return;
+    const stripeSaysPaid =
+      data.paymentStatus === "paid" || data.status === "complete" || data.status === "completed";
+    if (data.webhookConfirmed && stripeSaysPaid) {
+      tracked.current = true;
+      trackEvent("checkout_success", {
+        session_id,
+        tier_id: tier ?? null,
+        billing_period: billing ?? null,
+        amount_total: data.amountTotal,
+        currency: data.currency,
+        mode: data.mode,
+      });
+    } else if (data.status && !stripeSaysPaid && !data.webhookConfirmed) {
+      tracked.current = true;
+      trackEvent("checkout_failure", {
+        session_id,
+        tier_id: tier ?? null,
+        billing_period: billing ?? null,
+        status: data.status,
+        payment_status: data.paymentStatus,
+      });
+    }
+  }, [data, session_id, tier, billing]);
 
   // After a successful purchase, remove the item(s) from the local cart.
   useEffect(() => {
@@ -138,6 +180,27 @@ function CheckoutReturn() {
               : "Your payment is still being processed. We'll email you once it's complete."}
           </p>
         </div>
+
+        {tier && TIER_META[tier] && (
+          <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
+            {(() => {
+              const Icon = TIER_META[tier].icon;
+              return (
+                <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-primary-foreground" />
+                </div>
+              );
+            })()}
+            <div>
+              <p className="text-sm font-bold text-foreground">{TIER_META[tier].label}</p>
+              <p className="text-xs text-muted-foreground">
+                {billing === "yearly" ? "Annual billing" : billing === "monthly" ? "Monthly billing" : "Subscription"}
+              </p>
+            </div>
+          </div>
+        )}
+
+
 
         <div className="rounded-lg border border-border bg-card p-5 space-y-4">
           <h2 className="text-sm font-bold text-foreground">Order summary</h2>

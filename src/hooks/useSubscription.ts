@@ -9,6 +9,8 @@ export interface SubscriptionRow {
   stripe_customer_id: string;
   product_id: string;
   price_id: string;
+  tier_id: string | null;
+  quantity: number | null;
   status: string;
   current_period_start: string | null;
   current_period_end: string | null;
@@ -16,19 +18,33 @@ export interface SubscriptionRow {
   environment: string;
 }
 
+export type Tier = "free" | "hero" | "champion" | "team";
+export type BillingPeriod = "monthly" | "yearly" | null;
+
 export interface SubscriptionState {
   loading: boolean;
   subscription: SubscriptionRow | null;
   isActive: boolean;
-  tier: "free" | "hero" | "champion";
+  tier: Tier;
+  billingPeriod: BillingPeriod;
+  quantity: number;
 }
 
-const TIER_BY_PRICE: Record<string, "hero" | "champion"> = {
+const TIER_BY_PRICE: Record<string, Exclude<Tier, "free">> = {
   hero_monthly: "hero",
   hero_yearly: "hero",
   champion_monthly: "champion",
   champion_yearly: "champion",
+  team_monthly: "team",
+  team_yearly: "team",
 };
+
+export function billingPeriodFromPriceId(priceId: string | null | undefined): BillingPeriod {
+  if (!priceId) return null;
+  if (priceId.endsWith("_yearly")) return "yearly";
+  if (priceId.endsWith("_monthly")) return "monthly";
+  return null;
+}
 
 function computeIsActive(sub: SubscriptionRow | null): boolean {
   if (!sub) return false;
@@ -45,11 +61,20 @@ export function useSubscription(userId: string | null | undefined): Subscription
     subscription: null,
     isActive: false,
     tier: "free",
+    billingPeriod: null,
+    quantity: 1,
   });
 
   useEffect(() => {
     if (!userId) {
-      setState({ loading: false, subscription: null, isActive: false, tier: "free" });
+      setState({
+        loading: false,
+        subscription: null,
+        isActive: false,
+        tier: "free",
+        billingPeriod: null,
+        quantity: 1,
+      });
       return;
     }
     const env = getStripeEnvironment();
@@ -67,9 +92,17 @@ export function useSubscription(userId: string | null | undefined): Subscription
       if (cancelled) return;
       const sub = (data as SubscriptionRow | null) ?? null;
       const active = computeIsActive(sub);
-      const tier: "free" | "hero" | "champion" =
-        active && sub ? (TIER_BY_PRICE[sub.price_id] ?? "free") : "free";
-      setState({ loading: false, subscription: sub, isActive: active, tier });
+      const tier: Tier = active && sub
+        ? ((sub.tier_id as Tier) ?? TIER_BY_PRICE[sub.price_id] ?? "free")
+        : "free";
+      setState({
+        loading: false,
+        subscription: sub,
+        isActive: active,
+        tier,
+        billingPeriod: active ? billingPeriodFromPriceId(sub?.price_id) : null,
+        quantity: sub?.quantity ?? 1,
+      });
     };
 
     refetch();

@@ -19,6 +19,15 @@ function resolvePriceId(item: any): string | undefined {
     || item?.price?.id;
 }
 
+function tierFromPriceId(priceId: string | undefined): string | null {
+  if (!priceId) return null;
+  if (priceId.startsWith("hero_")) return "hero";
+  if (priceId.startsWith("champion_")) return "champion";
+  if (priceId.startsWith("team_")) return "team";
+  if (priceId.startsWith("go_")) return "go";
+  return null;
+}
+
 async function handleSubscriptionCreated(subscription: any, env: StripeEnv) {
   const userId = subscription.metadata?.userId;
   if (!userId) {
@@ -28,6 +37,8 @@ async function handleSubscriptionCreated(subscription: any, env: StripeEnv) {
   const item = subscription.items?.data?.[0];
   const priceId = resolvePriceId(item);
   const productId = item?.price?.product;
+  const quantity = item?.quantity ?? 1;
+  const tierId = tierFromPriceId(priceId);
   const periodStart = item?.current_period_start ?? subscription.current_period_start;
   const periodEnd = item?.current_period_end ?? subscription.current_period_end;
 
@@ -38,6 +49,8 @@ async function handleSubscriptionCreated(subscription: any, env: StripeEnv) {
       stripe_customer_id: subscription.customer,
       product_id: productId,
       price_id: priceId,
+      tier_id: tierId,
+      quantity,
       status: subscription.status,
       current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
       current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
@@ -52,6 +65,8 @@ async function handleSubscriptionUpdated(subscription: any, env: StripeEnv) {
   const item = subscription.items?.data?.[0];
   const priceId = resolvePriceId(item);
   const productId = item?.price?.product;
+  const quantity = item?.quantity ?? 1;
+  const tierId = tierFromPriceId(priceId);
   const periodStart = item?.current_period_start ?? subscription.current_period_start;
   const periodEnd = item?.current_period_end ?? subscription.current_period_end;
 
@@ -61,6 +76,8 @@ async function handleSubscriptionUpdated(subscription: any, env: StripeEnv) {
       status: subscription.status,
       product_id: productId,
       price_id: priceId,
+      tier_id: tierId,
+      quantity,
       current_period_start: periodStart ? new Date(periodStart * 1000).toISOString() : null,
       current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null,
       cancel_at_period_end: subscription.cancel_at_period_end || false,
