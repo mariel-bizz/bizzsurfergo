@@ -260,6 +260,7 @@ function ContactPage() {
                     onChange={(e) => update("name", e.target.value)}
                     placeholder="Jane Doe"
                     aria-invalid={!!errors.name}
+                    className={FIELD_CLASS}
                   />
                 </Field>
                 <Field id="role" label="Role" error={errors.role}>
@@ -269,6 +270,7 @@ function ContactPage() {
                     onChange={(e) => update("role", e.target.value)}
                     placeholder="COO, Founder…"
                     aria-invalid={!!errors.role}
+                    className={FIELD_CLASS}
                   />
                 </Field>
               </div>
@@ -281,6 +283,7 @@ function ContactPage() {
                     onChange={(e) => update("company", e.target.value)}
                     placeholder="Acme Inc."
                     aria-invalid={!!errors.company}
+                    className={FIELD_CLASS}
                   />
                 </Field>
                 <Field id="email" label="Email" error={errors.email}>
@@ -291,6 +294,7 @@ function ContactPage() {
                     onChange={(e) => update("email", e.target.value)}
                     placeholder="jane@company.com"
                     aria-invalid={!!errors.email}
+                    className={FIELD_CLASS}
                   />
                 </Field>
               </div>
@@ -309,6 +313,7 @@ function ContactPage() {
                     onChange={(e) => update("phone", e.target.value)}
                     placeholder="+1 555 123 4567"
                     aria-invalid={!!errors.phone}
+                    className={FIELD_CLASS}
                   />
                 </Field>
                 <Field id="topic" label="Preferred topic" error={errors.topic}>
@@ -335,6 +340,7 @@ function ContactPage() {
                   onChange={(e) => update("message", e.target.value)}
                   placeholder="Tell us a bit about what you're looking for…"
                   aria-invalid={!!errors.message}
+                    className={FIELD_CLASS}
                 />
               </Field>
 
