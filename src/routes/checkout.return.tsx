@@ -181,6 +181,27 @@ function CheckoutReturn() {
           </p>
         </div>
 
+        {tier && TIER_META[tier] && (
+          <div className="rounded-2xl border border-primary/30 bg-primary/5 p-4 flex items-center gap-3">
+            {(() => {
+              const Icon = TIER_META[tier].icon;
+              return (
+                <div className="w-10 h-10 rounded-xl bg-gradient-primary flex items-center justify-center shrink-0">
+                  <Icon className="w-5 h-5 text-primary-foreground" />
+                </div>
+              );
+            })()}
+            <div>
+              <p className="text-sm font-bold text-foreground">{TIER_META[tier].label}</p>
+              <p className="text-xs text-muted-foreground">
+                {billing === "yearly" ? "Annual billing" : billing === "monthly" ? "Monthly billing" : "Subscription"}
+              </p>
+            </div>
+          </div>
+        )}
+
+
+
         <div className="rounded-lg border border-border bg-card p-5 space-y-4">
           <h2 className="text-sm font-bold text-foreground">Order summary</h2>
 
