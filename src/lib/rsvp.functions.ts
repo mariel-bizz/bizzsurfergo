@@ -9,9 +9,53 @@ import {
   removeAttendeeFromEvent,
   extractMeetLink,
 } from "@/lib/google-calendar.server";
+import { getCurrentPeriodBounds, getEventQuota } from "@/lib/entitlements";
+import { TIER_BY_PRICE, type Tier } from "@/hooks/useSubscription";
 
 const rsvpInput = z.object({ eventId: z.number().int().positive() });
 const CALENDAR_ID = "primary";
+
+function detectEnv(): "sandbox" | "live" {
+  const token = process.env.VITE_PAYMENTS_CLIENT_TOKEN ?? "";
+  return token.startsWith("pk_test_") ? "sandbox" : "live";
+}
+
+async function resolveUserTier(
+  supabase: Parameters<Parameters<typeof createServerFn>[0] extends never ? never : never>[0] extends never ? never : never,
+  userId: string,
+): Promise<Tier> {
+  // Loose type to avoid pulling the full supabase client generic in here.
+  const sb = supabase as unknown as {
+    from: (t: string) => {
+      select: (s: string) => {
+        eq: (c: string, v: string) => {
+          eq: (c: string, v: string) => {
+            order: (c: string, o: { ascending: boolean }) => {
+              limit: (n: number) => { maybeSingle: () => Promise<{ data: { tier_id: string | null; price_id: string | null; status: string; current_period_end: string | null } | null }> };
+            };
+          };
+        };
+      };
+    };
+  };
+  const { data } = await sb
+    .from("subscriptions")
+    .select("tier_id,price_id,status,current_period_end")
+    .eq("user_id", userId)
+    .eq("environment", detectEnv())
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  if (!data) return "free";
+  const end = data.current_period_end ? new Date(data.current_period_end).getTime() : null;
+  const future = end === null || end > Date.now();
+  const active =
+    (["active", "trialing", "past_due"].includes(data.status) && future) ||
+    (data.status === "canceled" && end !== null && end > Date.now());
+  if (!active) return "free";
+  return ((data.tier_id as Tier) ?? TIER_BY_PRICE[data.price_id ?? ""] ?? "free") as Tier;
+}
+
 
 // Default 90 minutes if no end time defined
 function endISOFor(startISO: string): string {
