@@ -21,6 +21,7 @@ import { events as eventsData, pastEvents } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
 import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
 import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDialog";
+import { EventQuotaWidget, useEventQuota } from "@/components/events/EventQuotaWidget";
 import type { FeedEvent } from "@/lib/events-data";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
