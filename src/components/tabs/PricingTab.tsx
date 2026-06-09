@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Check, Crown, Rocket, Sparkles, Users, X, Loader2, Minus, Plus } from "lucide-react";
+import { Check, Crown, Rocket, Sparkles, Users, X, Loader2, Minus, Plus, ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useStripeCheckout } from "@/hooks/useStripeCheckout";
 import { PaymentTestModeBanner } from "@/components/PaymentTestModeBanner";
@@ -9,6 +9,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { useSubscription } from "@/hooks/useSubscription";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Link } from "@tanstack/react-router";
+import { PricingComparisonTable } from "@/components/pricing/PricingComparisonTable";
+import { trackEvent } from "@/lib/analytics";
+import { useServerFn } from "@tanstack/react-start";
+import { createPortalSession } from "@/lib/payments.functions";
+import { getStripeEnvironment } from "@/lib/stripe";
+import { toast } from "@/components/ui/sonner";
 
 const HERO_MONTHLY = 14.99;
 const HERO_YEARLY = 149;
