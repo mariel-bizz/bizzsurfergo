@@ -4,6 +4,7 @@ import { SplashScreen } from "./SplashScreen";
 import { BottomNav } from "./BottomNav";
 import { FloatingChat } from "./FloatingChat";
 import { NewsletterDialog } from "./NewsletterDialog";
+import { NotificationsBanner } from "./notifications/NotificationsBanner";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import { trackEvent } from "@/lib/analytics";
