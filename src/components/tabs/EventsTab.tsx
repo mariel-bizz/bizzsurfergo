@@ -104,6 +104,9 @@ export function EventsTab() {
             setMeetLinks(r.meetLinks ?? {});
           })
           .catch(() => {});
+        listWl()
+          .then((r) => setWaitlistDetails(r.details ?? {}))
+          .catch(() => {});
       }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
