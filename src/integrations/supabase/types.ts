@@ -298,6 +298,36 @@ export type Database = {
         }
         Relationships: []
       }
+      event_waitlist: {
+        Row: {
+          converted_at: string | null
+          created_at: string
+          email: string
+          event_id: number
+          id: string
+          notified_at: string | null
+          user_id: string
+        }
+        Insert: {
+          converted_at?: string | null
+          created_at?: string
+          email: string
+          event_id: number
+          id?: string
+          notified_at?: string | null
+          user_id: string
+        }
+        Update: {
+          converted_at?: string | null
+          created_at?: string
+          email?: string
+          event_id?: number
+          id?: string
+          notified_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       insights_comments: {
         Row: {
           article_slug: string
@@ -613,6 +643,78 @@ export type Database = {
         }
         Relationships: []
       }
+      quota_enforcement_log: {
+        Row: {
+          created_at: string
+          decision: string
+          event_id: number | null
+          id: string
+          period: string
+          period_end: string
+          period_start: string
+          quota_limit: number | null
+          reason: string | null
+          tier: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          event_id?: number | null
+          id?: string
+          period: string
+          period_end: string
+          period_start: string
+          quota_limit?: number | null
+          reason?: string | null
+          tier: string
+          used: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          event_id?: number | null
+          id?: string
+          period?: string
+          period_end?: string
+          period_start?: string
+          quota_limit?: number | null
+          reason?: string | null
+          tier?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
+      quota_notification_log: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          period_key: string
+          tier: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          period_key: string
+          tier: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          period_key?: string
+          tier?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null
@@ -804,6 +906,39 @@ export type Database = {
           provider?: string
           status?: string
           updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          kind: string
+          metadata: Json
+          read_at: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind: string
+          metadata?: Json
+          read_at?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          kind?: string
+          metadata?: Json
+          read_at?: string | null
+          title?: string
           user_id?: string
         }
         Relationships: []
