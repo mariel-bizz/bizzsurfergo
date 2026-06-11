@@ -11,9 +11,92 @@ import {
 } from "@/lib/google-calendar.server";
 import { getCurrentPeriodBounds, getEventQuota } from "@/lib/entitlements";
 import { TIER_BY_PRICE, type Tier } from "@/hooks/useSubscription";
+import { enqueueTemplateEmail } from "@/lib/email/enqueue.server";
 
 const rsvpInput = z.object({ eventId: z.number().int().positive() });
 const CALENDAR_ID = "primary";
+
+function periodKey(period: "month" | "year", now: Date = new Date()): string {
+  const y = now.getUTCFullYear();
+  if (period === "year") return String(y);
+  const m = String(now.getUTCMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function tierLabel(t: Tier): string {
+  return t === "free" ? "Free" : t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+async function logEnforcement(opts: {
+  userId: string;
+  decision: "allow" | "deny" | "waitlist";
+  reason?: string;
+  tier: Tier;
+  used: number;
+  limit: number | null;
+  eventId: number;
+}) {
+  const { startISO, endISO, period } = getCurrentPeriodBounds(opts.tier);
+  await supabaseAdmin.from("quota_enforcement_log").insert({
+    user_id: opts.userId,
+    decision: opts.decision,
+    reason: opts.reason ?? null,
+    tier: opts.tier,
+    period,
+    period_start: startISO,
+    period_end: endISO,
+    used: opts.used,
+    quota_limit: opts.limit,
+    event_id: opts.eventId,
+  });
+}
+
+async function maybeQuotaNotify(opts: {
+  userId: string;
+  email: string;
+  tier: Tier;
+  used: number;
+  limit: number;
+}) {
+  const remaining = Math.max(0, opts.limit - opts.used);
+  let kind: "last_slot" | "exhausted" | null = null;
+  if (remaining === 0) kind = "exhausted";
+  else if (remaining === 1) kind = "last_slot";
+  if (!kind) return;
+  const { period } = getCurrentPeriodBounds(opts.tier);
+  const pkey = periodKey(period);
+  // dedupe via unique (user_id, kind, period_key)
+  const { error: dedupeErr } = await supabaseAdmin
+    .from("quota_notification_log")
+    .insert({ user_id: opts.userId, kind, period_key: pkey, tier: opts.tier });
+  if (dedupeErr) return; // already sent
+  await Promise.allSettled([
+    enqueueTemplateEmail({
+      templateName: "quota-notification",
+      recipient: opts.email,
+      data: {
+        kind,
+        tierLabel: tierLabel(opts.tier),
+        period,
+        limit: opts.limit,
+        remaining,
+      },
+      idempotencyKey: `quota-${kind}-${opts.userId}-${pkey}`,
+    }),
+    supabaseAdmin.from("user_notifications").insert({
+      user_id: opts.userId,
+      kind: `quota_${kind}`,
+      title: kind === "exhausted" ? "You've used all your event RSVPs" : "1 event RSVP left this " + period,
+      body:
+        kind === "exhausted"
+          ? "Upgrade to Champion or Team for unlimited RSVPs, or join an event's waitlist."
+          : "Pick the executive session that matters most before the period resets.",
+      metadata: { tier: opts.tier, period, limit: opts.limit, remaining },
+    }),
+  ]);
+}
+
+
 
 function detectEnv(): "sandbox" | "live" {
   const token = process.env.VITE_PAYMENTS_CLIENT_TOKEN ?? "";
