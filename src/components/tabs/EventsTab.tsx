@@ -36,9 +36,13 @@ export function EventsTab() {
   const rsvp = useServerFn(rsvpToEvent);
   const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
+  const joinWl = useServerFn(joinEventWaitlist);
+  const leaveWl = useServerFn(leaveEventWaitlist);
+  const listWl = useServerFn(listMyWaitlist);
   const quota = useEventQuota();
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
+  const [waitlistDetails, setWaitlistDetails] = useState<Record<number, { position: number; total: number; notified: boolean }>>({});
   const [authed, setAuthed] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
