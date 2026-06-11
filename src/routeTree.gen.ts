@@ -42,6 +42,7 @@ import { Route as BizzsurferNewsSlugRouteImport } from './routes/bizzsurfer-news
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
+import { Route as AdminQuotaAuditRouteImport } from './routes/admin.quota-audit'
 import { Route as AdminMarketplaceApplicationsRouteImport } from './routes/admin.marketplace-applications'
 import { Route as AdminMarketNewsRouteImport } from './routes/admin.market-news'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
@@ -229,6 +230,11 @@ const AdminSalesRoute = AdminSalesRouteImport.update({
   path: '/admin/sales',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminQuotaAuditRoute = AdminQuotaAuditRouteImport.update({
+  id: '/admin/quota-audit',
+  path: '/admin/quota-audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminMarketplaceApplicationsRoute =
   AdminMarketplaceApplicationsRouteImport.update({
     id: '/admin/marketplace-applications',
@@ -372,6 +378,7 @@ export interface FileRoutesByFullPath {
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
+  '/admin/quota-audit': typeof AdminQuotaAuditRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
@@ -428,6 +435,7 @@ export interface FileRoutesByTo {
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
+  '/admin/quota-audit': typeof AdminQuotaAuditRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
@@ -485,6 +493,7 @@ export interface FileRoutesById {
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
+  '/admin/quota-audit': typeof AdminQuotaAuditRoute
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
@@ -543,6 +552,7 @@ export interface FileRouteTypes {
     | '/admin/insights-comments'
     | '/admin/market-news'
     | '/admin/marketplace-applications'
+    | '/admin/quota-audit'
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
@@ -599,6 +609,7 @@ export interface FileRouteTypes {
     | '/admin/insights-comments'
     | '/admin/market-news'
     | '/admin/marketplace-applications'
+    | '/admin/quota-audit'
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
@@ -655,6 +666,7 @@ export interface FileRouteTypes {
     | '/admin/insights-comments'
     | '/admin/market-news'
     | '/admin/marketplace-applications'
+    | '/admin/quota-audit'
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
@@ -712,6 +724,7 @@ export interface RootRouteChildren {
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
   AdminMarketNewsRoute: typeof AdminMarketNewsRoute
   AdminMarketplaceApplicationsRoute: typeof AdminMarketplaceApplicationsRoute
+  AdminQuotaAuditRoute: typeof AdminQuotaAuditRoute
   AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
@@ -975,6 +988,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSalesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/quota-audit': {
+      id: '/admin/quota-audit'
+      path: '/admin/quota-audit'
+      fullPath: '/admin/quota-audit'
+      preLoaderRoute: typeof AdminQuotaAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/marketplace-applications': {
       id: '/admin/marketplace-applications'
       path: '/admin/marketplace-applications'
@@ -1152,6 +1172,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
   AdminMarketNewsRoute: AdminMarketNewsRoute,
   AdminMarketplaceApplicationsRoute: AdminMarketplaceApplicationsRoute,
+  AdminQuotaAuditRoute: AdminQuotaAuditRoute,
   AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
