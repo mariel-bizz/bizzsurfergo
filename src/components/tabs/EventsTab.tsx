@@ -264,6 +264,9 @@ export function EventsTab() {
 
       {view === "upcoming" && events.map((e) => {
         const isRsvped = rsvpedIds.includes(e.id);
+        const wl = waitlistDetails[e.id];
+        const onWaitlist = !!wl;
+        const quotaExhausted = quota.limit !== null && (quota.remaining ?? 0) <= 0;
         return (
           <article key={e.id} className="rounded-3xl bg-card border border-border shadow-card overflow-hidden">
             {e.image ? (
