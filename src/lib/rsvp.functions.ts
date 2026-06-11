@@ -328,6 +328,12 @@ export const cancelRsvp = createServerFn({ method: "POST" })
         }
       }
     }
+    // A spot just opened — tell the next waitlisted user (best-effort).
+    try {
+      await notifyNextWaitlisted(data.eventId);
+    } catch (err) {
+      console.error("[rsvp] notifyNextWaitlisted failed", err);
+    }
     return { ok: true };
   });
 
