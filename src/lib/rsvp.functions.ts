@@ -203,6 +203,7 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
     // already on does NOT consume a new slot (upsert is idempotent).
     const tier = await resolveUserTier(userId);
     const quota = getEventQuota(tier);
+    let usedNow = 0;
     if (quota.limit !== null) {
       const { data: existing } = await supabaseAdmin
         .from("event_rsvps")
@@ -210,13 +211,20 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
         .eq("user_id", userId)
         .eq("event_id", data.eventId)
         .maybeSingle();
-      if (!existing) {
-        const used = await countUserRsvpsInPeriod(userId, tier);
-        if (used >= quota.limit) {
-          throw new Error(
-            `You've used all ${quota.limit} event RSVPs for this ${quota.period}. Upgrade your plan to register for more.`,
-          );
-        }
+      usedNow = await countUserRsvpsInPeriod(userId, tier);
+      if (!existing && usedNow >= quota.limit) {
+        await logEnforcement({
+          userId,
+          decision: "deny",
+          reason: "quota_exhausted",
+          tier,
+          used: usedNow,
+          limit: quota.limit,
+          eventId: data.eventId,
+        });
+        throw new Error(
+          `You've used all ${quota.limit} event RSVPs for this ${quota.period}. Join the waitlist or upgrade your plan.`,
+        );
       }
     }
 
@@ -233,6 +241,36 @@ export const rsvpToEvent = createServerFn({ method: "POST" })
       { onConflict: "user_id,event_id" }
     );
     if (error) throw new Error(error.message);
+
+    await logEnforcement({
+      userId,
+      decision: "allow",
+      tier,
+      used: usedNow + 1,
+      limit: quota.limit,
+      eventId: data.eventId,
+    });
+
+    // If this RSVP brought them to 1 left or 0 left, notify (deduped per period).
+    if (quota.limit !== null) {
+      await maybeQuotaNotify({
+        userId,
+        email,
+        tier,
+        used: usedNow + 1,
+        limit: quota.limit,
+      });
+    }
+
+    // If user was on the waitlist for this event, clear it.
+    await supabaseAdmin
+      .from("event_waitlist")
+      .update({ converted_at: new Date().toISOString() })
+      .eq("user_id", userId)
+      .eq("event_id", event.id)
+      .is("converted_at", null);
+
+
 
 
     // Best-effort calendar invite + Meet link. Never break RSVP if Calendar fails.
