@@ -234,6 +234,8 @@ export function AppShell() {
           </div>
         </header>
 
+        <NotificationsBanner />
+
         <main className="mx-auto max-w-md pb-28">
           <Outlet />
         </main>
