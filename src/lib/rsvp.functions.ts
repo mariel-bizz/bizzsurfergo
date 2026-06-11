@@ -12,6 +12,7 @@ import {
 import { getCurrentPeriodBounds, getEventQuota } from "@/lib/entitlements";
 import { TIER_BY_PRICE, type Tier } from "@/hooks/useSubscription";
 import { enqueueTemplateEmail } from "@/lib/email/enqueue.server";
+import { notifyNextWaitlisted } from "@/lib/event-waitlist.functions";
 
 const rsvpInput = z.object({ eventId: z.number().int().positive() });
 const CALENDAR_ID = "primary";
