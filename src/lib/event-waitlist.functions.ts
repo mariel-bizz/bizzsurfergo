@@ -52,13 +52,70 @@ export const listMyWaitlist = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { userId } = context;
-    const { data, error } = await supabaseAdmin
+    const { data: mine, error } = await supabaseAdmin
       .from("event_waitlist")
-      .select("event_id")
-      .eq("user_id", userId);
+      .select("event_id, created_at, notified_at, converted_at")
+      .eq("user_id", userId)
+      .is("converted_at", null);
     if (error) throw new Error(error.message);
-    return { eventIds: (data ?? []).map((r) => r.event_id as number) };
+    const rows = mine ?? [];
+    const eventIds = rows.map((r) => r.event_id as number);
+    // Position = count of earlier non-converted entries +1 for this event.
+    const details: Record<number, { position: number; total: number; notified: boolean }> = {};
+    for (const r of rows) {
+      const { data: all } = await supabaseAdmin
+        .from("event_waitlist")
+        .select("user_id, created_at")
+        .eq("event_id", r.event_id)
+        .is("converted_at", null)
+        .order("created_at", { ascending: true });
+      const list = all ?? [];
+      const idx = list.findIndex((x) => x.user_id === userId);
+      details[r.event_id as number] = {
+        position: idx >= 0 ? idx + 1 : 1,
+        total: list.length,
+        notified: !!r.notified_at,
+      };
+    }
+    return { eventIds, details };
   });
+
+/** Notify just the head of the waitlist for an event (called after a cancellation). */
+export async function notifyNextWaitlisted(eventId: number): Promise<void> {
+  const event = eventsList.find((e) => e.id === eventId);
+  if (!event) return;
+  const { data: rows } = await supabaseAdmin
+    .from("event_waitlist")
+    .select("id,user_id,email")
+    .eq("event_id", eventId)
+    .is("notified_at", null)
+    .is("converted_at", null)
+    .order("created_at", { ascending: true })
+    .limit(1);
+  const row = rows?.[0];
+  if (!row) return;
+  await enqueueTemplateEmail({
+    templateName: "event-waitlist-open",
+    recipient: row.email,
+    data: {
+      eventTitle: event.title,
+      eventDate: eventDate(event).toLocaleString(),
+      rsvpUrl: `https://go.bizzsurfer.ai/events`,
+    },
+    idempotencyKey: `waitlist-open-${eventId}-${row.user_id}`,
+  });
+  await supabaseAdmin.from("user_notifications").insert({
+    user_id: row.user_id,
+    kind: "waitlist_open",
+    title: `You're next — a spot opened for "${event.title}"`,
+    body: `Confirm your RSVP now — seats are first-come, first-served.`,
+    metadata: { event_id: eventId },
+  });
+  await supabaseAdmin
+    .from("event_waitlist")
+    .update({ notified_at: new Date().toISOString() })
+    .eq("id", row.id);
+}
 
 /**
  * Notify all waitlisted users for an event that a spot is open.

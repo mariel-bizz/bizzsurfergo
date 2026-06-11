@@ -12,6 +12,7 @@ import {
 import { getCurrentPeriodBounds, getEventQuota } from "@/lib/entitlements";
 import { TIER_BY_PRICE, type Tier } from "@/hooks/useSubscription";
 import { enqueueTemplateEmail } from "@/lib/email/enqueue.server";
+import { notifyNextWaitlisted } from "@/lib/event-waitlist.functions";
 
 const rsvpInput = z.object({ eventId: z.number().int().positive() });
 const CALENDAR_ID = "primary";
@@ -326,6 +327,12 @@ export const cancelRsvp = createServerFn({ method: "POST" })
           console.error("[rsvp] removeAttendee failed", err);
         }
       }
+    }
+    // A spot just opened — tell the next waitlisted user (best-effort).
+    try {
+      await notifyNextWaitlisted(data.eventId);
+    } catch (err) {
+      console.error("[rsvp] notifyNextWaitlisted failed", err);
     }
     return { ok: true };
   });

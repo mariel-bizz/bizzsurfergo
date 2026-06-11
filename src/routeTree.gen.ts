@@ -59,6 +59,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksSyncMarketNewsRouteImport } from './routes/api/public/hooks/sync-market-news'
+import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
 import { Route as ApiPublicChatEmailSummaryRouteImport } from './routes/api/public/chat/email-summary'
@@ -322,6 +323,12 @@ const ApiPublicHooksSyncMarketNewsRoute =
     path: '/api/public/hooks/sync-market-news',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksQuotaResetRoute =
+  ApiPublicHooksQuotaResetRouteImport.update({
+    id: '/api/public/hooks/quota-reset',
+    path: '/api/public/hooks/quota-reset',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksIframeAlertCheckRoute =
   ApiPublicHooksIframeAlertCheckRouteImport.update({
     id: '/api/public/hooks/iframe-alert-check',
@@ -400,6 +407,7 @@ export interface FileRoutesByFullPath {
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
   '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -457,6 +465,7 @@ export interface FileRoutesByTo {
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
   '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -515,6 +524,7 @@ export interface FileRoutesById {
   '/api/public/chat/email-summary': typeof ApiPublicChatEmailSummaryRoute
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
+  '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
   '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -574,6 +584,7 @@ export interface FileRouteTypes {
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/hooks/quota-reset'
     | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -631,6 +642,7 @@ export interface FileRouteTypes {
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/hooks/quota-reset'
     | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -688,6 +700,7 @@ export interface FileRouteTypes {
     | '/api/public/chat/email-summary'
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
+    | '/api/public/hooks/quota-reset'
     | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -746,6 +759,7 @@ export interface RootRouteChildren {
   ApiPublicChatEmailSummaryRoute: typeof ApiPublicChatEmailSummaryRoute
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
+  ApiPublicHooksQuotaResetRoute: typeof ApiPublicHooksQuotaResetRoute
   ApiPublicHooksSyncMarketNewsRoute: typeof ApiPublicHooksSyncMarketNewsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1107,6 +1121,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncMarketNewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/quota-reset': {
+      id: '/api/public/hooks/quota-reset'
+      path: '/api/public/hooks/quota-reset'
+      fullPath: '/api/public/hooks/quota-reset'
+      preLoaderRoute: typeof ApiPublicHooksQuotaResetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/iframe-alert-check': {
       id: '/api/public/hooks/iframe-alert-check'
       path: '/api/public/hooks/iframe-alert-check'
@@ -1194,6 +1215,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicChatEmailSummaryRoute: ApiPublicChatEmailSummaryRoute,
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
+  ApiPublicHooksQuotaResetRoute: ApiPublicHooksQuotaResetRoute,
   ApiPublicHooksSyncMarketNewsRoute: ApiPublicHooksSyncMarketNewsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,

@@ -20,9 +20,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { events as eventsData, pastEvents } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
 import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
+import { joinEventWaitlist, leaveEventWaitlist, listMyWaitlist } from "@/lib/event-waitlist.functions";
 import { RsvpConfirmationDialog } from "@/components/events/RsvpConfirmationDialog";
 import { EventQuotaWidget, useEventQuota } from "@/components/events/EventQuotaWidget";
 import type { FeedEvent } from "@/lib/events-data";
+import { BellPlus, BellOff } from "lucide-react";
 
 const images: Record<number, string> = { 1: event1, 2: event2, 3: event3 };
 
@@ -34,9 +36,13 @@ export function EventsTab() {
   const rsvp = useServerFn(rsvpToEvent);
   const cancel = useServerFn(cancelRsvp);
   const listRsvps = useServerFn(listMyRsvps);
+  const joinWl = useServerFn(joinEventWaitlist);
+  const leaveWl = useServerFn(leaveEventWaitlist);
+  const listWl = useServerFn(listMyWaitlist);
   const quota = useEventQuota();
   const [rsvpedIds, setRsvpedIds] = useState<number[]>([]);
   const [meetLinks, setMeetLinks] = useState<Record<number, string>>({});
+  const [waitlistDetails, setWaitlistDetails] = useState<Record<number, { position: number; total: number; notified: boolean }>>({});
   const [authed, setAuthed] = useState(false);
   const [userEmail, setUserEmail] = useState<string>("");
   const [confirmation, setConfirmation] = useState<{ event: FeedEvent; meetLink?: string } | null>(null);
@@ -98,6 +104,9 @@ export function EventsTab() {
             setMeetLinks(r.meetLinks ?? {});
           })
           .catch(() => {});
+        listWl()
+          .then((r) => setWaitlistDetails(r.details ?? {}))
+          .catch(() => {});
       }
     });
     const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -105,7 +114,39 @@ export function EventsTab() {
       setUserEmail(session?.user?.email ?? "");
     });
     return () => sub.subscription.unsubscribe();
-  }, [listRsvps]);
+  }, [listRsvps, listWl]);
+
+  const refreshWaitlist = () =>
+    listWl().then((r) => setWaitlistDetails(r.details ?? {})).catch(() => {});
+
+  const handleJoinWaitlist = async (id: number) => {
+    if (!authed) {
+      toast.info("Sign in to join the waitlist.");
+      navigate({ to: "/login", search: { redirect: "/events" } });
+      return;
+    }
+    try {
+      await joinWl({ data: { eventId: id } });
+      toast.success("You're on the waitlist. We'll email you when a spot opens.");
+      refreshWaitlist();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not join waitlist");
+    }
+  };
+
+  const handleLeaveWaitlist = async (id: number) => {
+    try {
+      await leaveWl({ data: { eventId: id } });
+      setWaitlistDetails((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      toast.success("Removed from waitlist.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not leave waitlist");
+    }
+  };
 
   const handleRsvp = async (id: number, href: string) => {
     if (!authed) {
@@ -223,6 +264,9 @@ export function EventsTab() {
 
       {view === "upcoming" && events.map((e) => {
         const isRsvped = rsvpedIds.includes(e.id);
+        const wl = waitlistDetails[e.id];
+        const onWaitlist = !!wl;
+        const quotaExhausted = quota.limit !== null && (quota.remaining ?? 0) <= 0;
         return (
           <article key={e.id} className="rounded-3xl bg-card border border-border shadow-card overflow-hidden">
             {e.image ? (
@@ -268,6 +312,20 @@ export function EventsTab() {
                   <span className="ml-auto truncate opacity-70">{meetLinks[e.id].replace(/^https?:\/\//, "")}</span>
                 </a>
               )}
+              {onWaitlist && !isRsvped && (
+                <div className="rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-xs">
+                  <p className="font-bold text-foreground">
+                    {wl!.position === 1
+                      ? "You're next in line."
+                      : `Waitlist position #${wl!.position} of ${wl!.total}`}
+                  </p>
+                  <p className="text-muted-foreground mt-0.5">
+                    {wl!.notified
+                      ? "A spot is open — confirm your RSVP above."
+                      : `We'll email you the moment a seat opens before ${e.date}.`}
+                  </p>
+                </div>
+              )}
               <div className="flex gap-2 pt-1">
                 {isRsvped ? (
                   <Button
@@ -277,6 +335,22 @@ export function EventsTab() {
                   >
                     <Check className="w-4 h-4 mr-1 text-primary" /> RSVP'd · Cancel
                     <X className="w-3.5 h-3.5 ml-1 opacity-70" />
+                  </Button>
+                ) : onWaitlist ? (
+                  <Button
+                    onClick={() => handleLeaveWaitlist(e.id)}
+                    variant="outline"
+                    className="flex-1 h-11 font-bold border-primary/40 text-foreground"
+                  >
+                    <BellOff className="w-4 h-4 mr-1" /> On waitlist · Leave
+                  </Button>
+                ) : quotaExhausted ? (
+                  <Button
+                    onClick={() => handleJoinWaitlist(e.id)}
+                    variant="outline"
+                    className="flex-1 h-11 font-bold border-primary/40 text-foreground"
+                  >
+                    <BellPlus className="w-4 h-4 mr-1" /> Join waitlist
                   </Button>
                 ) : (
                   <Button
