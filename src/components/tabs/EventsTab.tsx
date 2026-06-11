@@ -114,7 +114,39 @@ export function EventsTab() {
       setUserEmail(session?.user?.email ?? "");
     });
     return () => sub.subscription.unsubscribe();
-  }, [listRsvps]);
+  }, [listRsvps, listWl]);
+
+  const refreshWaitlist = () =>
+    listWl().then((r) => setWaitlistDetails(r.details ?? {})).catch(() => {});
+
+  const handleJoinWaitlist = async (id: number) => {
+    if (!authed) {
+      toast.info("Sign in to join the waitlist.");
+      navigate({ to: "/login", search: { redirect: "/events" } });
+      return;
+    }
+    try {
+      await joinWl({ data: { eventId: id } });
+      toast.success("You're on the waitlist. We'll email you when a spot opens.");
+      refreshWaitlist();
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not join waitlist");
+    }
+  };
+
+  const handleLeaveWaitlist = async (id: number) => {
+    try {
+      await leaveWl({ data: { eventId: id } });
+      setWaitlistDetails((prev) => {
+        const next = { ...prev };
+        delete next[id];
+        return next;
+      });
+      toast.success("Removed from waitlist.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not leave waitlist");
+    }
+  };
 
   const handleRsvp = async (id: number, href: string) => {
     if (!authed) {
