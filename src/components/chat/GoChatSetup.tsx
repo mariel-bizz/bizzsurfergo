@@ -113,9 +113,18 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
                     <p className="text-sm font-bold text-foreground">{p.name}</p>
                   </div>
                   {locked ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
-                      <Lock className="w-3 h-3" /> Champion
-                    </span>
+                    <div className="flex flex-col items-end gap-1">
+                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
+                        <Lock className="w-3 h-3" /> Champion
+                      </span>
+                      <Link
+                        to="/pricing"
+                        onClick={(e) => e.stopPropagation()}
+                        className="text-[10px] font-extrabold uppercase tracking-wider text-primary underline"
+                      >
+                        Upgrade →
+                      </Link>
+                    </div>
                   ) : (
                     <span className="text-[11px] font-extrabold uppercase tracking-widest bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent drop-shadow-sm">INCLUDED</span>
                   )}
