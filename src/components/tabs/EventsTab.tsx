@@ -312,6 +312,20 @@ export function EventsTab() {
                   <span className="ml-auto truncate opacity-70">{meetLinks[e.id].replace(/^https?:\/\//, "")}</span>
                 </a>
               )}
+              {onWaitlist && !isRsvped && (
+                <div className="rounded-xl border border-primary/30 bg-primary/5 px-3 py-2 text-xs">
+                  <p className="font-bold text-foreground">
+                    {wl!.position === 1
+                      ? "You're next in line."
+                      : `Waitlist position #${wl!.position} of ${wl!.total}`}
+                  </p>
+                  <p className="text-muted-foreground mt-0.5">
+                    {wl!.notified
+                      ? "A spot is open — confirm your RSVP above."
+                      : `We'll email you the moment a seat opens before ${e.date}.`}
+                  </p>
+                </div>
+              )}
               <div className="flex gap-2 pt-1">
                 {isRsvped ? (
                   <Button
@@ -321,6 +335,22 @@ export function EventsTab() {
                   >
                     <Check className="w-4 h-4 mr-1 text-primary" /> RSVP'd · Cancel
                     <X className="w-3.5 h-3.5 ml-1 opacity-70" />
+                  </Button>
+                ) : onWaitlist ? (
+                  <Button
+                    onClick={() => handleLeaveWaitlist(e.id)}
+                    variant="outline"
+                    className="flex-1 h-11 font-bold border-primary/40 text-foreground"
+                  >
+                    <BellOff className="w-4 h-4 mr-1" /> On waitlist · Leave
+                  </Button>
+                ) : quotaExhausted ? (
+                  <Button
+                    onClick={() => handleJoinWaitlist(e.id)}
+                    variant="outline"
+                    className="flex-1 h-11 font-bold border-primary/40 text-foreground"
+                  >
+                    <BellPlus className="w-4 h-4 mr-1" /> Join waitlist
                   </Button>
                 ) : (
                   <Button
