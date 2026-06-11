@@ -19,6 +19,8 @@ import { template as marketplaceOrderRequest } from './marketplace-order-request
 import { template as marketplaceOrderConfirmation } from './marketplace-order-confirmation'
 import { template as adminAlert } from './admin-alert'
 import { template as checkoutConfirmation } from './checkout-confirmation'
+import { template as eventWaitlistOpen } from './event-waitlist-open'
+import { template as quotaNotification } from './quota-notification'
 
 /**
  * Template registry — maps template names to their React Email components.
@@ -34,4 +36,6 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'marketplace-order-confirmation': marketplaceOrderConfirmation,
   'admin-alert': adminAlert,
   'checkout-confirmation': checkoutConfirmation,
+  'event-waitlist-open': eventWaitlistOpen,
+  'quota-notification': quotaNotification,
 }
