@@ -96,6 +96,18 @@ const CONFIG_KEY = "bizzsurfer.gochat.config";
 const AUTOSAVE_KEY = "bizzsurfer.chat.autosave";
 const AUTOSAVE_VERSIONS_KEY = "bizzsurfer.chat.autosave.versions";
 const QUESTION_LIMIT = 5;
+const FREE_WEEKLY_LIMIT = 3;
+const WEEKLY_KEY = "bizzsurfer.chat.weekly";
+
+// ISO-week key (yyyy-Www) used to reset the Free-plan weekly counter every Monday.
+function isoWeekKey(d: Date = new Date()): string {
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
