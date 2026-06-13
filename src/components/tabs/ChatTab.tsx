@@ -936,7 +936,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     [config?.provider],
   );
 
-  const creditsLeft = Math.max(0, QUESTION_LIMIT - questionCount);
+  const creditsLeft = Math.max(0, questionLimit - questionCount);
 
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)] max-h-full">
