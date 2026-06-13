@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, X, Plus, Lock, Crown } from "lucide-react";
+import { Check, X, Plus, Crown } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import logoOpenAI from "@/assets/llm-openai.png";
 import logoClaude from "@/assets/llm-claude.png";
@@ -81,9 +81,9 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
               <div className="mt-2 rounded-xl border border-primary/30 bg-primary/5 p-3 flex items-start gap-2">
                 <Crown className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <div className="text-xs text-foreground">
-                  <p className="font-bold">Premium AI is a Champion & Team perk.</p>
+                  <p className="font-bold">Try any model — 3 free questions per week.</p>
                   <p className="text-muted-foreground mt-1">
-                    Upgrade to unlock Claude, Gemini, OpenAI, Mistral and Perplexity.{" "}
+                    Upgrade to Champion or Team for unlimited Claude, Gemini, OpenAI, Mistral and Perplexity.{" "}
                     <Link to="/pricing" className="text-primary font-bold underline">See plans</Link>
                   </p>
                 </div>
@@ -92,18 +92,14 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
           </div>
           <div className="grid grid-cols-1 gap-2">
             {PROVIDERS.map((p) => {
-              const locked = !canUsePremium;
               return (
                 <button
                   key={p.id}
-                  disabled={locked}
-                  onClick={() => !locked && setProvider(p.id)}
+                  onClick={() => setProvider(p.id)}
                   className={`flex items-center gap-3 rounded-2xl border p-3 text-left transition ${
-                    locked
-                      ? "border-border bg-muted/40 opacity-70 cursor-not-allowed"
-                      : provider === p.id
-                        ? "border-primary bg-primary/5 shadow-soft"
-                        : "border-border bg-card hover:border-primary/40"
+                    provider === p.id
+                      ? "border-primary bg-primary/5 shadow-soft"
+                      : "border-border bg-card hover:border-primary/40"
                   }`}
                 >
                   <div className="w-11 h-11 rounded-xl bg-transparent flex items-center justify-center shrink-0">
@@ -112,21 +108,10 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-bold text-foreground">{p.name}</p>
                   </div>
-                  {locked ? (
-                    <div className="flex flex-col items-end gap-1">
-                      <span className="inline-flex items-center gap-1 text-[10px] font-extrabold uppercase tracking-widest text-muted-foreground">
-                        <Lock className="w-3 h-3" /> Champion
-                      </span>
-                      <Link
-                        to="/pricing"
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-[10px] font-extrabold uppercase tracking-wider text-primary underline"
-                      >
-                        Upgrade →
-                      </Link>
-                    </div>
-                  ) : (
+                  {canUsePremium ? (
                     <span className="text-[11px] font-extrabold uppercase tracking-widest bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent drop-shadow-sm">INCLUDED</span>
+                  ) : (
+                    <span className="text-[11px] font-extrabold uppercase tracking-widest bg-[linear-gradient(90deg,#1D4ED8,#F28328)] bg-clip-text text-transparent drop-shadow-sm">FREE</span>
                   )}
                 </button>
               );
@@ -137,11 +122,16 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
               Continue
             </Button>
           ) : (
-            <Link to="/pricing" className="block">
-              <Button className="w-full rounded-md bg-gradient-agentic text-white shadow-soft h-12 text-base font-extrabold">
-                <Crown className="w-4 h-4 mr-2" /> Upgrade to unlock Premium AI
+            <div className="space-y-2">
+              <Button disabled={!provider} onClick={() => setStep(2)} className="w-full rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid">
+                Continue with 3 free / week
               </Button>
-            </Link>
+              <Link to="/pricing" className="block">
+                <Button variant="outline" className="w-full rounded-md h-11 text-sm font-bold border-2">
+                  <Crown className="w-4 h-4 mr-2" /> Upgrade for unlimited
+                </Button>
+              </Link>
+            </div>
           )}
         </section>
       )}
