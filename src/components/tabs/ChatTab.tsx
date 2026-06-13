@@ -164,6 +164,24 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [streaming, setStreaming] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [questionCount, setQuestionCount] = useState(0);
+  const questionLimit = tier === "free" ? FREE_WEEKLY_LIMIT : QUESTION_LIMIT;
+
+  // Restore Free-plan weekly count from storage; reset automatically on a new ISO week.
+  useEffect(() => {
+    if (tier !== "free" || typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(WEEKLY_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { week?: string; count?: number };
+      if (parsed?.week === isoWeekKey() && typeof parsed.count === "number") {
+        setQuestionCount(parsed.count);
+      } else {
+        window.localStorage.removeItem(WEEKLY_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [tier]);
   const [emailOpen, setEmailOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
   const [firstName, setFirstName] = useState("");
