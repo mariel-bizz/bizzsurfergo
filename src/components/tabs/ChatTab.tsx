@@ -964,9 +964,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           {config && (
             <span
               className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur px-2 py-0.5 text-[10px] font-bold shrink-0"
-              title={`${creditsLeft} of ${QUESTION_LIMIT} free credits left`}
+              title={`${creditsLeft} of ${questionLimit} ${tier === "free" ? "weekly" : "free"} credits left`}
             >
-              <Sparkle className="w-3 h-3" /> {creditsLeft}/{QUESTION_LIMIT}
+              <Sparkle className="w-3 h-3" /> {creditsLeft}/{questionLimit}
             </span>
           )}
           {config ? (
