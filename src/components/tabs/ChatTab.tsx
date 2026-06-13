@@ -96,6 +96,18 @@ const CONFIG_KEY = "bizzsurfer.gochat.config";
 const AUTOSAVE_KEY = "bizzsurfer.chat.autosave";
 const AUTOSAVE_VERSIONS_KEY = "bizzsurfer.chat.autosave.versions";
 const QUESTION_LIMIT = 5;
+const FREE_WEEKLY_LIMIT = 3;
+const WEEKLY_KEY = "bizzsurfer.chat.weekly";
+
+// ISO-week key (yyyy-Www) used to reset the Free-plan weekly counter every Monday.
+function isoWeekKey(d: Date = new Date()): string {
+  const date = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  const week = Math.ceil(((date.getTime() - yearStart.getTime()) / 86400000 + 1) / 7);
+  return `${date.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
 
 const PRESETS = [
   "How do I get my board aligned on an Agentic AI investment case?",
@@ -152,6 +164,24 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
   const [streaming, setStreaming] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [questionCount, setQuestionCount] = useState(0);
+  const questionLimit = tier === "free" ? FREE_WEEKLY_LIMIT : QUESTION_LIMIT;
+
+  // Restore Free-plan weekly count from storage; reset automatically on a new ISO week.
+  useEffect(() => {
+    if (tier !== "free" || typeof window === "undefined") return;
+    try {
+      const raw = window.localStorage.getItem(WEEKLY_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as { week?: string; count?: number };
+      if (parsed?.week === isoWeekKey() && typeof parsed.count === "number") {
+        setQuestionCount(parsed.count);
+      } else {
+        window.localStorage.removeItem(WEEKLY_KEY);
+      }
+    } catch {
+      /* ignore */
+    }
+  }, [tier]);
   const [emailOpen, setEmailOpen] = useState(false);
   const [emailValue, setEmailValue] = useState("");
   const [firstName, setFirstName] = useState("");
@@ -525,7 +555,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   const send = async (text: string) => {
     if ((!text.trim() && attachments.length === 0) || streaming) return;
-    if (questionCount >= QUESTION_LIMIT) {
+    if (questionCount >= questionLimit) {
       setEmailOpen(true);
       return;
     }
@@ -543,7 +573,17 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     // Decrement credits immediately so the header updates in real time.
     const newCount = questionCount + 1;
     setQuestionCount(newCount);
-    if (newCount >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
+    if (tier === "free" && typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem(
+          WEEKLY_KEY,
+          JSON.stringify({ week: isoWeekKey(), count: newCount }),
+        );
+      } catch {
+        /* ignore */
+      }
+    }
+    if (newCount >= questionLimit) setTimeout(() => setEmailOpen(true), 800);
 
     game.update((s) => {
       const q = s.questionsAsked + 1;
@@ -896,7 +936,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     [config?.provider],
   );
 
-  const creditsLeft = Math.max(0, QUESTION_LIMIT - questionCount);
+  const creditsLeft = Math.max(0, questionLimit - questionCount);
 
   return (
     <div className="flex flex-col h-[calc(100vh-7.5rem)] max-h-full">
@@ -924,9 +964,9 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
           {config && (
             <span
               className="inline-flex items-center gap-1 rounded-full bg-white/20 backdrop-blur px-2 py-0.5 text-[10px] font-bold shrink-0"
-              title={`${creditsLeft} of ${QUESTION_LIMIT} free credits left`}
+              title={`${creditsLeft} of ${questionLimit} ${tier === "free" ? "weekly" : "free"} credits left`}
             >
-              <Sparkle className="w-3 h-3" /> {creditsLeft}/{QUESTION_LIMIT}
+              <Sparkle className="w-3 h-3" /> {creditsLeft}/{questionLimit}
             </span>
           )}
           {config ? (
@@ -1097,10 +1137,12 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             </div>
           )}
 
-          {questionCount >= QUESTION_LIMIT && (
+          {questionCount >= questionLimit && (
             <div className="mx-4 mb-2 rounded-xl bg-accent/60 border border-primary/30 px-3 py-2 text-[11px] text-foreground flex items-center justify-between gap-2">
               <span>
-                You've used all {QUESTION_LIMIT} free credits. Unlock the full report by email.
+                {tier === "free"
+                  ? `You've used all ${questionLimit} questions for this week. Upgrade or unlock the full report by email.`
+                  : `You've used all ${questionLimit} free credits. Unlock the full report by email.`}
               </span>
               <button
                 onClick={() => setEmailOpen(true)}
@@ -1269,11 +1311,13 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
-                  questionCount >= QUESTION_LIMIT
-                    ? "Get the PDF to continue…"
+                  questionCount >= questionLimit
+                    ? tier === "free"
+                      ? "Weekly limit reached — upgrade to ask more…"
+                      : "Get the PDF to continue…"
                     : `Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`
                 }
-                disabled={streaming || questionCount >= QUESTION_LIMIT}
+                disabled={streaming || questionCount >= questionLimit}
                 className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
               />
               <Button
