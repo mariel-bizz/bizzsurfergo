@@ -1137,10 +1137,12 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
             </div>
           )}
 
-          {questionCount >= QUESTION_LIMIT && (
+          {questionCount >= questionLimit && (
             <div className="mx-4 mb-2 rounded-xl bg-accent/60 border border-primary/30 px-3 py-2 text-[11px] text-foreground flex items-center justify-between gap-2">
               <span>
-                You've used all {QUESTION_LIMIT} free credits. Unlock the full report by email.
+                {tier === "free"
+                  ? `You've used all ${questionLimit} questions for this week. Upgrade or unlock the full report by email.`
+                  : `You've used all ${questionLimit} free credits. Unlock the full report by email.`}
               </span>
               <button
                 onClick={() => setEmailOpen(true)}
