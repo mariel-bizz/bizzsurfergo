@@ -124,11 +124,11 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
           ) : (
             <div className="space-y-2">
               <Button disabled={!provider} onClick={() => setStep(2)} className="w-full rounded-md bg-gradient-primary text-primary-foreground shadow-soft hover:opacity-95 h-12 text-lg font-extrabold px-[20px] border-[#ff6f00] border-2 border-solid">
-                Continue with 3 free / week
+                Use your 3 free chats per week ↓
               </Button>
               <Link to="/pricing" className="block">
                 <Button variant="outline" className="w-full rounded-md h-11 text-sm font-bold border-2">
-                  <Crown className="w-4 h-4 mr-2" /> Upgrade for unlimited
+                  <Crown className="w-4 h-4 mr-2" /> Or Upgrade Now For Unlimited Chats 😎
                 </Button>
               </Link>
             </div>
