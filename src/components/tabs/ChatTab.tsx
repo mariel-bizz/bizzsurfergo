@@ -555,7 +555,7 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
 
   const send = async (text: string) => {
     if ((!text.trim() && attachments.length === 0) || streaming) return;
-    if (questionCount >= QUESTION_LIMIT) {
+    if (questionCount >= questionLimit) {
       setEmailOpen(true);
       return;
     }
@@ -573,7 +573,17 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
     // Decrement credits immediately so the header updates in real time.
     const newCount = questionCount + 1;
     setQuestionCount(newCount);
-    if (newCount >= QUESTION_LIMIT) setTimeout(() => setEmailOpen(true), 800);
+    if (tier === "free" && typeof window !== "undefined") {
+      try {
+        window.localStorage.setItem(
+          WEEKLY_KEY,
+          JSON.stringify({ week: isoWeekKey(), count: newCount }),
+        );
+      } catch {
+        /* ignore */
+      }
+    }
+    if (newCount >= questionLimit) setTimeout(() => setEmailOpen(true), 800);
 
     game.update((s) => {
       const q = s.questionsAsked + 1;
