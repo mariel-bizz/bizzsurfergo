@@ -1311,11 +1311,13 @@ export function ChatTab({ seedPrompt }: { seedPrompt?: string } = {}) {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={
-                  questionCount >= QUESTION_LIMIT
-                    ? "Get the PDF to continue…"
+                  questionCount >= questionLimit
+                    ? tier === "free"
+                      ? "Weekly limit reached — upgrade to ask more…"
+                      : "Get the PDF to continue…"
                     : `Ask via ${providerMeta?.name ?? "BizzSurfer Go!"}…`
                 }
-                disabled={streaming || questionCount >= QUESTION_LIMIT}
+                disabled={streaming || questionCount >= questionLimit}
                 className="flex-1 rounded-2xl bg-muted px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 disabled:opacity-60"
               />
               <Button
