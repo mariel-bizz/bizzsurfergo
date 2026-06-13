@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Check, X, Plus, Lock, Crown } from "lucide-react";
+import { Check, X, Plus, Crown } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import logoOpenAI from "@/assets/llm-openai.png";
 import logoClaude from "@/assets/llm-claude.png";
