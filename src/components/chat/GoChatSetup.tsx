@@ -81,9 +81,9 @@ export function GoChatSetup({ onComplete, canUsePremium = true }: { onComplete: 
               <div className="mt-2 rounded-xl border border-primary/30 bg-primary/5 p-3 flex items-start gap-2">
                 <Crown className="w-4 h-4 text-primary mt-0.5 shrink-0" />
                 <div className="text-xs text-foreground">
-                  <p className="font-bold">Premium AI is a Champion & Team perk.</p>
+                  <p className="font-bold">Try any model — 3 free questions per week.</p>
                   <p className="text-muted-foreground mt-1">
-                    Upgrade to unlock Claude, Gemini, OpenAI, Mistral and Perplexity.{" "}
+                    Upgrade to Champion or Team for unlimited Claude, Gemini, OpenAI, Mistral and Perplexity.{" "}
                     <Link to="/pricing" className="text-primary font-bold underline">See plans</Link>
                   </p>
                 </div>
