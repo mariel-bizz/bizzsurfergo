@@ -32,7 +32,7 @@ const HEADERS: { key: TierKey; label: string }[] = [
 
 function Cell({ value }: { value: boolean | string }) {
   if (value === true) return <Check className="w-4 h-4 text-primary mx-auto" />;
-  if (value === false) return <Minus className="w-4 h-4 text-muted-foreground/50 mx-auto" />;
+  if (value === false) return <Minus className="w-4 h-4 text-muted-foreground mx-auto" aria-label="Not included" />;
   return <span className="text-xs text-foreground">{value}</span>;
 }
 
