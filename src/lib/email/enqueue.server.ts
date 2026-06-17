@@ -4,8 +4,8 @@ import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { TEMPLATES } from "@/lib/email-templates/registry";
 
 const SITE_NAME = "bizzsurfergo";
-const SENDER_DOMAIN = "notify.bizzsurfer.com";
-const FROM_DOMAIN = "notify.bizzsurfer.com";
+const SENDER_DOMAIN = "notify.go.bizzsurfer.ai";
+const FROM_DOMAIN = "notify.go.bizzsurfer.ai";
 
 /**
  * Pre-render a registered template and push it onto the transactional email

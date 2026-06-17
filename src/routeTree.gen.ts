@@ -36,6 +36,7 @@ import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$
 import { Route as JoinTeamOwnerIdRouteImport } from './routes/join-team.$ownerId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
+import { Route as EmailUnsubscribedRouteImport } from './routes/email.unsubscribed'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as BizzsurferNewsSlugRouteImport } from './routes/bizzsurfer-news.$slug'
@@ -46,6 +47,7 @@ import { Route as AdminQuotaAuditRouteImport } from './routes/admin.quota-audit'
 import { Route as AdminMarketplaceApplicationsRouteImport } from './routes/admin.marketplace-applications'
 import { Route as AdminMarketNewsRouteImport } from './routes/admin.market-news'
 import { Route as AdminInsightsCommentsRouteImport } from './routes/admin.insights-comments'
+import { Route as AdminEmailsRouteImport } from './routes/admin.emails'
 import { Route as AdminDigestSubscribersRouteImport } from './routes/admin.digest-subscribers'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
@@ -203,6 +205,11 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
   path: '/insights/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmailUnsubscribedRoute = EmailUnsubscribedRouteImport.update({
+  id: '/email/unsubscribed',
+  path: '/email/unsubscribed',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
@@ -252,6 +259,11 @@ const AdminMarketNewsRoute = AdminMarketNewsRouteImport.update({
 const AdminInsightsCommentsRoute = AdminInsightsCommentsRouteImport.update({
   id: '/admin/insights-comments',
   path: '/admin/insights-comments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminEmailsRoute = AdminEmailsRouteImport.update({
+  id: '/admin/emails',
+  path: '/admin/emails',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminDigestSubscribersRoute = AdminDigestSubscribersRouteImport.update({
@@ -394,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
@@ -404,6 +417,7 @@ export interface FileRoutesByFullPath {
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/email/unsubscribed': typeof EmailUnsubscribedRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
@@ -454,6 +468,7 @@ export interface FileRoutesByTo {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
@@ -464,6 +479,7 @@ export interface FileRoutesByTo {
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/email/unsubscribed': typeof EmailUnsubscribedRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
@@ -515,6 +531,7 @@ export interface FileRoutesById {
   '/admin/alerts': typeof AdminAlertsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/digest-subscribers': typeof AdminDigestSubscribersRoute
+  '/admin/emails': typeof AdminEmailsRoute
   '/admin/insights-comments': typeof AdminInsightsCommentsRoute
   '/admin/market-news': typeof AdminMarketNewsRoute
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
@@ -525,6 +542,7 @@ export interface FileRoutesById {
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
+  '/email/unsubscribed': typeof EmailUnsubscribedRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
@@ -577,6 +595,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/digest-subscribers'
+    | '/admin/emails'
     | '/admin/insights-comments'
     | '/admin/market-news'
     | '/admin/marketplace-applications'
@@ -587,6 +606,7 @@ export interface FileRouteTypes {
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/email/unsubscribed'
     | '/insights/$slug'
     | '/invite/$token'
     | '/join-team/$ownerId'
@@ -637,6 +657,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/digest-subscribers'
+    | '/admin/emails'
     | '/admin/insights-comments'
     | '/admin/market-news'
     | '/admin/marketplace-applications'
@@ -647,6 +668,7 @@ export interface FileRouteTypes {
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/email/unsubscribed'
     | '/insights/$slug'
     | '/invite/$token'
     | '/join-team/$ownerId'
@@ -697,6 +719,7 @@ export interface FileRouteTypes {
     | '/admin/alerts'
     | '/admin/analytics'
     | '/admin/digest-subscribers'
+    | '/admin/emails'
     | '/admin/insights-comments'
     | '/admin/market-news'
     | '/admin/marketplace-applications'
@@ -707,6 +730,7 @@ export interface FileRouteTypes {
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
     | '/email/unsubscribe'
+    | '/email/unsubscribed'
     | '/insights/$slug'
     | '/invite/$token'
     | '/join-team/$ownerId'
@@ -758,6 +782,7 @@ export interface RootRouteChildren {
   AdminAlertsRoute: typeof AdminAlertsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminDigestSubscribersRoute: typeof AdminDigestSubscribersRoute
+  AdminEmailsRoute: typeof AdminEmailsRoute
   AdminInsightsCommentsRoute: typeof AdminInsightsCommentsRoute
   AdminMarketNewsRoute: typeof AdminMarketNewsRoute
   AdminMarketplaceApplicationsRoute: typeof AdminMarketplaceApplicationsRoute
@@ -768,6 +793,7 @@ export interface RootRouteChildren {
   BizzsurferNewsSlugRoute: typeof BizzsurferNewsSlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
+  EmailUnsubscribedRoute: typeof EmailUnsubscribedRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
   JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
@@ -986,6 +1012,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/email/unsubscribed': {
+      id: '/email/unsubscribed'
+      path: '/email/unsubscribed'
+      fullPath: '/email/unsubscribed'
+      preLoaderRoute: typeof EmailUnsubscribedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/email/unsubscribe': {
       id: '/email/unsubscribe'
       path: '/email/unsubscribe'
@@ -1054,6 +1087,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/insights-comments'
       fullPath: '/admin/insights-comments'
       preLoaderRoute: typeof AdminInsightsCommentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/emails': {
+      id: '/admin/emails'
+      path: '/admin/emails'
+      fullPath: '/admin/emails'
+      preLoaderRoute: typeof AdminEmailsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/digest-subscribers': {
@@ -1230,6 +1270,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminAlertsRoute: AdminAlertsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminDigestSubscribersRoute: AdminDigestSubscribersRoute,
+  AdminEmailsRoute: AdminEmailsRoute,
   AdminInsightsCommentsRoute: AdminInsightsCommentsRoute,
   AdminMarketNewsRoute: AdminMarketNewsRoute,
   AdminMarketplaceApplicationsRoute: AdminMarketplaceApplicationsRoute,
@@ -1240,6 +1281,7 @@ const rootRouteChildren: RootRouteChildren = {
   BizzsurferNewsSlugRoute: BizzsurferNewsSlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
+  EmailUnsubscribedRoute: EmailUnsubscribedRoute,
   InsightsSlugRoute: InsightsSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
   JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
