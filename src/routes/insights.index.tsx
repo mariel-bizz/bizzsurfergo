@@ -28,7 +28,7 @@ export const Route = createFileRoute("/insights/")({
     const blogLd = {
       "@context": "https://schema.org",
       "@type": "Blog",
-      "@id": "https://go.bizzsurfer.ai/insights#blog",
+      "@id": "https://go.bizzsurfer.ai/insights",
       name: "BizzSurfer Insights",
       description: "Playbooks, frameworks and insights for transformation leaders exploring Agentic AI.",
       url: "https://go.bizzsurfer.ai/insights",
