@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { HomeTab } from "@/components/tabs/HomeTab";
+import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
 
 const SITE = "https://go.bizzsurfer.ai";
 
@@ -26,7 +27,11 @@ export const Route = createFileRoute("/")({
           "Connect enterprise systems and let AI agents orchestrate change. Built for transformation leaders who want measurable ROI.",
       },
     ],
-    links: [{ rel: "canonical", href: `${SITE}/` }],
+    links: [
+      { rel: "canonical", href: `${SITE}/` },
+      // Preload the above-the-fold LCP image so the published page paints faster.
+      { rel: "preload", as: "image", href: eventAgenticVsAgents, fetchpriority: "high" },
+    ],
     scripts: [
       {
         type: "application/ld+json",
