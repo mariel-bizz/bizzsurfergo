@@ -17,7 +17,7 @@ import event3 from "@/assets/event-boards-csuite.png";
 import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { events as eventsData, pastEvents } from "@/lib/events-data";
+import { events as eventsData, pastEvents, eventSlug } from "@/lib/events-data";
 import { googleCalendarUrl, outlookCalendarUrl, icsDownloadUrl } from "@/lib/calendar-links";
 import { rsvpToEvent, listMyRsvps, cancelRsvp } from "@/lib/rsvp.functions";
 import { joinEventWaitlist, leaveEventWaitlist, listMyWaitlist } from "@/lib/event-waitlist.functions";
