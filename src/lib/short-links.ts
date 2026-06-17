@@ -1,5 +1,6 @@
 import { SITE, eventSlug, eventStatus, type FeedEvent } from "./events-data";
 import { slugify } from "./slugify";
+import { withBizzSuffix } from "./link-suffix";
 import type { Listing } from "./marketplace-data";
 
 /** Path-mirroring share URLs for newsletter / social. */
@@ -12,7 +13,7 @@ export function eventShareUrl(e: FeedEvent): string {
 }
 
 export function postSharePath(slug: string): string {
-  return `/insights/${slug}`;
+  return `/insights/${withBizzSuffix(slug)}`;
 }
 export function postShareUrl(slug: string): string {
   return `${SITE}${postSharePath(slug)}`;
