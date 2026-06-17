@@ -109,8 +109,7 @@ export const sendTestDeliveryEmail = createServerFn({ method: 'POST' })
   .handler(async ({ data, context }) => {
     await assertAdmin(context as any)
     const ctx = context as any
-    const { data: userRow } = await ctx.supabase.auth.getUser()
-    const callerEmail = userRow?.user?.email
+    const callerEmail = ctx.claims?.email as string | undefined
     const recipient = (data.recipientEmail || callerEmail || '').trim()
     if (!recipient) throw new Error('No recipient and caller has no email on file')
 
