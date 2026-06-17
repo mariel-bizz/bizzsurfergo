@@ -259,7 +259,7 @@ function InsightsPage() {
           <Link
             key={post.id}
             to="/insights/$slug"
-            params={{ slug: post.slug }}
+            params={{ slug: `${post.slug}-bizzsurfer` }}
             className="group block"
           >
             <Card className="h-full overflow-hidden transition hover:shadow-elegant">

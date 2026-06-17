@@ -156,16 +156,19 @@ const eventSlugMap = buildSlugMap(
 const slugByEventId = new Map<number, string>();
 for (const [slug, ev] of eventSlugMap) slugByEventId.set(ev.id, slug);
 
+import { withBizzSuffix, stripBizzSuffix } from "./link-suffix";
+
 export function eventSlug(e: FeedEvent): string {
-  return slugByEventId.get(e.id) ?? slugify(e.title) ?? String(e.id);
+  const base = slugByEventId.get(e.id) ?? slugify(e.title) ?? String(e.id);
+  return withBizzSuffix(base);
 }
 
 export function findEventBySlug(slug: string): FeedEvent | undefined {
-  return eventSlugMap.get(slug);
+  return eventSlugMap.get(slug) ?? eventSlugMap.get(stripBizzSuffix(slug));
 }
 
 export function allEventSlugs(): string[] {
-  return Array.from(eventSlugMap.keys());
+  return Array.from(eventSlugMap.keys()).map(withBizzSuffix);
 }
 
 export function isEventPast(e: FeedEvent): boolean {
