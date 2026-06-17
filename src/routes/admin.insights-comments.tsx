@@ -166,10 +166,10 @@ function ModerationPage() {
                     On{" "}
                     <Link
                       to="/insights/$slug"
-                      params={{ slug: c.article_slug }}
+                      params={{ slug: `${c.article_slug}-bizzsurfer` }}
                       className="text-primary underline-offset-2 hover:underline"
                     >
-                      /insights/{c.article_slug}
+                      /insights/{c.article_slug}-bizzsurfer
                     </Link>
                     {c.moderation_reason && (
                       <span className="ml-2 italic">— {c.moderation_reason}</span>
