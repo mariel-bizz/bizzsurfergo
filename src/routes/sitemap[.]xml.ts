@@ -1,8 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { fetchBlogPosts } from "@/lib/contentful.server";
-import { allEvents, eventSlug } from "@/lib/events-data";
+import { allEvents, eventSlug, eventStatus } from "@/lib/events-data";
 import { listings } from "@/lib/marketplace-data";
-import { slugify } from "@/lib/slugify";
 
 const SITE = "https://go.bizzsurfer.ai";
 
@@ -47,12 +46,6 @@ export const Route = createFileRoute("/sitemap.xml")({
               changefreq: "monthly",
               lastmod: (p.publishedDate || today).slice(0, 10),
             });
-            entries.push({
-              path: `/p/${p.slug}`,
-              priority: "0.5",
-              changefreq: "monthly",
-              lastmod: (p.publishedDate || today).slice(0, 10),
-            });
           }
         } catch {
           // If Contentful is unavailable, still serve the static portion.
@@ -60,7 +53,7 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         for (const e of allEvents) {
           entries.push({
-            path: `/e/${eventSlug(e)}`,
+            path: `/events/${eventStatus(e)}/${eventSlug(e)}`,
             priority: "0.7",
             changefreq: "weekly",
             lastmod: today,
@@ -69,12 +62,13 @@ export const Route = createFileRoute("/sitemap.xml")({
 
         for (const l of listings) {
           entries.push({
-            path: `/m/${slugify(l.title) || l.id}`,
+            path: `/marketplace/${l.id}`,
             priority: "0.5",
             changefreq: "monthly",
             lastmod: today,
           });
         }
+
 
 
         const urls = entries
