@@ -121,6 +121,28 @@ export function escapeXml(s: string): string {
 }
 
 import { buildSlugMap, slugify } from "./slugify";
+import eventAgenticVsAgents from "@/assets/event-agentic-ai-vs-ai-agents.png";
+import eventMariel from "@/assets/event-mariel.png";
+import eventChroPlaybook from "@/assets/event-chro-playbook.png";
+import eventBoardsCsuite from "@/assets/event-boards-csuite.png";
+
+const eventImages: Record<number, string> = {
+  1: eventAgenticVsAgents,
+  2: eventChroPlaybook,
+  3: eventBoardsCsuite,
+  101: eventMariel,
+};
+
+export function eventImage(e: FeedEvent): string | null {
+  return eventImages[e.id] ?? null;
+}
+
+export function eventImageAbsolute(e: FeedEvent): string | null {
+  const rel = eventImages[e.id];
+  if (!rel) return null;
+  if (/^https?:\/\//.test(rel)) return rel;
+  return `${SITE}${rel.startsWith("/") ? "" : "/"}${rel}`;
+}
 
 /** Combined upcoming + past events for slug-based lookups. */
 export const allEvents: FeedEvent[] = [...events, ...pastEvents];
