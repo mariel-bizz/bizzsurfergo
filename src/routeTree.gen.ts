@@ -51,6 +51,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as MarketplaceApplicationTokenRouteImport } from './routes/marketplace.application.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as EventsStatusSlugRouteImport } from './routes/events_.$status.$slug'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -278,6 +279,11 @@ const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   path: '/lovable/email/suppression',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsStatusSlugRoute = EventsStatusSlugRouteImport.update({
+  id: '/events_/$status/$slug',
+  path: '/events/$status/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
   id: '/api/public/contact',
   path: '/api/public/contact',
@@ -400,6 +406,7 @@ export interface FileRoutesByFullPath {
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/events/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
@@ -458,6 +465,7 @@ export interface FileRoutesByTo {
   '/insights': typeof InsightsIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/events/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
@@ -517,6 +525,7 @@ export interface FileRoutesById {
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/events_/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
@@ -577,6 +586,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/marketplace/'
     | '/api/public/contact'
+    | '/events/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/auth/linkedin/callback'
@@ -635,6 +645,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/marketplace'
     | '/api/public/contact'
+    | '/events/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/auth/linkedin/callback'
@@ -693,6 +704,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/marketplace/'
     | '/api/public/contact'
+    | '/events_/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/auth/linkedin/callback'
@@ -752,6 +764,7 @@ export interface RootRouteChildren {
   InsightsIndexRoute: typeof InsightsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
+  EventsStatusSlugRoute: typeof EventsStatusSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   MarketplaceApplicationTokenRoute: typeof MarketplaceApplicationTokenRoute
   ApiAuthLinkedinCallbackRoute: typeof ApiAuthLinkedinCallbackRoute
@@ -1065,6 +1078,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events_/$status/$slug': {
+      id: '/events_/$status/$slug'
+      path: '/events/$status/$slug'
+      fullPath: '/events/$status/$slug'
+      preLoaderRoute: typeof EventsStatusSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/contact': {
       id: '/api/public/contact'
       path: '/api/public/contact'
@@ -1208,6 +1228,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsIndexRoute: InsightsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
+  EventsStatusSlugRoute: EventsStatusSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   MarketplaceApplicationTokenRoute: MarketplaceApplicationTokenRoute,
   ApiAuthLinkedinCallbackRoute: ApiAuthLinkedinCallbackRoute,
