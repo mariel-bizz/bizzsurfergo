@@ -17,14 +17,14 @@ type CheckResult = { ok: boolean; missing: string[]; skipped: boolean };
 // every change to the generated tree, surfacing a clear error and a fix hint
 // instead of an opaque module-resolution crash.
 function routeFilesCheckPlugin() {
-  const run = (label) => {
-    const { ok, missing, skipped } = checkRouteFiles({ quiet: true });
+  const run = (label: string) => {
+    const { ok, missing, skipped } = checkRouteFiles({ quiet: true }) as CheckResult;
     if (skipped) return;
     if (!ok) {
       const msg =
         `[route-check] Stale src/routeTree.gen.ts (${label}). ` +
         `Missing route files:\n` +
-        missing.map((r) => `  - src/${r}`).join("\n") +
+        missing.map((r: string) => `  - src/${r}`).join("\n") +
         `\nFix: restart the dev server so TanStack Router regenerates the route tree.`;
       console.error("\n\u001b[31m" + msg + "\u001b[0m\n");
     }
