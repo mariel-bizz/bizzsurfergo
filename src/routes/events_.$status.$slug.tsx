@@ -145,6 +145,17 @@ function EventDetailPage() {
           <p className="text-lg text-muted-foreground">{e.subtitle}</p>
         </div>
 
+        {image && (
+          <div className="overflow-hidden rounded-xl border bg-card">
+            <img
+              src={image}
+              alt={e.title}
+              className="w-full h-auto block"
+              loading="eager"
+            />
+          </div>
+        )}
+
         <div className="grid sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-card">
           <InfoRow icon={Calendar} label={e.date} />
           <InfoRow icon={Clock} label={e.time} />
