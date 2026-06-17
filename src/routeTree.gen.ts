@@ -40,6 +40,7 @@ import { Route as EmailUnsubscribedRouteImport } from './routes/email.unsubscrib
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as BizzsurferNewsSlugRouteImport } from './routes/bizzsurfer-news.$slug'
+import { Route as AuthResendRouteImport } from './routes/auth.resend'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
@@ -223,6 +224,11 @@ const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
 const BizzsurferNewsSlugRoute = BizzsurferNewsSlugRouteImport.update({
   id: '/bizzsurfer-news/$slug',
   path: '/bizzsurfer-news/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthResendRoute = AuthResendRouteImport.update({
+  id: '/auth/resend',
+  path: '/auth/resend',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminStorageRoute = AdminStorageRouteImport.update({
@@ -414,6 +420,7 @@ export interface FileRoutesByFullPath {
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/auth/resend': typeof AuthResendRoute
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -476,6 +483,7 @@ export interface FileRoutesByTo {
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/auth/resend': typeof AuthResendRoute
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -539,6 +547,7 @@ export interface FileRoutesById {
   '/admin/sales': typeof AdminSalesRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
+  '/auth/resend': typeof AuthResendRoute
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
@@ -603,6 +612,7 @@ export interface FileRouteTypes {
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
+    | '/auth/resend'
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -665,6 +675,7 @@ export interface FileRouteTypes {
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
+    | '/auth/resend'
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -727,6 +738,7 @@ export interface FileRouteTypes {
     | '/admin/sales'
     | '/admin/seo'
     | '/admin/storage'
+    | '/auth/resend'
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
     | '/email/unsubscribe'
@@ -790,6 +802,7 @@ export interface RootRouteChildren {
   AdminSalesRoute: typeof AdminSalesRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
+  AuthResendRoute: typeof AuthResendRoute
   BizzsurferNewsSlugRoute: typeof BizzsurferNewsSlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
@@ -1040,6 +1053,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BizzsurferNewsSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth/resend': {
+      id: '/auth/resend'
+      path: '/auth/resend'
+      fullPath: '/auth/resend'
+      preLoaderRoute: typeof AuthResendRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/storage': {
       id: '/admin/storage'
       path: '/admin/storage'
@@ -1278,6 +1298,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminSalesRoute: AdminSalesRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
+  AuthResendRoute: AuthResendRoute,
   BizzsurferNewsSlugRoute: BizzsurferNewsSlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
