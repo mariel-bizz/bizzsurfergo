@@ -52,6 +52,7 @@ import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as MarketplaceApplicationTokenRouteImport } from './routes/marketplace.application.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
 import { Route as EventsStatusSlugRouteImport } from './routes/events_.$status.$slug'
+import { Route as ApiPublicHealthRouteImport } from './routes/api/public/health'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -284,6 +285,11 @@ const EventsStatusSlugRoute = EventsStatusSlugRouteImport.update({
   path: '/events/$status/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHealthRoute = ApiPublicHealthRouteImport.update({
+  id: '/api/public/health',
+  path: '/api/public/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
   id: '/api/public/contact',
   path: '/api/public/contact',
@@ -406,6 +412,7 @@ export interface FileRoutesByFullPath {
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/events/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
@@ -465,6 +472,7 @@ export interface FileRoutesByTo {
   '/insights': typeof InsightsIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/events/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
@@ -525,6 +533,7 @@ export interface FileRoutesById {
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/api/public/health': typeof ApiPublicHealthRoute
   '/events_/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
@@ -586,6 +595,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/marketplace/'
     | '/api/public/contact'
+    | '/api/public/health'
     | '/events/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
@@ -645,6 +655,7 @@ export interface FileRouteTypes {
     | '/insights'
     | '/marketplace'
     | '/api/public/contact'
+    | '/api/public/health'
     | '/events/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
@@ -704,6 +715,7 @@ export interface FileRouteTypes {
     | '/insights/'
     | '/marketplace/'
     | '/api/public/contact'
+    | '/api/public/health'
     | '/events_/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
@@ -764,6 +776,7 @@ export interface RootRouteChildren {
   InsightsIndexRoute: typeof InsightsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
+  ApiPublicHealthRoute: typeof ApiPublicHealthRoute
   EventsStatusSlugRoute: typeof EventsStatusSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   MarketplaceApplicationTokenRoute: typeof MarketplaceApplicationTokenRoute
@@ -1085,6 +1098,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsStatusSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/health': {
+      id: '/api/public/health'
+      path: '/api/public/health'
+      fullPath: '/api/public/health'
+      preLoaderRoute: typeof ApiPublicHealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/contact': {
       id: '/api/public/contact'
       path: '/api/public/contact'
@@ -1228,6 +1248,7 @@ const rootRouteChildren: RootRouteChildren = {
   InsightsIndexRoute: InsightsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
+  ApiPublicHealthRoute: ApiPublicHealthRoute,
   EventsStatusSlugRoute: EventsStatusSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   MarketplaceApplicationTokenRoute: MarketplaceApplicationTokenRoute,
