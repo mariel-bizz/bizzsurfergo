@@ -146,3 +146,11 @@ export function allEventSlugs(): string[] {
   return Array.from(eventSlugMap.keys());
 }
 
+export function isEventPast(e: FeedEvent): boolean {
+  return pastEvents.some((p) => p.id === e.id);
+}
+
+export function eventStatus(e: FeedEvent): "upcoming" | "past" {
+  return isEventPast(e) ? "past" : "upcoming";
+}
+

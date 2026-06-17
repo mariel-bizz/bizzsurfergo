@@ -31,15 +31,12 @@ import { Route as AtomDotxmlRouteImport } from './routes/atom[.]xml'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as MarketplaceIndexRouteImport } from './routes/marketplace.index'
 import { Route as InsightsIndexRouteImport } from './routes/insights.index'
-import { Route as PSlugRouteImport } from './routes/p.$slug'
 import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.checkout'
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
-import { Route as MSlugRouteImport } from './routes/m.$slug'
 import { Route as JoinTeamOwnerIdRouteImport } from './routes/join-team.$ownerId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
-import { Route as ESlugRouteImport } from './routes/e.$slug'
 import { Route as CheckoutReturnRouteImport } from './routes/checkout.return'
 import { Route as BizzsurferNewsSlugRouteImport } from './routes/bizzsurfer-news.$slug'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
@@ -54,6 +51,7 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin.analytics'
 import { Route as AdminAlertsRouteImport } from './routes/admin.alerts'
 import { Route as MarketplaceApplicationTokenRouteImport } from './routes/marketplace.application.$token'
 import { Route as LovableEmailSuppressionRouteImport } from './routes/lovable/email/suppression'
+import { Route as EventsStatusSlugRouteImport } from './routes/events_.$status.$slug'
 import { Route as ApiPublicContactRouteImport } from './routes/api/public/contact'
 import { Route as LovableEmailTransactionalSendRouteImport } from './routes/lovable/email/transactional/send'
 import { Route as LovableEmailTransactionalPreviewRouteImport } from './routes/lovable/email/transactional/preview'
@@ -179,11 +177,6 @@ const InsightsIndexRoute = InsightsIndexRouteImport.update({
   path: '/insights/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PSlugRoute = PSlugRouteImport.update({
-  id: '/p/$slug',
-  path: '/p/$slug',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const MarketplaceCheckoutRoute = MarketplaceCheckoutRouteImport.update({
   id: '/marketplace/checkout',
   path: '/marketplace/checkout',
@@ -192,11 +185,6 @@ const MarketplaceCheckoutRoute = MarketplaceCheckoutRouteImport.update({
 const MarketplaceListingIdRoute = MarketplaceListingIdRouteImport.update({
   id: '/marketplace/$listingId',
   path: '/marketplace/$listingId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MSlugRoute = MSlugRouteImport.update({
-  id: '/m/$slug',
-  path: '/m/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinTeamOwnerIdRoute = JoinTeamOwnerIdRouteImport.update({
@@ -217,11 +205,6 @@ const InsightsSlugRoute = InsightsSlugRouteImport.update({
 const EmailUnsubscribeRoute = EmailUnsubscribeRouteImport.update({
   id: '/email/unsubscribe',
   path: '/email/unsubscribe',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ESlugRoute = ESlugRouteImport.update({
-  id: '/e/$slug',
-  path: '/e/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CheckoutReturnRoute = CheckoutReturnRouteImport.update({
@@ -294,6 +277,11 @@ const MarketplaceApplicationTokenRoute =
 const LovableEmailSuppressionRoute = LovableEmailSuppressionRouteImport.update({
   id: '/lovable/email/suppression',
   path: '/lovable/email/suppression',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsStatusSlugRoute = EventsStatusSlugRouteImport.update({
+  id: '/events_/$status/$slug',
+  path: '/events/$status/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ApiPublicContactRoute = ApiPublicContactRouteImport.update({
@@ -409,18 +397,16 @@ export interface FileRoutesByFullPath {
   '/admin/storage': typeof AdminStorageRoute
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
-  '/e/$slug': typeof ESlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
-  '/m/$slug': typeof MSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
-  '/p/$slug': typeof PSlugRoute
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/events/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
@@ -470,18 +456,16 @@ export interface FileRoutesByTo {
   '/admin/storage': typeof AdminStorageRoute
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
-  '/e/$slug': typeof ESlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
-  '/m/$slug': typeof MSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
-  '/p/$slug': typeof PSlugRoute
   '/insights': typeof InsightsIndexRoute
   '/marketplace': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/events/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
@@ -532,18 +516,16 @@ export interface FileRoutesById {
   '/admin/storage': typeof AdminStorageRoute
   '/bizzsurfer-news/$slug': typeof BizzsurferNewsSlugRoute
   '/checkout/return': typeof CheckoutReturnRoute
-  '/e/$slug': typeof ESlugRoute
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/insights/$slug': typeof InsightsSlugRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
-  '/m/$slug': typeof MSlugRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
   '/marketplace/checkout': typeof MarketplaceCheckoutRoute
-  '/p/$slug': typeof PSlugRoute
   '/insights/': typeof InsightsIndexRoute
   '/marketplace/': typeof MarketplaceIndexRoute
   '/api/public/contact': typeof ApiPublicContactRoute
+  '/events_/$status/$slug': typeof EventsStatusSlugRoute
   '/lovable/email/suppression': typeof LovableEmailSuppressionRoute
   '/marketplace/application/$token': typeof MarketplaceApplicationTokenRoute
   '/api/auth/linkedin/callback': typeof ApiAuthLinkedinCallbackRoute
@@ -595,18 +577,16 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
-    | '/e/$slug'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/invite/$token'
     | '/join-team/$ownerId'
-    | '/m/$slug'
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
-    | '/p/$slug'
     | '/insights/'
     | '/marketplace/'
     | '/api/public/contact'
+    | '/events/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/auth/linkedin/callback'
@@ -656,18 +636,16 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
-    | '/e/$slug'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/invite/$token'
     | '/join-team/$ownerId'
-    | '/m/$slug'
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
-    | '/p/$slug'
     | '/insights'
     | '/marketplace'
     | '/api/public/contact'
+    | '/events/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/auth/linkedin/callback'
@@ -717,18 +695,16 @@ export interface FileRouteTypes {
     | '/admin/storage'
     | '/bizzsurfer-news/$slug'
     | '/checkout/return'
-    | '/e/$slug'
     | '/email/unsubscribe'
     | '/insights/$slug'
     | '/invite/$token'
     | '/join-team/$ownerId'
-    | '/m/$slug'
     | '/marketplace/$listingId'
     | '/marketplace/checkout'
-    | '/p/$slug'
     | '/insights/'
     | '/marketplace/'
     | '/api/public/contact'
+    | '/events_/$status/$slug'
     | '/lovable/email/suppression'
     | '/marketplace/application/$token'
     | '/api/auth/linkedin/callback'
@@ -779,18 +755,16 @@ export interface RootRouteChildren {
   AdminStorageRoute: typeof AdminStorageRoute
   BizzsurferNewsSlugRoute: typeof BizzsurferNewsSlugRoute
   CheckoutReturnRoute: typeof CheckoutReturnRoute
-  ESlugRoute: typeof ESlugRoute
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
   InviteTokenRoute: typeof InviteTokenRoute
   JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
-  MSlugRoute: typeof MSlugRoute
   MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
   MarketplaceCheckoutRoute: typeof MarketplaceCheckoutRoute
-  PSlugRoute: typeof PSlugRoute
   InsightsIndexRoute: typeof InsightsIndexRoute
   MarketplaceIndexRoute: typeof MarketplaceIndexRoute
   ApiPublicContactRoute: typeof ApiPublicContactRoute
+  EventsStatusSlugRoute: typeof EventsStatusSlugRoute
   LovableEmailSuppressionRoute: typeof LovableEmailSuppressionRoute
   MarketplaceApplicationTokenRoute: typeof MarketplaceApplicationTokenRoute
   ApiAuthLinkedinCallbackRoute: typeof ApiAuthLinkedinCallbackRoute
@@ -964,13 +938,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/p/$slug': {
-      id: '/p/$slug'
-      path: '/p/$slug'
-      fullPath: '/p/$slug'
-      preLoaderRoute: typeof PSlugRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/marketplace/checkout': {
       id: '/marketplace/checkout'
       path: '/marketplace/checkout'
@@ -983,13 +950,6 @@ declare module '@tanstack/react-router' {
       path: '/marketplace/$listingId'
       fullPath: '/marketplace/$listingId'
       preLoaderRoute: typeof MarketplaceListingIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/m/$slug': {
-      id: '/m/$slug'
-      path: '/m/$slug'
-      fullPath: '/m/$slug'
-      preLoaderRoute: typeof MSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join-team/$ownerId': {
@@ -1018,13 +978,6 @@ declare module '@tanstack/react-router' {
       path: '/email/unsubscribe'
       fullPath: '/email/unsubscribe'
       preLoaderRoute: typeof EmailUnsubscribeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/e/$slug': {
-      id: '/e/$slug'
-      path: '/e/$slug'
-      fullPath: '/e/$slug'
-      preLoaderRoute: typeof ESlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/checkout/return': {
@@ -1123,6 +1076,13 @@ declare module '@tanstack/react-router' {
       path: '/lovable/email/suppression'
       fullPath: '/lovable/email/suppression'
       preLoaderRoute: typeof LovableEmailSuppressionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events_/$status/$slug': {
+      id: '/events_/$status/$slug'
+      path: '/events/$status/$slug'
+      fullPath: '/events/$status/$slug'
+      preLoaderRoute: typeof EventsStatusSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/public/contact': {
@@ -1259,18 +1219,16 @@ const rootRouteChildren: RootRouteChildren = {
   AdminStorageRoute: AdminStorageRoute,
   BizzsurferNewsSlugRoute: BizzsurferNewsSlugRoute,
   CheckoutReturnRoute: CheckoutReturnRoute,
-  ESlugRoute: ESlugRoute,
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   InsightsSlugRoute: InsightsSlugRoute,
   InviteTokenRoute: InviteTokenRoute,
   JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
-  MSlugRoute: MSlugRoute,
   MarketplaceListingIdRoute: MarketplaceListingIdRoute,
   MarketplaceCheckoutRoute: MarketplaceCheckoutRoute,
-  PSlugRoute: PSlugRoute,
   InsightsIndexRoute: InsightsIndexRoute,
   MarketplaceIndexRoute: MarketplaceIndexRoute,
   ApiPublicContactRoute: ApiPublicContactRoute,
+  EventsStatusSlugRoute: EventsStatusSlugRoute,
   LovableEmailSuppressionRoute: LovableEmailSuppressionRoute,
   MarketplaceApplicationTokenRoute: MarketplaceApplicationTokenRoute,
   ApiAuthLinkedinCallbackRoute: ApiAuthLinkedinCallbackRoute,
