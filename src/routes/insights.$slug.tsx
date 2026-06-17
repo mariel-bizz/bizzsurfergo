@@ -21,10 +21,13 @@ function truncate(s: string, n: number) {
   return s.slice(0, n - 1).trimEnd() + "…";
 }
 
+import { stripBizzSuffix } from "@/lib/link-suffix";
+
 export const Route = createFileRoute("/insights/$slug")({
   loader: async ({ params }) => {
+    const canonicalSlug = stripBizzSuffix(params.slug);
     try {
-      const post = await getBlogPost({ data: { slug: params.slug } });
+      const post = await getBlogPost({ data: { slug: canonicalSlug } });
       return { post };
     } catch {
       return { post: null };
