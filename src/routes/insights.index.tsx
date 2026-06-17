@@ -82,6 +82,12 @@ function prettyCategory(c: string | null) {
     .join(" ");
 }
 
+function scrollToId(id: string) {
+  if (typeof document === "undefined") return;
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function InsightsPage() {
   const fetchPosts = useServerFn(getBlogPosts);
   const { data, isLoading, isError, error, refetch } = useQuery({
