@@ -43,6 +43,7 @@ import { Route as BizzsurferNewsSlugRouteImport } from './routes/bizzsurfer-news
 import { Route as AuthResendRouteImport } from './routes/auth.resend'
 import { Route as AdminStorageRouteImport } from './routes/admin.storage'
 import { Route as AdminSeoRouteImport } from './routes/admin.seo'
+import { Route as AdminSecurityRouteImport } from './routes/admin.security'
 import { Route as AdminSalesRouteImport } from './routes/admin.sales'
 import { Route as AdminQuotaAuditRouteImport } from './routes/admin.quota-audit'
 import { Route as AdminMarketplaceApplicationsRouteImport } from './routes/admin.marketplace-applications'
@@ -64,6 +65,7 @@ import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/em
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 import { Route as ApiPublicPaymentsWebhookRouteImport } from './routes/api/public/payments/webhook'
 import { Route as ApiPublicHooksSyncMarketNewsRouteImport } from './routes/api/public/hooks/sync-market-news'
+import { Route as ApiPublicHooksSecurityScanRouteImport } from './routes/api/public/hooks/security-scan'
 import { Route as ApiPublicHooksQuotaResetRouteImport } from './routes/api/public/hooks/quota-reset'
 import { Route as ApiPublicHooksIframeAlertCheckRouteImport } from './routes/api/public/hooks/iframe-alert-check'
 import { Route as ApiPublicEventsEventIdDoticsRouteImport } from './routes/api/public/events/$eventId[.]ics'
@@ -241,6 +243,11 @@ const AdminSeoRoute = AdminSeoRouteImport.update({
   path: '/admin/seo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminSecurityRoute = AdminSecurityRouteImport.update({
+  id: '/admin/security',
+  path: '/admin/security',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminSalesRoute = AdminSalesRouteImport.update({
   id: '/admin/sales',
   path: '/admin/sales',
@@ -353,6 +360,12 @@ const ApiPublicHooksSyncMarketNewsRoute =
     path: '/api/public/hooks/sync-market-news',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiPublicHooksSecurityScanRoute =
+  ApiPublicHooksSecurityScanRouteImport.update({
+    id: '/api/public/hooks/security-scan',
+    path: '/api/public/hooks/security-scan',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiPublicHooksQuotaResetRoute =
   ApiPublicHooksQuotaResetRouteImport.update({
     id: '/api/public/hooks/quota-reset',
@@ -418,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/quota-audit': typeof AdminQuotaAuditRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/security': typeof AdminSecurityRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/auth/resend': typeof AuthResendRoute
@@ -443,6 +457,7 @@ export interface FileRoutesByFullPath {
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
+  '/api/public/hooks/security-scan': typeof ApiPublicHooksSecurityScanRoute
   '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -481,6 +496,7 @@ export interface FileRoutesByTo {
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/quota-audit': typeof AdminQuotaAuditRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/security': typeof AdminSecurityRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/auth/resend': typeof AuthResendRoute
@@ -506,6 +522,7 @@ export interface FileRoutesByTo {
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
+  '/api/public/hooks/security-scan': typeof ApiPublicHooksSecurityScanRoute
   '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -545,6 +562,7 @@ export interface FileRoutesById {
   '/admin/marketplace-applications': typeof AdminMarketplaceApplicationsRoute
   '/admin/quota-audit': typeof AdminQuotaAuditRoute
   '/admin/sales': typeof AdminSalesRoute
+  '/admin/security': typeof AdminSecurityRoute
   '/admin/seo': typeof AdminSeoRoute
   '/admin/storage': typeof AdminStorageRoute
   '/auth/resend': typeof AuthResendRoute
@@ -570,6 +588,7 @@ export interface FileRoutesById {
   '/api/public/events/$eventId.ics': typeof ApiPublicEventsEventIdDoticsRoute
   '/api/public/hooks/iframe-alert-check': typeof ApiPublicHooksIframeAlertCheckRoute
   '/api/public/hooks/quota-reset': typeof ApiPublicHooksQuotaResetRoute
+  '/api/public/hooks/security-scan': typeof ApiPublicHooksSecurityScanRoute
   '/api/public/hooks/sync-market-news': typeof ApiPublicHooksSyncMarketNewsRoute
   '/api/public/payments/webhook': typeof ApiPublicPaymentsWebhookRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -610,6 +629,7 @@ export interface FileRouteTypes {
     | '/admin/marketplace-applications'
     | '/admin/quota-audit'
     | '/admin/sales'
+    | '/admin/security'
     | '/admin/seo'
     | '/admin/storage'
     | '/auth/resend'
@@ -635,6 +655,7 @@ export interface FileRouteTypes {
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
     | '/api/public/hooks/quota-reset'
+    | '/api/public/hooks/security-scan'
     | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -673,6 +694,7 @@ export interface FileRouteTypes {
     | '/admin/marketplace-applications'
     | '/admin/quota-audit'
     | '/admin/sales'
+    | '/admin/security'
     | '/admin/seo'
     | '/admin/storage'
     | '/auth/resend'
@@ -698,6 +720,7 @@ export interface FileRouteTypes {
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
     | '/api/public/hooks/quota-reset'
+    | '/api/public/hooks/security-scan'
     | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -736,6 +759,7 @@ export interface FileRouteTypes {
     | '/admin/marketplace-applications'
     | '/admin/quota-audit'
     | '/admin/sales'
+    | '/admin/security'
     | '/admin/seo'
     | '/admin/storage'
     | '/auth/resend'
@@ -761,6 +785,7 @@ export interface FileRouteTypes {
     | '/api/public/events/$eventId.ics'
     | '/api/public/hooks/iframe-alert-check'
     | '/api/public/hooks/quota-reset'
+    | '/api/public/hooks/security-scan'
     | '/api/public/hooks/sync-market-news'
     | '/api/public/payments/webhook'
     | '/lovable/email/auth/preview'
@@ -800,6 +825,7 @@ export interface RootRouteChildren {
   AdminMarketplaceApplicationsRoute: typeof AdminMarketplaceApplicationsRoute
   AdminQuotaAuditRoute: typeof AdminQuotaAuditRoute
   AdminSalesRoute: typeof AdminSalesRoute
+  AdminSecurityRoute: typeof AdminSecurityRoute
   AdminSeoRoute: typeof AdminSeoRoute
   AdminStorageRoute: typeof AdminStorageRoute
   AuthResendRoute: typeof AuthResendRoute
@@ -825,6 +851,7 @@ export interface RootRouteChildren {
   ApiPublicEventsEventIdDoticsRoute: typeof ApiPublicEventsEventIdDoticsRoute
   ApiPublicHooksIframeAlertCheckRoute: typeof ApiPublicHooksIframeAlertCheckRoute
   ApiPublicHooksQuotaResetRoute: typeof ApiPublicHooksQuotaResetRoute
+  ApiPublicHooksSecurityScanRoute: typeof ApiPublicHooksSecurityScanRoute
   ApiPublicHooksSyncMarketNewsRoute: typeof ApiPublicHooksSyncMarketNewsRoute
   ApiPublicPaymentsWebhookRoute: typeof ApiPublicPaymentsWebhookRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -1074,6 +1101,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminSeoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/security': {
+      id: '/admin/security'
+      path: '/admin/security'
+      fullPath: '/admin/security'
+      preLoaderRoute: typeof AdminSecurityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/sales': {
       id: '/admin/sales'
       path: '/admin/sales'
@@ -1221,6 +1255,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicHooksSyncMarketNewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/security-scan': {
+      id: '/api/public/hooks/security-scan'
+      path: '/api/public/hooks/security-scan'
+      fullPath: '/api/public/hooks/security-scan'
+      preLoaderRoute: typeof ApiPublicHooksSecurityScanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/public/hooks/quota-reset': {
       id: '/api/public/hooks/quota-reset'
       path: '/api/public/hooks/quota-reset'
@@ -1296,6 +1337,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminMarketplaceApplicationsRoute: AdminMarketplaceApplicationsRoute,
   AdminQuotaAuditRoute: AdminQuotaAuditRoute,
   AdminSalesRoute: AdminSalesRoute,
+  AdminSecurityRoute: AdminSecurityRoute,
   AdminSeoRoute: AdminSeoRoute,
   AdminStorageRoute: AdminStorageRoute,
   AuthResendRoute: AuthResendRoute,
@@ -1321,6 +1363,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicEventsEventIdDoticsRoute: ApiPublicEventsEventIdDoticsRoute,
   ApiPublicHooksIframeAlertCheckRoute: ApiPublicHooksIframeAlertCheckRoute,
   ApiPublicHooksQuotaResetRoute: ApiPublicHooksQuotaResetRoute,
+  ApiPublicHooksSecurityScanRoute: ApiPublicHooksSecurityScanRoute,
   ApiPublicHooksSyncMarketNewsRoute: ApiPublicHooksSyncMarketNewsRoute,
   ApiPublicPaymentsWebhookRoute: ApiPublicPaymentsWebhookRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,

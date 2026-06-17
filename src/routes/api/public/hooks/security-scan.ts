@@ -65,14 +65,9 @@ interface Issue {
 async function runScan(): Promise<Response> {
   const issues: Issue[] = [];
 
-  // 1. Every public table should have RLS enabled.
-  const { data: rlsRows, error: rlsErr } = await supabaseAdmin
-    .rpc("exec_sql" as never, {})
-    .then(() => ({ data: null, error: null }))
-    .catch(() => ({ data: null, error: null }));
-  // ^ no generic exec; fall back to direct queries via PostgREST-exposed views.
-  void rlsRows;
-  void rlsErr;
+  // Sentinel-table check: any of these reachable via service_role with an error
+  // matching RLS / permission denied indicates a misconfiguration.
+
 
   // Use information_schema via PostgREST is not enabled — instead, rely on the
   // curated baseline shipped in security-findings.ts and check a small set of
