@@ -80,7 +80,7 @@ export function FeaturedVideoHome() {
     <section className="px-5">
       <div className="mb-3 flex items-end justify-between">
         <h2 className="text-base font-bold uppercase tracking-wider text-foreground">Featured video</h2>
-        <Link to="/insights" hash="video-content" className="text-xs font-semibold text-primary hover:underline">
+        <Link to="/insights" className="text-xs font-semibold text-primary hover:underline">
           More videos →
         </Link>
       </div>
@@ -109,7 +109,7 @@ export function FeaturedVideoHome() {
               </Link>
             </Button>
             <Button asChild size="sm" variant="outline">
-              <Link to="/insights" hash="video-content">
+              <Link to="/insights">
                 Watch more
               </Link>
             </Button>
