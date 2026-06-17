@@ -433,46 +433,55 @@ export function EventsTab() {
               {(() => {
                 const m = e.href?.match(/linkedin\.com\/events\/(\d+)/);
                 if (!m) return null;
+                const slug = eventSlug(e);
                 return (
-                  <a
-                    href={e.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="mt-3 group block rounded-xl overflow-hidden border border-border bg-gradient-to-br from-[#0a66c2]/10 via-card to-card hover:border-[#0a66c2]/50 transition-colors"
-                  >
-                    <div className="relative overflow-hidden">
-                      <img
-                        src={eventAgenticVsAgents}
-                        alt={e.title}
-                        className="w-full h-auto block"
-                        loading="lazy"
-                      />
-                      <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
-                        <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Replay
-                      </span>
-                    </div>
-                    <div className="p-3 flex items-center gap-3">
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[11px] font-semibold uppercase tracking-wider text-[#0a66c2]">LinkedIn Event</p>
-                        <p className="text-sm font-bold text-foreground truncate">{e.title}</p>
-                        <p className="text-xs text-muted-foreground truncate">linkedin.com/events</p>
+                  <div className="mt-3 space-y-2">
+                    <Link
+                      to="/events_/$status/$slug"
+                      params={{ status: "past", slug }}
+                      className="group block rounded-xl overflow-hidden border border-border bg-gradient-to-br from-[#0a66c2]/10 via-card to-card hover:border-[#0a66c2]/50 transition-colors"
+                    >
+                      <div className="relative overflow-hidden">
+                        <img
+                          src={eventAgenticVsAgents}
+                          alt={e.title}
+                          className="w-full h-auto block"
+                          loading="lazy"
+                        />
+                        <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-black/60 backdrop-blur px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-500" /> Replay
+                        </span>
                       </div>
-                      <span className="text-xs font-semibold text-[#0a66c2] group-hover:underline shrink-0">
-                        Rewatch →
-                      </span>
-                    </div>
-                  </a>
+                      <div className="p-3 flex items-center gap-3">
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[11px] font-semibold uppercase tracking-wider text-[#0a66c2]">Event details</p>
+                          <p className="text-sm font-bold text-foreground truncate">{e.title}</p>
+                          <p className="text-xs text-muted-foreground truncate">go.bizzsurfer.ai/events/past/{slug}</p>
+                        </div>
+                        <span className="text-xs font-semibold text-primary group-hover:underline shrink-0">
+                          Open →
+                        </span>
+                      </div>
+                    </Link>
+                    <a
+                      href={e.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#0a66c2] hover:underline"
+                    >
+                      <Linkedin className="w-3.5 h-3.5" /> Watch replay on LinkedIn ↗
+                    </a>
+                  </div>
                 );
               })()}
               {e.href && e.href !== "#" && !/linkedin\.com\/events/.test(e.href) && (
-                <a
-                  href={e.href}
-                  target="_blank"
-                  rel="noreferrer"
+                <Link
+                  to="/events_/$status/$slug"
+                  params={{ status: "past", slug: eventSlug(e) }}
                   className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
                 >
-                  {e.cta} →
-                </a>
+                  Event details →
+                </Link>
               )}
             </article>
               ))}
