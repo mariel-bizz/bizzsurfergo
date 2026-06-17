@@ -119,3 +119,30 @@ export function escapeXml(s: string): string {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 }
+
+import { buildSlugMap, slugify } from "./slugify";
+
+/** Combined upcoming + past events for slug-based lookups. */
+export const allEvents: FeedEvent[] = [...events, ...pastEvents];
+
+const eventSlugMap = buildSlugMap(
+  allEvents,
+  (e) => e.title,
+  (e) => e.id,
+);
+
+const slugByEventId = new Map<number, string>();
+for (const [slug, ev] of eventSlugMap) slugByEventId.set(ev.id, slug);
+
+export function eventSlug(e: FeedEvent): string {
+  return slugByEventId.get(e.id) ?? slugify(e.title) ?? String(e.id);
+}
+
+export function findEventBySlug(slug: string): FeedEvent | undefined {
+  return eventSlugMap.get(slug);
+}
+
+export function allEventSlugs(): string[] {
+  return Array.from(eventSlugMap.keys());
+}
+
