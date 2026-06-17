@@ -124,36 +124,38 @@ function InsightsPage() {
       </header>
 
       <nav aria-label="Insights sections" className="mb-6 grid grid-cols-3 gap-2 sm:grid-cols-6">
-        <a
-          href="#blog-articles"
+        <button
+          type="button"
+          onClick={() => scrollToId("blog-articles")}
           className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <BookOpen className="h-4 w-4" />
           </span>
           <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Blog<br />articles</span>
-        </a>
-        <a
-          href="#video-content"
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollToId("video-content")}
           className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <PlayCircle className="h-4 w-4" />
           </span>
           <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Video<br />content</span>
-        </a>
-        <a
-          href="#download-resources"
+        </button>
+        <button
+          type="button"
+          onClick={() => scrollToId("download-resources")}
           className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Download className="h-4 w-4" />
           </span>
           <span className="text-xs font-bold leading-tight text-foreground group-hover:text-primary">Downloads</span>
-        </a>
+        </button>
         <Link
           to="/events"
-          hash="past"
           className="group flex flex-col items-center gap-2 rounded-2xl border border-border bg-card p-3 text-center shadow-card transition hover:border-primary/40 hover:shadow-soft"
         >
           <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
