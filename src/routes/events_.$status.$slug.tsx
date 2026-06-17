@@ -4,6 +4,8 @@ import {
   eventDate,
   eventLink,
   eventStatus,
+  eventImage,
+  eventImageAbsolute,
   type FeedEvent,
 } from "@/lib/events-data";
 import {
