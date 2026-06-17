@@ -5,7 +5,10 @@
 //     error logger plugins, and sandbox detection (port/host/strictPort).
 // You can pass additional config via defineConfig({ vite: { ... } }) if needed.
 import { defineConfig } from "@lovable.dev/vite-tanstack-config";
+// @ts-expect-error - plain JS helper, no types
 import { checkRouteFiles } from "./scripts/check-route-files.mjs";
+
+type CheckResult = { ok: boolean; missing: string[]; skipped: boolean };
 
 // Dev-time guard: TanStack Router writes src/routeTree.gen.ts based on files in
 // src/routes/. If a route file is deleted but the generated tree hasn't been
