@@ -56,18 +56,28 @@ export const Route = createFileRoute("/events_/$status/$slug")({
       };
     }
     const description = `${e.subtitle} — ${e.date} at ${e.time}. ${e.location}. Speaker: ${e.speaker}.`;
+    const ogImage = eventImageAbsolute(e);
+    const baseMeta = [
+      { title: `${e.title} — BizzSurfer Go!` },
+      { name: "description", content: description },
+      { property: "og:title", content: e.title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: e.title },
+      { name: "twitter:description", content: description },
+    ];
+    const meta = ogImage
+      ? [
+          ...baseMeta,
+          { property: "og:image", content: ogImage },
+          { property: "og:image:alt", content: e.title },
+          { name: "twitter:image", content: ogImage },
+        ]
+      : baseMeta;
     return {
-      meta: [
-        { title: `${e.title} — BizzSurfer Go!` },
-        { name: "description", content: description },
-        { property: "og:title", content: e.title },
-        { property: "og:description", content: description },
-        { property: "og:url", content: url },
-        { property: "og:type", content: "website" },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: e.title },
-        { name: "twitter:description", content: description },
-      ],
+      meta,
       links: [{ rel: "canonical", href: url }],
       scripts: [
         {
