@@ -46,9 +46,11 @@ async function main() {
   clearCaches();
 
   console.log("[dev:reset] Starting dev server…");
-  const child = spawn("vite", ["dev"], {
+  const viteBin = process.platform === "win32" ? "vite.cmd" : "vite";
+  const child = spawn(viteBin, ["dev"], {
     stdio: "inherit",
     shell: true,
+    env: { ...process.env, PATH: `${process.env.PATH}` },
   });
 
   // Wait for server to respond
