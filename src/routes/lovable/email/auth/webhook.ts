@@ -10,15 +10,9 @@ import { MagicLinkEmail } from '@/lib/email-templates/magic-link'
 import { RecoveryEmail } from '@/lib/email-templates/recovery'
 import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
+import { AUTH_BRAND, AUTH_SUBJECTS } from '@/lib/email-templates/auth-branding'
 
-const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
-}
+const EMAIL_SUBJECTS = AUTH_SUBJECTS
 
 // Template mapping
 const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
@@ -31,9 +25,9 @@ const EMAIL_TEMPLATES: Record<string, React.ComponentType<any>> = {
 }
 
 // Configuration
-const SITE_NAME = "bizzsurfergo"
+const SITE_NAME = AUTH_BRAND.siteName
 const SENDER_DOMAIN = "notify.go.bizzsurfer.ai"
-const ROOT_DOMAIN = "bizzsurfer.com"
+const ROOT_DOMAIN = "go.bizzsurfer.ai"
 const FROM_DOMAIN = "notify.go.bizzsurfer.ai"
 
 function redactEmail(email: string | null | undefined): string {
