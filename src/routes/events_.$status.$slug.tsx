@@ -4,6 +4,8 @@ import {
   eventDate,
   eventLink,
   eventStatus,
+  eventImage,
+  eventImageAbsolute,
   type FeedEvent,
 } from "@/lib/events-data";
 import {
@@ -54,18 +56,28 @@ export const Route = createFileRoute("/events_/$status/$slug")({
       };
     }
     const description = `${e.subtitle} — ${e.date} at ${e.time}. ${e.location}. Speaker: ${e.speaker}.`;
+    const ogImage = eventImageAbsolute(e);
+    const baseMeta = [
+      { title: `${e.title} — BizzSurfer Go!` },
+      { name: "description", content: description },
+      { property: "og:title", content: e.title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: url },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: e.title },
+      { name: "twitter:description", content: description },
+    ];
+    const meta = ogImage
+      ? [
+          ...baseMeta,
+          { property: "og:image", content: ogImage },
+          { property: "og:image:alt", content: e.title },
+          { name: "twitter:image", content: ogImage },
+        ]
+      : baseMeta;
     return {
-      meta: [
-        { title: `${e.title} — BizzSurfer Go!` },
-        { name: "description", content: description },
-        { property: "og:title", content: e.title },
-        { property: "og:description", content: description },
-        { property: "og:url", content: url },
-        { property: "og:type", content: "website" },
-        { name: "twitter:card", content: "summary_large_image" },
-        { name: "twitter:title", content: e.title },
-        { name: "twitter:description", content: description },
-      ],
+      meta,
       links: [{ rel: "canonical", href: url }],
       scripts: [
         {
@@ -111,6 +123,7 @@ export const Route = createFileRoute("/events_/$status/$slug")({
 function EventDetailPage() {
   const { event: e, status } = Route.useLoaderData();
   const link = eventLink(e);
+  const image = eventImage(e);
 
   return (
     <div className="min-h-screen bg-background">
@@ -131,6 +144,17 @@ function EventDetailPage() {
           </h1>
           <p className="text-lg text-muted-foreground">{e.subtitle}</p>
         </div>
+
+        {image && (
+          <div className="overflow-hidden rounded-xl border bg-card">
+            <img
+              src={image}
+              alt={e.title}
+              className="w-full h-auto block"
+              loading="eager"
+            />
+          </div>
+        )}
 
         <div className="grid sm:grid-cols-2 gap-3 p-4 rounded-xl border bg-card">
           <InfoRow icon={Calendar} label={e.date} />
@@ -171,6 +195,35 @@ function EventDetailPage() {
             </DropdownMenu>
           )}
         </div>
+
+        <nav
+          aria-label="Explore BizzSurfer Go!"
+          className="mt-8 pt-6 border-t"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            Explore more
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/">Home</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/events">All events</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/chat">Chat</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/pricing">Pricing</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/marketplace">Marketplace</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/insights">Insights</Link>
+            </Button>
+          </div>
+        </nav>
       </div>
     </div>
   );
