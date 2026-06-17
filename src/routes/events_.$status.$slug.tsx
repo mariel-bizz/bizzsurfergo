@@ -123,6 +123,7 @@ export const Route = createFileRoute("/events_/$status/$slug")({
 function EventDetailPage() {
   const { event: e, status } = Route.useLoaderData();
   const link = eventLink(e);
+  const image = eventImage(e);
 
   return (
     <div className="min-h-screen bg-background">
