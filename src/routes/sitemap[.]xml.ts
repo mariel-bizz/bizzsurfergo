@@ -41,7 +41,7 @@ export const Route = createFileRoute("/sitemap.xml")({
           const posts = await fetchBlogPosts();
           for (const p of posts) {
             entries.push({
-              path: `/insights/${p.slug}`,
+              path: `/insights/${p.slug}-bizzsurfer`,
               priority: "0.7",
               changefreq: "monthly",
               lastmod: (p.publishedDate || today).slice(0, 10),
