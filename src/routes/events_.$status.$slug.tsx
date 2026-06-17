@@ -195,6 +195,35 @@ function EventDetailPage() {
             </DropdownMenu>
           )}
         </div>
+
+        <nav
+          aria-label="Explore BizzSurfer Go!"
+          className="mt-8 pt-6 border-t"
+        >
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+            Explore more
+          </p>
+          <div className="flex flex-wrap gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link to="/">Home</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/events">All events</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/chat">Chat</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/pricing">Pricing</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/marketplace">Marketplace</Link>
+            </Button>
+            <Button asChild variant="outline" size="sm">
+              <Link to="/insights">Insights</Link>
+            </Button>
+          </div>
+        </nav>
       </div>
     </div>
   );
