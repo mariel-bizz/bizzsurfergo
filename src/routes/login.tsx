@@ -307,6 +307,13 @@ function LoginPage() {
                 : "Have an account? Sign in"}
           </button>
 
+          <div className="text-center text-xs text-muted-foreground">
+            Didn't get your email?{" "}
+            <a href="/auth/resend" className="underline hover:text-foreground">
+              Resend verification or change email
+            </a>
+          </div>
+
           {/* OAuth diagnostics panel — surfaces the exact LinkedIn callback
               URL we use for this host, plus the most recent error returned
               by /api/auth/linkedin/callback (passed via ?error=). */}
