@@ -36,7 +36,7 @@ export const Route = createFileRoute("/insights/$slug")({
   head: ({ params, loaderData }) => {
     const post = loaderData?.post ?? null;
     // Canonical points to the marketing site so SEO/views consolidate on www.bizzsurfer.com.
-    const canonical = marketingUrlForSlug(params.slug);
+    const canonical = marketingUrlForSlug(stripBizzSuffix(params.slug));
     const title = post
       ? truncate(post.metaTitle || `${post.title} — BizzSurfer`, 60)
       : "Insights — BizzSurfer Go!";
