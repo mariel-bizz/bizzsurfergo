@@ -72,6 +72,16 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
 }
 
 export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()({
+  beforeLoad: ({ location }) => {
+    // Legacy URL redirect: old shared links used a literal underscore
+    // segment (e.g. /events_/past/...). Forward to canonical /events/...
+    if (location.pathname.startsWith("/events_/")) {
+      throw redirect({
+        href: location.pathname.replace(/^\/events_\//, "/events/") + location.searchStr,
+        statusCode: 301,
+      });
+    }
+  },
   head: () => ({
     meta: [
       { charSet: "utf-8" },
