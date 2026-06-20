@@ -186,14 +186,15 @@ const richTextOptions = {
 
 function ArticlePage() {
   const { slug } = Route.useParams();
+  const canonicalSlug = stripBizzSuffix(slug);
   const fetchPost = useServerFn(getBlogPost);
   useEffect(() => {
-    trackInsightView(slug);
-  }, [slug]);
+    trackInsightView(canonicalSlug);
+  }, [canonicalSlug]);
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ["blog-post", slug],
+    queryKey: ["blog-post", canonicalSlug],
     queryFn: async () => {
-      const post = await fetchPost({ data: { slug } });
+      const post = await fetchPost({ data: { slug: canonicalSlug } });
       if (!post) throw notFound();
       return post;
     },
