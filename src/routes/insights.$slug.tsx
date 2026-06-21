@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArticleEngagement } from "@/components/insights/ArticleEngagement";
+import { ReadingProgressBar } from "@/components/insights/ReadingProgressBar";
+import { SaveArticleButton } from "@/components/insights/SaveArticleButton";
 import { trackInsightView, marketingUrlForSlug } from "@/lib/insights-engagement";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
@@ -235,12 +237,17 @@ function ArticlePage() {
 
   return (
     <article className="px-4 py-4">
-      <Link
-        to="/insights"
-        className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
-      >
-        <ArrowLeft className="h-3 w-3" /> All insights
-      </Link>
+      <ReadingProgressBar />
+      <div className="flex items-center justify-between gap-2">
+        <Link
+          to="/insights"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
+        >
+          <ArrowLeft className="h-3 w-3" /> All insights
+        </Link>
+        <SaveArticleButton slug={data.slug} />
+      </div>
+
 
       <header className="mt-3">
         {data.category && (

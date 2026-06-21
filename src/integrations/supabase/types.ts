@@ -715,6 +715,24 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_insights: {
+        Row: {
+          created_at: string
+          slug: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          slug: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          slug?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           cancel_at_period_end: boolean | null

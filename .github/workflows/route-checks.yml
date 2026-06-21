@@ -1,0 +1,24 @@
+name: Route checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
+
+jobs:
+  routes:
+    runs-on: ubuntu-latest
+    env:
+      BASE_URL: https://go.bizzsurfer.ai
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Insights routes + OG tags
+        run: node scripts/check-insights-routes.mjs
+      - name: Event routes + legacy redirects
+        run: node scripts/check-event-routes.mjs

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { pageHead } from "@/lib/page-head";
@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles, BookOpen, Video, Music2, Youtube, Download, PlayCircle } from "lucide-react";
+import { AlertTriangle, Bookmark, Calendar, Search, User, ArrowRight, Rss, Sparkles, BookOpen, Video, Music2, Youtube, Download, PlayCircle } from "lucide-react";
+import { listSavedSlugs, syncLocalToCloud } from "@/lib/saved-insights";
+import { supabase } from "@/integrations/supabase/client";
 import { DownloadResources } from "@/components/insights/DownloadResources";
 import { VideoContent } from "@/components/insights/VideoContent";
 import { WaitlistDialog } from "@/components/WaitlistDialog";
@@ -98,6 +100,25 @@ function InsightsPage() {
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
+  const [savedOnly, setSavedOnly] = useState(false);
+  const [savedSlugs, setSavedSlugs] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Sync local-only saves to the cloud once a user is signed in, then refresh list.
+  useEffect(() => {
+    let alive = true;
+    const refresh = () => listSavedSlugs().then((s) => alive && setSavedSlugs(s));
+    refresh();
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === "SIGNED_IN") await syncLocalToCloud();
+      refresh();
+    });
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -107,6 +128,7 @@ function InsightsPage() {
 
   const filtered = useMemo(() => {
     return (data || []).filter((p) => {
+      if (savedOnly && !savedSlugs.includes(p.slug)) return false;
       if (category && p.category !== category) return false;
       if (query) {
         const q = query.toLowerCase();
@@ -118,7 +140,35 @@ function InsightsPage() {
       }
       return true;
     });
-  }, [data, query, category]);
+  }, [data, query, category, savedOnly, savedSlugs]);
+
+  // Reset paging when filters change.
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [query, category, savedOnly]);
+
+  // Infinite scroll: reveal 6 more when sentinel enters viewport.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        setVisibleCount((c) => Math.min(c + 6, filtered.length));
+      }
+    }, { rootMargin: "400px" });
+    io.observe(node);
+    return () => io.disconnect();
+  }, [filtered.length]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const feedHref = `/insights/feed.xml${[
+    category ? `category=${encodeURIComponent(category)}` : null,
+    query ? `q=${encodeURIComponent(query)}` : null,
+  ].filter(Boolean).join("&") ? `?${[
+    category ? `category=${encodeURIComponent(category)}` : null,
+    query ? `q=${encodeURIComponent(query)}` : null,
+  ].filter(Boolean).join("&")}` : ""}`;
+
 
   return (
     <section className="px-4 pt-4 pb-8">
@@ -235,6 +285,30 @@ function InsightsPage() {
             ))}
           </div>
         )}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSavedOnly((s) => !s)}
+            aria-pressed={savedOnly}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition ${
+              savedOnly
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            <Bookmark className="h-3 w-3" />
+            Saved{savedSlugs.length > 0 ? ` (${savedSlugs.length})` : ""}
+          </button>
+          <a
+            href={feedHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/80"
+            title="RSS feed for the current filters"
+          >
+            <Rss className="h-3 w-3" /> RSS
+          </a>
+        </div>
       </div>
 
       {isLoading && <ListSkeleton />}
@@ -263,7 +337,7 @@ function InsightsPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {filtered.map((post) => (
+        {visible.map((post) => (
           <Link
             key={post.id}
             to="/insights/$slug"
@@ -308,6 +382,12 @@ function InsightsPage() {
           </Link>
         ))}
       </div>
+
+      {visibleCount < filtered.length && (
+        <div ref={sentinelRef} className="mt-6 flex justify-center py-4">
+          <Skeleton className="h-8 w-32" />
+        </div>
+      )}
 
       <DownloadResources />
 
