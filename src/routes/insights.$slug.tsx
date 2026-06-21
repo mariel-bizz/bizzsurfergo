@@ -3,6 +3,8 @@ import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ArticleEngagement } from "@/components/insights/ArticleEngagement";
+import { ReadingProgressBar } from "@/components/insights/ReadingProgressBar";
+import { SaveArticleButton } from "@/components/insights/SaveArticleButton";
 import { trackInsightView, marketingUrlForSlug } from "@/lib/insights-engagement";
 import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
 import { BLOCKS, INLINES, MARKS } from "@contentful/rich-text-types";
