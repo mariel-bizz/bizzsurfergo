@@ -285,6 +285,30 @@ function InsightsPage() {
             ))}
           </div>
         )}
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setSavedOnly((s) => !s)}
+            aria-pressed={savedOnly}
+            className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium transition ${
+              savedOnly
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            <Bookmark className="h-3 w-3" />
+            Saved{savedSlugs.length > 0 ? ` (${savedSlugs.length})` : ""}
+          </button>
+          <a
+            href={feedHref}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground hover:bg-muted/80"
+            title="RSS feed for the current filters"
+          >
+            <Rss className="h-3 w-3" /> RSS
+          </a>
+        </div>
       </div>
 
       {isLoading && <ListSkeleton />}
