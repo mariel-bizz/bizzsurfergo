@@ -337,7 +337,7 @@ function InsightsPage() {
       )}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        {filtered.map((post) => (
+        {visible.map((post) => (
           <Link
             key={post.id}
             to="/insights/$slug"
@@ -382,6 +382,12 @@ function InsightsPage() {
           </Link>
         ))}
       </div>
+
+      {visibleCount < filtered.length && (
+        <div ref={sentinelRef} className="mt-6 flex justify-center py-4">
+          <Skeleton className="h-8 w-32" />
+        </div>
+      )}
 
       <DownloadResources />
 
