@@ -100,6 +100,25 @@ function InsightsPage() {
 
   const [query, setQuery] = useState("");
   const [category, setCategory] = useState<string | null>(null);
+  const [savedOnly, setSavedOnly] = useState(false);
+  const [savedSlugs, setSavedSlugs] = useState<string[]>([]);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  // Sync local-only saves to the cloud once a user is signed in, then refresh list.
+  useEffect(() => {
+    let alive = true;
+    const refresh = () => listSavedSlugs().then((s) => alive && setSavedSlugs(s));
+    refresh();
+    const { data: sub } = supabase.auth.onAuthStateChange(async (event) => {
+      if (event === "SIGNED_IN") await syncLocalToCloud();
+      refresh();
+    });
+    return () => {
+      alive = false;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -109,6 +128,7 @@ function InsightsPage() {
 
   const filtered = useMemo(() => {
     return (data || []).filter((p) => {
+      if (savedOnly && !savedSlugs.includes(p.slug)) return false;
       if (category && p.category !== category) return false;
       if (query) {
         const q = query.toLowerCase();
@@ -120,7 +140,35 @@ function InsightsPage() {
       }
       return true;
     });
-  }, [data, query, category]);
+  }, [data, query, category, savedOnly, savedSlugs]);
+
+  // Reset paging when filters change.
+  useEffect(() => {
+    setVisibleCount(6);
+  }, [query, category, savedOnly]);
+
+  // Infinite scroll: reveal 6 more when sentinel enters viewport.
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const io = new IntersectionObserver((entries) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        setVisibleCount((c) => Math.min(c + 6, filtered.length));
+      }
+    }, { rootMargin: "400px" });
+    io.observe(node);
+    return () => io.disconnect();
+  }, [filtered.length]);
+
+  const visible = filtered.slice(0, visibleCount);
+  const feedHref = `/insights/feed.xml${[
+    category ? `category=${encodeURIComponent(category)}` : null,
+    query ? `q=${encodeURIComponent(query)}` : null,
+  ].filter(Boolean).join("&") ? `?${[
+    category ? `category=${encodeURIComponent(category)}` : null,
+    query ? `q=${encodeURIComponent(query)}` : null,
+  ].filter(Boolean).join("&")}` : ""}`;
+
 
   return (
     <section className="px-4 pt-4 pb-8">
