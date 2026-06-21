@@ -237,12 +237,17 @@ function ArticlePage() {
 
   return (
     <article className="px-4 py-4">
-      <Link
-        to="/insights"
-        className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
-      >
-        <ArrowLeft className="h-3 w-3" /> All insights
-      </Link>
+      <ReadingProgressBar />
+      <div className="flex items-center justify-between gap-2">
+        <Link
+          to="/insights"
+          className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-primary"
+        >
+          <ArrowLeft className="h-3 w-3" /> All insights
+        </Link>
+        <SaveArticleButton slug={data.slug} />
+      </div>
+
 
       <header className="mt-3">
         {data.category && (
