@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useRouter } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { pageHead } from "@/lib/page-head";
@@ -9,7 +9,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertTriangle, Calendar, Search, User, ArrowRight, Sparkles, BookOpen, Video, Music2, Youtube, Download, PlayCircle } from "lucide-react";
+import { AlertTriangle, Bookmark, Calendar, Search, User, ArrowRight, Rss, Sparkles, BookOpen, Video, Music2, Youtube, Download, PlayCircle } from "lucide-react";
+import { listSavedSlugs, syncLocalToCloud } from "@/lib/saved-insights";
+import { supabase } from "@/integrations/supabase/client";
 import { DownloadResources } from "@/components/insights/DownloadResources";
 import { VideoContent } from "@/components/insights/VideoContent";
 import { WaitlistDialog } from "@/components/WaitlistDialog";
