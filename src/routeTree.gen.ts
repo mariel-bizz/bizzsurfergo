@@ -35,6 +35,7 @@ import { Route as MarketplaceCheckoutRouteImport } from './routes/marketplace.ch
 import { Route as MarketplaceListingIdRouteImport } from './routes/marketplace.$listingId'
 import { Route as JoinTeamOwnerIdRouteImport } from './routes/join-team.$ownerId'
 import { Route as InviteTokenRouteImport } from './routes/invite.$token'
+import { Route as InsightsFeedDotxmlRouteImport } from './routes/insights.feed[.]xml'
 import { Route as InsightsSlugRouteImport } from './routes/insights.$slug'
 import { Route as EmailUnsubscribedRouteImport } from './routes/email.unsubscribed'
 import { Route as EmailUnsubscribeRouteImport } from './routes/email/unsubscribe'
@@ -201,6 +202,11 @@ const JoinTeamOwnerIdRoute = JoinTeamOwnerIdRouteImport.update({
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InsightsFeedDotxmlRoute = InsightsFeedDotxmlRouteImport.update({
+  id: '/insights/feed.xml',
+  path: '/insights/feed.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InsightsSlugRoute = InsightsSlugRouteImport.update({
@@ -440,6 +446,7 @@ export interface FileRoutesByFullPath {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/email/unsubscribed': typeof EmailUnsubscribedRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/insights/feed.xml': typeof InsightsFeedDotxmlRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
@@ -505,6 +512,7 @@ export interface FileRoutesByTo {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/email/unsubscribed': typeof EmailUnsubscribedRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/insights/feed.xml': typeof InsightsFeedDotxmlRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
@@ -571,6 +579,7 @@ export interface FileRoutesById {
   '/email/unsubscribe': typeof EmailUnsubscribeRoute
   '/email/unsubscribed': typeof EmailUnsubscribedRoute
   '/insights/$slug': typeof InsightsSlugRoute
+  '/insights/feed.xml': typeof InsightsFeedDotxmlRoute
   '/invite/$token': typeof InviteTokenRoute
   '/join-team/$ownerId': typeof JoinTeamOwnerIdRoute
   '/marketplace/$listingId': typeof MarketplaceListingIdRoute
@@ -638,6 +647,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/email/unsubscribed'
     | '/insights/$slug'
+    | '/insights/feed.xml'
     | '/invite/$token'
     | '/join-team/$ownerId'
     | '/marketplace/$listingId'
@@ -703,6 +713,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/email/unsubscribed'
     | '/insights/$slug'
+    | '/insights/feed.xml'
     | '/invite/$token'
     | '/join-team/$ownerId'
     | '/marketplace/$listingId'
@@ -768,6 +779,7 @@ export interface FileRouteTypes {
     | '/email/unsubscribe'
     | '/email/unsubscribed'
     | '/insights/$slug'
+    | '/insights/feed.xml'
     | '/invite/$token'
     | '/join-team/$ownerId'
     | '/marketplace/$listingId'
@@ -834,6 +846,7 @@ export interface RootRouteChildren {
   EmailUnsubscribeRoute: typeof EmailUnsubscribeRoute
   EmailUnsubscribedRoute: typeof EmailUnsubscribedRoute
   InsightsSlugRoute: typeof InsightsSlugRoute
+  InsightsFeedDotxmlRoute: typeof InsightsFeedDotxmlRoute
   InviteTokenRoute: typeof InviteTokenRoute
   JoinTeamOwnerIdRoute: typeof JoinTeamOwnerIdRoute
   MarketplaceListingIdRoute: typeof MarketplaceListingIdRoute
@@ -1043,6 +1056,13 @@ declare module '@tanstack/react-router' {
       path: '/invite/$token'
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/insights/feed.xml': {
+      id: '/insights/feed.xml'
+      path: '/insights/feed.xml'
+      fullPath: '/insights/feed.xml'
+      preLoaderRoute: typeof InsightsFeedDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/insights/$slug': {
@@ -1346,6 +1366,7 @@ const rootRouteChildren: RootRouteChildren = {
   EmailUnsubscribeRoute: EmailUnsubscribeRoute,
   EmailUnsubscribedRoute: EmailUnsubscribedRoute,
   InsightsSlugRoute: InsightsSlugRoute,
+  InsightsFeedDotxmlRoute: InsightsFeedDotxmlRoute,
   InviteTokenRoute: InviteTokenRoute,
   JoinTeamOwnerIdRoute: JoinTeamOwnerIdRoute,
   MarketplaceListingIdRoute: MarketplaceListingIdRoute,
